@@ -71,7 +71,7 @@ class _ControlesWidgetState extends State<ControlesWidget> with WidgetsBindingOb
           r'''$.id_control''',
         ).toString();
       } else {
-        print('⚠️ jsonControles está vacío - esto NO debería pasar después del login');
+        print('jsonControles está vacío - esto NO debería pasar después del login');
       }
 
       safeSetState(() {});
