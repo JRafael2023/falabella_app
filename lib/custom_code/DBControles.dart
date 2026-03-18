@@ -1,0 +1,357 @@
+import 'sqlite_helper.dart';
+import 'package:sqflite/sqflite.dart';
+import 'Control.dart';
+import 'DBControlAttachments.dart';
+
+class DBControles {
+  //       final database = await db;
+  //
+
+  static Future<String> insertControl(Control control) async {
+    try {
+      final database = await DBHelper.db;
+      if (database == null) {
+        return "Error: No se pudo acceder a la base de datos";
+      }
+
+      // Extraer attachments antes de insertar
+      final photos = control.getPhotosList();
+      final videos = control.getVideosList();
+      final archives = control.getArchivesList();
+
+      // Limpiar attachments del control antes de insertar en tabla Controles
+      control.photos = '';
+      control.video = '';
+      control.archives = '';
+
+      // Convertimos el control a un mapa y lo insertamos
+      final result = await database.insert('Controles', control.toMap());
+      if (result > 0) {
+        // Guardar attachments en tabla separada
+        if (photos.isNotEmpty) {
+          await DBControlAttachments.guardarPhotos(control.idControl, photos);
+        }
+        if (videos.isNotEmpty) {
+          await DBControlAttachments.guardarVideos(control.idControl, videos);
+        }
+        if (archives.isNotEmpty) {
+          await DBControlAttachments.guardarArchives(control.idControl, archives);
+        }
+
+        return "Control agregado correctamente";
+      } else {
+        return "Error: No se pudo agregar al Control";
+      }
+    } catch (e) {
+      print('Error al insertar control: $e');
+      return "Error al insertar control: $e";
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> listarControlesJson(
+      String idObjetivo) async {
+    final database = await DBHelper.db;
+    if (database == null) return [];
+
+    // Columnas base (siempre existen desde v8)
+    const _colsBase = [
+      'id', 'id_control', 'title', 'description', 'finding_status',
+      'walkthrough_id', 'objective_id', 'completed', 'status',
+      'titulo', 'nivel_riesgo', 'observacion', 'gerencia', 'ecosistema',
+      'fecha', 'descripcion_hallazgo', 'recomendacion', 'proceso_propuesto',
+    ];
+
+    // Columnas v19 (agregadas en migración v19)
+    const _colsV19 = [
+      'titulo_observacion', 'risk_level_id', 'publication_status_id',
+      'estado_publicacion', 'impact_type_id', 'tipo_impacto',
+      'ecosystem_support_id', 'soporte_ecosistema', 'risk_type_id',
+      'tipo_riesgo', 'risk_typology_id', 'tipologia_riesgo',
+      'gerente_responsable', 'auditor_responsable', 'descripcion_riesgo',
+      'observation_scope_id', 'alcance_observacion', 'risk_actual_level_id',
+      'riesgo_actual', 'causa_raiz',
+    ];
+
+    Future<List<Map<String, dynamic>>> _query(List<String> cols) =>
+        database.query('Controles',
+            columns: cols,
+            where: 'objective_id = ?',
+            whereArgs: [idObjetivo]);
+
+    Future<List<Map<String, dynamic>>> _buildResult(
+        List<Map<String, dynamic>> maps) async {
+      final idControles = maps.map((m) => m['id_control'] as String).toList();
+      final attachmentCounts =
+          await DBControlAttachments.contarAttachmentsPorLote(idControles);
+      return maps.map((control) {
+        final idControl = control['id_control'] as String;
+        final counts = attachmentCounts[idControl] ??
+            {'photos': 0, 'archives': 0, 'hasVideo': false};
+        return {
+          ...control,
+          'id_objective': control['objective_id'],
+          'photos': null,
+          'video': null,
+          'archives': null,
+          'photos_count': counts['photos'],
+          'archives_count': counts['archives'],
+          'has_video': (counts['hasVideo'] as bool) ? 1 : 0,
+        };
+      }).toList();
+    }
+
+    try {
+      // Intentar con columnas v19
+      final maps = await _query([..._colsBase, ..._colsV19]);
+      print("✅ listarControlesJson v19: ${maps.length} controles");
+      return _buildResult(maps);
+    } catch (_) {
+      // Fallback: DB antigua sin columnas v19 (migración pendiente)
+      try {
+        print("⚠️ listarControlesJson fallback sin v19 para $idObjetivo");
+        final maps = await _query(_colsBase);
+        print("✅ listarControlesJson base: ${maps.length} controles");
+        return _buildResult(maps);
+      } catch (e) {
+        print("❌ Error al listar controles: $e");
+        return [];
+      }
+    }
+  }
+
+  /// Obtiene un control COMPLETO con todos sus campos (incluyendo archivos grandes)
+  /// Usar solo cuando se abre un control específico
+  static Future<Map<String, dynamic>?> obtenerControlCompleto(String idControl) async {
+    try {
+      final database = await DBHelper.db;
+      if (database == null) {
+        return null;
+      }
+
+      final List<Map<String, dynamic>> maps = await database.query(
+        'Controles',
+        where: 'id_control = ?',
+        whereArgs: [idControl],
+        limit: 1,
+      );
+
+      if (maps.isNotEmpty) {
+        final control = maps.first;
+
+        // Obtener attachments desde tabla separada
+        final attachments = await DBControlAttachments.obtenerTodosAttachments(idControl);
+
+        return {
+          ...control,
+          'id_objective': control['objective_id'], // Agregar alias
+          'photos': attachments['photos'],
+          'video': attachments['video'],
+          'archives': attachments['archives'],
+        };
+      }
+
+      return null;
+    } catch (e) {
+      print("Error al obtener control completo: $e");
+      return null;
+    }
+  }
+
+  /// Obtiene solo el control_text de un control específico (campo muy grande)
+  static Future<String?> obtenerControlText(String idControl) async {
+    try {
+      final database = await DBHelper.db;
+      if (database == null) {
+        return null;
+      }
+
+      final List<Map<String, dynamic>> maps = await database.query(
+        'Controles',
+        columns: ['control_text'],
+        where: 'id_control = ?',
+        whereArgs: [idControl],
+        limit: 1,
+      );
+
+      if (maps.isNotEmpty && maps.first['control_text'] != null) {
+        return maps.first['control_text'] as String;
+      }
+
+      return null;
+    } catch (e) {
+      print("Error al obtener control_text: $e");
+      return null;
+    }
+  }
+
+  static Future<String> listarControlesJsonTodos(String idObjetivo) async {
+    try {
+      final database = await DBHelper.db;
+      if (database == null) {
+        return "vacio base datos";
+      }
+
+      // Realizamos una consulta con un filtro WHERE basado en idControl
+      final List<Map<String, dynamic>> maps = await database.query('Controles');
+
+      print("Éxito: ${maps.length} controles encontrados");
+
+      // Retornamos la lista de resultados filtrados
+      return ("Éxito: ${maps.length} controles encontrados");
+    } catch (e) {
+      print("Error al listar controles: $e");
+      return ("Error al listar controles: $e");
+    }
+  }
+
+  static Future<String> insertControlesMasivos(
+      List<Control> controles, String objectiveId) async {
+    try {
+      final database = await DBHelper.db;
+
+      if (database == null) {
+        return "Error: No se pudo acceder a la base de datos";
+      }
+
+      // Primero eliminar attachments de todos los controles del objetivo
+      final controlesExistentes = await database.query(
+        'Controles',
+        columns: ['id_control'],
+        where: 'objective_id = ?',
+        whereArgs: [objectiveId],
+      );
+
+      for (var control in controlesExistentes) {
+        final idControl = control['id_control'] as String;
+        await DBControlAttachments.eliminarTodosAttachments(idControl);
+      }
+
+      // Guardar attachments para procesar después de la transacción
+      final attachmentsToSave = <Map<String, dynamic>>[];
+
+      await database.transaction((txn) async {
+        // 1️⃣ BORRAR SOLO LOS CONTROLES DEL OBJETIVO ACTUAL
+        await txn.delete('Controles',
+            where: 'objective_id = ?', whereArgs: [objectiveId]);
+
+        // 2️⃣ INSERTAR CONTROLES NUEVOS
+        for (var control in controles) {
+          try {
+            // Extraer attachments
+            final photos = control.getPhotosList();
+            final videos = control.getVideosList();
+            final archives = control.getArchivesList();
+
+            // Guardar para después
+            if (photos.isNotEmpty || videos.isNotEmpty || archives.isNotEmpty) {
+              attachmentsToSave.add({
+                'idControl': control.idControl,
+                'photos': photos,
+                'videos': videos,
+                'archives': archives,
+              });
+            }
+
+            // Limpiar attachments antes de insertar
+            control.photos = '';
+            control.video = '';
+            control.archives = '';
+
+            await txn.insert(
+              'Controles',
+              control.toMap(),
+            );
+          } catch (e) {
+            print('Error al insertar control ${control.idControl}: $e');
+          }
+        }
+      });
+
+      // 3️⃣ GUARDAR ATTACHMENTS FUERA DE LA TRANSACCIÓN
+      print('💾 Guardando ${attachmentsToSave.length} controles con attachments...');
+      for (var attachment in attachmentsToSave) {
+        final idControl = attachment['idControl'] as String;
+        final photos = attachment['photos'] as List<String>;
+        final videos = attachment['videos'] as List<String>;
+        final archives = attachment['archives'] as List<String>;
+
+        if (photos.isNotEmpty) {
+          await DBControlAttachments.guardarPhotos(idControl, photos);
+        }
+        if (videos.isNotEmpty) {
+          await DBControlAttachments.guardarVideos(idControl, videos);
+        }
+        if (archives.isNotEmpty) {
+          await DBControlAttachments.guardarArchives(idControl, archives);
+        }
+      }
+
+      return "Controles eliminados y sincronizados correctamente";
+    } catch (e) {
+      print('Error en la sincronización de controles: $e');
+      return "Error en la sincronización de controles: $e";
+    }
+  }
+  // ⭐ AGREGAR ESTE MÉTODO DESPUÉS DE insertControl() y ANTES DE listarControlesJson()
+
+  static Future<String> updateControl(Control control) async {
+    try {
+      final database = await DBHelper.db;
+      if (database == null) {
+        return "Error: No se pudo acceder a la base de datos";
+      }
+
+      // Extraer attachments antes de actualizar
+      final photos = control.getPhotosList();
+      final videos = control.getVideosList();
+      final archives = control.getArchivesList();
+
+      // Limpiar attachments del control antes de actualizar en tabla Controles
+      control.photos = '';
+      control.video = '';
+      control.archives = '';
+
+      // Actualizamos el control en SQLite usando id_control como filtro
+      final result = await database.update(
+        'Controles',
+        control.toMap(),
+        where: 'id_control = ?',
+        whereArgs: [control.idControl],
+      );
+
+      if (result > 0) {
+        // Actualizar attachments en tabla separada
+        await DBControlAttachments.guardarPhotos(control.idControl, photos);
+        if (videos.isNotEmpty) {
+          await DBControlAttachments.guardarVideos(control.idControl, videos);
+        } else {
+          await DBControlAttachments.eliminarAttachmentsPorTipo(control.idControl, 'video');
+        }
+        await DBControlAttachments.guardarArchives(control.idControl, archives);
+
+        return "Control actualizado correctamente en SQLite";
+      } else {
+        return "Error: No se encontró el control para actualizar";
+      }
+    } catch (e) {
+      print('Error al actualizar control: $e');
+      return "Error al actualizar control: $e";
+    }
+  }
+
+  static Future<String> dropControlesTable() async {
+    try {
+      final database = await DBHelper.db;
+      if (database == null) {
+        return "Error: No se pudo acceder a la base de datos";
+      }
+
+      // Ejecutamos el comando para eliminar la tabla 'Controles'
+      await database.execute('DROP TABLE IF EXISTS Controles');
+      return "Tabla 'Controles' eliminada correctamente";
+    } catch (e) {
+      print('Error al eliminar la tabla Controles: $e');
+      return "Error al eliminar la tabla Controles: $e";
+    }
+  }
+}

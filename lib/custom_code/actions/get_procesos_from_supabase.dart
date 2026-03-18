@@ -1,0 +1,67 @@
+// Automatic FlutterFlow imports
+import '/backend/schema/structs/index.dart';
+import '/backend/schema/enums/enums.dart';
+import '/backend/supabase/supabase.dart';
+import '/actions/actions.dart' as action_blocks;
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import 'index.dart'; // Imports other custom actions
+import '/flutter_flow/custom_functions.dart'; // Imports custom functions
+import 'package:flutter/material.dart';
+// Begin custom action code
+// DO NOT REMOVE OR MODIFY THE CODE ABOVE!
+
+import 'index.dart';
+import '/flutter_flow/custom_functions.dart';
+
+import 'package:tottus/custom_code/DBProceso.dart';
+import 'package:tottus/custom_code/sqlite_helper.dart';
+
+/// Obtener todos los procesos desde Supabase
+Future<List<ProcesoStruct>> getProcesosFromSupabase() async {
+  try {
+    print('📥 Consultando procesos desde Supabase...');
+    final response = await SupaFlow.client
+        .from('Processes')
+        .select()
+        .eq('status', true)
+        .order('created_at', ascending: false);
+
+    if (response == null) {
+      print('⚠️ No hay procesos en Supabase');
+      return [];
+    }
+
+    print('📊 Respuesta de Supabase: ${response.length} registros');
+
+    final List<ProcesoStruct> procesos = [];
+
+    for (var item in (response as List)) {
+      try {
+        print('🔄 Procesando: ${item['name']} - ID: ${item['id']}');
+        final proceso = ProcesoStruct(
+          id: item['id'] as String?,
+          idProceso: (item['process_id'] as String?) ?? (item['id'] as String?),
+          nombre: item['name'] as String?,
+          createdAt: item['created_at'] != null
+              ? DateTime.parse(item['created_at'])
+              : DateTime.now(),
+          updateAt: item['updated_at'] != null
+              ? DateTime.parse(item['updated_at'])
+              : null,
+          estado: item['status'] as bool? ?? true,
+        );
+        procesos.add(proceso);
+      } catch (e) {
+        print('❌ Error procesando item: ${item['name']} - Error: $e');
+      }
+    }
+
+    print(
+        '✅ ${procesos.length} procesos obtenidos exitosamente desde Supabase');
+    return procesos;
+  } catch (e) {
+    print('❌ Error al obtener procesos desde Supabase: $e');
+    return [];
+  }
+}

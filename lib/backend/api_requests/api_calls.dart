@@ -1,0 +1,451 @@
+import 'dart:convert';
+import 'dart:typed_data';
+import '../schema/structs/index.dart';
+
+import 'package:flutter/foundation.dart';
+
+import '/flutter_flow/flutter_flow_util.dart';
+import 'api_manager.dart';
+
+export 'api_manager.dart' show ApiCallResponse;
+
+const _kPrivateApiFunctionName = 'ffPrivateApiCall';
+
+/// Start Supabase Group Code
+
+class SupabaseGroup {
+  static String getBaseUrl({
+    String? apikey = '',
+    String? auth = '',
+    String? filters = '',
+  }) =>
+      'https://rzstotbamqrwdlixzdfk.supabase.co/rest/v1';
+  static Map<String, String> headers = {
+    'apikey':
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6c3RvdGJhbXFyd2RsaXh6ZGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MzcxMzAsImV4cCI6MjA4MjUxMzEzMH0.jW9JFnKq8ePYUkHP6Ya5Y4R6wv1JzY5JabUC08N6QuA',
+    'Authorization':
+        'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6c3RvdGJhbXFyd2RsaXh6ZGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MzcxMzAsImV4cCI6MjA4MjUxMzEzMH0.jW9JFnKq8ePYUkHP6Ya5Y4R6wv1JzY5JabUC08N6QuA',
+  };
+  static GetProjectsCall getProjectsCall = GetProjectsCall();
+  static GetMatricesCall getMatricesCall = GetMatricesCall();
+  static GetUsersCall getUsersCall = GetUsersCall();
+}
+
+class GetProjectsCall {
+  Future<ApiCallResponse> call({
+    int? offset,
+    int? limit,
+    String? apikey = '',
+    String? auth = '',
+    String? filters = '',
+  }) async {
+    final baseUrl = SupabaseGroup.getBaseUrl(
+      apikey: apikey,
+      auth: auth,
+      filters: filters,
+    );
+
+    return ApiManager.instance.makeApiCall(
+      callName: 'Get Projects',
+      apiUrl: '${baseUrl}/Projects${filters}',
+      callType: ApiCallType.GET,
+      headers: {
+        'apikey':
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6c3RvdGJhbXFyd2RsaXh6ZGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MzcxMzAsImV4cCI6MjA4MjUxMzEzMH0.jW9JFnKq8ePYUkHP6Ya5Y4R6wv1JzY5JabUC08N6QuA',
+        'Authorization':
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6c3RvdGJhbXFyd2RsaXh6ZGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MzcxMzAsImV4cCI6MjA4MjUxMzEzMH0.jW9JFnKq8ePYUkHP6Ya5Y4R6wv1JzY5JabUC08N6QuA',
+      },
+      params: {},
+      returnBody: true,
+      encodeBodyUtf8: false,
+      decodeUtf8: false,
+      cache: false,
+      isStreamingApi: false,
+      alwaysAllowBody: false,
+    );
+  }
+}
+
+class GetMatricesCall {
+  Future<ApiCallResponse> call({
+    String? apikey = '',
+    String? auth = '',
+    String? filters = '',
+  }) async {
+    final baseUrl = SupabaseGroup.getBaseUrl(
+      apikey: apikey,
+      auth: auth,
+      filters: filters,
+    );
+
+    return ApiManager.instance.makeApiCall(
+      callName: 'Get Matrices',
+      apiUrl: '${baseUrl}/Matrices',
+      callType: ApiCallType.GET,
+      headers: {
+        'apikey':
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6c3RvdGJhbXFyd2RsaXh6ZGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MzcxMzAsImV4cCI6MjA4MjUxMzEzMH0.jW9JFnKq8ePYUkHP6Ya5Y4R6wv1JzY5JabUC08N6QuA',
+        'Authorization':
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6c3RvdGJhbXFyd2RsaXh6ZGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MzcxMzAsImV4cCI6MjA4MjUxMzEzMH0.jW9JFnKq8ePYUkHP6Ya5Y4R6wv1JzY5JabUC08N6QuA',
+      },
+      params: {},
+      returnBody: true,
+      encodeBodyUtf8: false,
+      decodeUtf8: false,
+      cache: false,
+      isStreamingApi: false,
+      alwaysAllowBody: false,
+    );
+  }
+}
+
+class GetUsersCall {
+  Future<ApiCallResponse> call({
+    int? offset,
+    int? limit,
+    String? apikey = '',
+    String? auth = '',
+    String? filters = '',
+  }) async {
+    final baseUrl = SupabaseGroup.getBaseUrl(
+      apikey: apikey,
+      auth: auth,
+      filters: filters,
+    );
+
+    return ApiManager.instance.makeApiCall(
+      callName: 'Get Users',
+      apiUrl: '${baseUrl}/Users${filters}',
+      callType: ApiCallType.GET,
+      headers: {
+        'apikey':
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6c3RvdGJhbXFyd2RsaXh6ZGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MzcxMzAsImV4cCI6MjA4MjUxMzEzMH0.jW9JFnKq8ePYUkHP6Ya5Y4R6wv1JzY5JabUC08N6QuA',
+        'Authorization':
+            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6c3RvdGJhbXFyd2RsaXh6ZGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5MzcxMzAsImV4cCI6MjA4MjUxMzEzMH0.jW9JFnKq8ePYUkHP6Ya5Y4R6wv1JzY5JabUC08N6QuA',
+      },
+      params: {},
+      returnBody: true,
+      encodeBodyUtf8: false,
+      decodeUtf8: false,
+      cache: false,
+      isStreamingApi: false,
+      alwaysAllowBody: false,
+    );
+  }
+}
+
+/// End Supabase Group Code
+
+/// Start Supabase Functions Group Code
+
+class SupabaseFunctionsGroup {
+  static String getBaseUrl() =>
+      'https://rzstotbamqrwdlixzdfk.supabase.co/functions/v1';
+  static Map<String, String> headers = {};
+  static GetObjetivesHighbondCall getObjetivesHighbondCall =
+      GetObjetivesHighbondCall();
+  static GetControlsDescriptionHighbondCall getControlsDescriptionHighbondCall =
+      GetControlsDescriptionHighbondCall();
+  static GetControlsWalkthroughHighbondCall getControlsWalkthroughHighbondCall =
+      GetControlsWalkthroughHighbondCall();
+  static UpdateControlHighbondCall updateControlHighbondCall =
+      UpdateControlHighbondCall();
+  static GetProjectsHighbondCall getProjectsHighbondCall =
+      GetProjectsHighbondCall();
+  static UpdateControlHighbondInefectivoCall
+      updateControlHighbondInefectivoCall =
+      UpdateControlHighbondInefectivoCall();
+  static GetTaksHighbondCall getTaksHighbondCall = GetTaksHighbondCall();
+}
+
+class GetObjetivesHighbondCall {
+  Future<ApiCallResponse> call({
+    String? idProject = '',
+  }) async {
+    final baseUrl = SupabaseFunctionsGroup.getBaseUrl();
+
+    final ffApiRequestBody = '''
+{
+  "id_project": "${escapeStringForJson(idProject)}"
+}''';
+    return ApiManager.instance.makeApiCall(
+      callName: 'Get Objetives Highbond',
+      apiUrl: '${baseUrl}/get-objetives-highbond',
+      callType: ApiCallType.POST,
+      headers: {},
+      params: {},
+      body: ffApiRequestBody,
+      bodyType: BodyType.JSON,
+      returnBody: true,
+      encodeBodyUtf8: false,
+      decodeUtf8: false,
+      cache: false,
+      isStreamingApi: false,
+      alwaysAllowBody: false,
+    );
+  }
+}
+
+class GetControlsDescriptionHighbondCall {
+  Future<ApiCallResponse> call({
+    String? apiKey =
+        '439091cb3b083581cb361802a76d20fb8a701ddbb3cd2171c926d694966c12dc',
+    String? idObjective = '',
+  }) async {
+    final baseUrl = SupabaseFunctionsGroup.getBaseUrl();
+
+    final ffApiRequestBody = '''
+{
+  "api_key": "${escapeStringForJson(apiKey)}",
+  "id_objective": "${escapeStringForJson(idObjective)}"
+}''';
+    return ApiManager.instance.makeApiCall(
+      callName: 'Get Controls Description Highbond',
+      apiUrl: '${baseUrl}/get-controls-highbond',
+      callType: ApiCallType.POST,
+      headers: {},
+      params: {},
+      body: ffApiRequestBody,
+      bodyType: BodyType.JSON,
+      returnBody: true,
+      encodeBodyUtf8: false,
+      decodeUtf8: false,
+      cache: false,
+      isStreamingApi: false,
+      alwaysAllowBody: false,
+    );
+  }
+}
+
+class GetControlsWalkthroughHighbondCall {
+  Future<ApiCallResponse> call({
+    String? apiKey =
+        '439091cb3b083581cb361802a76d20fb8a701ddbb3cd2171c926d694966c12dc',
+    String? idObjective = '',
+  }) async {
+    final baseUrl = SupabaseFunctionsGroup.getBaseUrl();
+
+    final ffApiRequestBody = '''
+{
+  "api_key": "${escapeStringForJson(apiKey)}",
+  "id_objective": "${escapeStringForJson(idObjective)}"
+}''';
+    return ApiManager.instance.makeApiCall(
+      callName: 'Get Controls Walkthrough Highbond',
+      apiUrl: '${baseUrl}/get-controls-walkthrough-highbond',
+      callType: ApiCallType.POST,
+      headers: {},
+      params: {},
+      body: ffApiRequestBody,
+      bodyType: BodyType.JSON,
+      returnBody: true,
+      encodeBodyUtf8: false,
+      decodeUtf8: false,
+      cache: false,
+      isStreamingApi: false,
+      alwaysAllowBody: false,
+    );
+  }
+}
+
+class UpdateControlHighbondCall {
+  Future<ApiCallResponse> call({
+    String? apiKey =
+        '439091cb3b083581cb361802a76d20fb8a701ddbb3cd2171c926d694966c12dc',
+    String? idWalkthrough = '',
+    String? walkthroughResults = '',
+    bool? controlDesign,
+  }) async {
+    final baseUrl = SupabaseFunctionsGroup.getBaseUrl();
+
+    final ffApiRequestBody = '''
+{
+  "api_key": "${escapeStringForJson(apiKey)}",
+  "id_walkthrough": "${escapeStringForJson(idWalkthrough)}",
+  "walkthrough_results": "${escapeStringForJson(walkthroughResults)}",
+  "control_design": ${controlDesign}
+}''';
+    return ApiManager.instance.makeApiCall(
+      callName: 'Update Control Highbond',
+      apiUrl: '${baseUrl}/patch-control-highbond',
+      callType: ApiCallType.POST,
+      headers: {},
+      params: {},
+      body: ffApiRequestBody,
+      bodyType: BodyType.JSON,
+      returnBody: true,
+      encodeBodyUtf8: false,
+      decodeUtf8: false,
+      cache: false,
+      isStreamingApi: false,
+      alwaysAllowBody: false,
+    );
+  }
+}
+
+class GetProjectsHighbondCall {
+  Future<ApiCallResponse> call({
+    String? apiKey =
+        '439091cb3b083581cb361802a76d20fb8a701ddbb3cd2171c926d694966c12dc',
+  }) async {
+    final baseUrl = SupabaseFunctionsGroup.getBaseUrl();
+
+    final ffApiRequestBody = '''
+{
+  "api_key": "${escapeStringForJson(apiKey)}"
+}''';
+    return ApiManager.instance.makeApiCall(
+      callName: 'Get Projects Highbond',
+      apiUrl: '${baseUrl}/get-projects-highbond',
+      callType: ApiCallType.POST,
+      headers: {},
+      params: {},
+      body: ffApiRequestBody,
+      bodyType: BodyType.JSON,
+      returnBody: true,
+      encodeBodyUtf8: false,
+      decodeUtf8: false,
+      cache: false,
+      isStreamingApi: false,
+      alwaysAllowBody: false,
+    );
+  }
+}
+
+class UpdateControlHighbondInefectivoCall {
+  Future<ApiCallResponse> call({
+    String? projectId = '',
+    String? idControl = '',
+    String? procesoPropuesto = '',
+    String? tituloObservacion = '',
+    String? titulo = '',
+    String? gerencia = '',
+    String? ecosistema = '',
+    String? fecha = '',
+    String? nivelRiesgo = '',
+    String? descripcion = '',
+    String? recomendacion = '',
+    List<String>? imagesList,
+    List<String>? videosList,
+    List<String>? archivosList,
+    String? projectName = '',
+    String? controlText = '',
+  }) async {
+    final baseUrl = SupabaseFunctionsGroup.getBaseUrl();
+    final images = _serializeList(imagesList);
+    final videos = _serializeList(videosList);
+    final archivos = _serializeList(archivosList);
+
+    final ffApiRequestBody = '''
+{
+  "project_name": "${escapeStringForJson(projectName)}",
+  "control_text": "${escapeStringForJson(controlText)}",
+  "project_id": "${escapeStringForJson(projectId)}",
+  "id_control": "${escapeStringForJson(idControl)}",
+  "proceso_propuesto": "${escapeStringForJson(procesoPropuesto)}",
+  "titulo_observacion": "${escapeStringForJson(tituloObservacion)}",
+  "titulo": "${escapeStringForJson(titulo)}",
+  "gerencia": "${escapeStringForJson(gerencia)}",
+  "ecosistema": "${escapeStringForJson(ecosistema)}",
+  "fecha": "${escapeStringForJson(fecha)}",
+  "nivel_riesgo": "${escapeStringForJson(nivelRiesgo)}",
+  "descripcion": "${escapeStringForJson(descripcion)}",
+  "recomendacion": "${escapeStringForJson(recomendacion)}",
+  "images": ${images},
+  "videos": ${videos},
+  "archivos": ${archivos}
+}''';
+    return ApiManager.instance.makeApiCall(
+      callName: 'Update Control Highbond Inefectivo',
+      apiUrl: '${baseUrl}/update-control-highbond-inefectivo',
+      callType: ApiCallType.POST,
+      headers: {},
+      params: {},
+      body: ffApiRequestBody,
+      bodyType: BodyType.JSON,
+      returnBody: true,
+      encodeBodyUtf8: false,
+      decodeUtf8: false,
+      cache: false,
+      isStreamingApi: false,
+      alwaysAllowBody: false,
+    );
+  }
+}
+
+class GetTaksHighbondCall {
+  Future<ApiCallResponse> call() async {
+    final baseUrl = SupabaseFunctionsGroup.getBaseUrl();
+
+    return ApiManager.instance.makeApiCall(
+      callName: 'Get Taks Highbond',
+      apiUrl: '${baseUrl}/get-task-highbond',
+      callType: ApiCallType.GET,
+      headers: {},
+      params: {},
+      returnBody: true,
+      encodeBodyUtf8: false,
+      decodeUtf8: false,
+      cache: false,
+      isStreamingApi: false,
+      alwaysAllowBody: false,
+    );
+  }
+}
+
+/// End Supabase Functions Group Code
+
+class ApiPagingParams {
+  int nextPageNumber = 0;
+  int numItems = 0;
+  dynamic lastResponse;
+
+  ApiPagingParams({
+    required this.nextPageNumber,
+    required this.numItems,
+    required this.lastResponse,
+  });
+
+  @override
+  String toString() =>
+      'PagingParams(nextPageNumber: $nextPageNumber, numItems: $numItems, lastResponse: $lastResponse,)';
+}
+
+String _toEncodable(dynamic item) {
+  return item;
+}
+
+String _serializeList(List? list) {
+  list ??= <String>[];
+  try {
+    return json.encode(list, toEncodable: _toEncodable);
+  } catch (_) {
+    if (kDebugMode) {
+      print("List serialization failed. Returning empty list.");
+    }
+    return '[]';
+  }
+}
+
+String _serializeJson(dynamic jsonVar, [bool isList = false]) {
+  jsonVar ??= (isList ? [] : {});
+  try {
+    return json.encode(jsonVar, toEncodable: _toEncodable);
+  } catch (_) {
+    if (kDebugMode) {
+      print("Json serialization failed. Returning empty json.");
+    }
+    return isList ? '[]' : '{}';
+  }
+}
+
+String? escapeStringForJson(String? input) {
+  if (input == null) {
+    return null;
+  }
+  return input
+      .replaceAll('\\', '\\\\')
+      .replaceAll('"', '\\"')
+      .replaceAll('\n', '\\n')
+      .replaceAll('\t', '\\t');
+}
