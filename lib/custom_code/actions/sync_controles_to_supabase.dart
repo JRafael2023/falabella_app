@@ -15,6 +15,7 @@ import 'index.dart'; // Imports other custom actions
 import '/custom_code/Control.dart';
 import '/custom_code/DBControles.dart';
 import '/custom_code/DBObjetivos.dart';
+import '/custom_code/DBProyectos.dart';
 import '/custom_code/sqlite_helper.dart';
 import '/backend/api_requests/api_calls.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
@@ -97,7 +98,17 @@ Future<String> syncControlesToSupabase(
       };
     }
 
-    // 5️⃣ COMPARAR Y SINCRONIZAR DIFERENCIAS
+    // 5️⃣ RESOLVER NOMBRE DEL PROYECTO DESDE SQLITE (fallback robusto)
+    String projectName = FFAppState().projectName;
+    if (projectName.isEmpty) {
+      final proyecto = await DBProyectos.getProyectoByIdProject(FFAppState().idproyect);
+      projectName = proyecto?.name ?? '';
+      if (projectName.isNotEmpty) {
+        print('📦 projectName resuelto desde SQLite: $projectName');
+      }
+    }
+
+    // 6️⃣ COMPARAR Y SINCRONIZAR DIFERENCIAS
     int sincronizados = 0;
     int omitidos = 0;
     int errores = 0;
@@ -254,18 +265,23 @@ Future<String> syncControlesToSupabase(
                 '🔄 Sincronizando $idControl (Local: completed=${controlLocal.completed}, Remoto: completed=${controlRemoto['completed']})');
 
             // PASO 1: Actualizar API HighBond (SOLO si está completado y tiene walkthroughId)
+            final projectIdValido = FFAppState().idproyect.isNotEmpty && FFAppState().idproyect != '0';
             if (controlLocal.completed &&
                 controlLocal.walkthroughId != null &&
-                controlLocal.walkthroughId!.isNotEmpty) {
+                controlLocal.walkthroughId!.isNotEmpty &&
+                projectIdValido) {
               try {
-                // 🔹 SI ES INEFECTIVO (findingStatus == 0) → Llamar API Inefectivo primero
-                if (controlLocal.findingStatus == 0) {
-                  print('🔄 Llamando API Inefectivo para $idControl');
+                // 🔹 SI TIENE ADJUNTOS (EFECTIVO o INEFECTIVO) → Llamar API de evidencias
+                List<String>? photosList = controlLocal.getPhotosList();
+                List<String>? videosList = controlLocal.getVideosList();
+                List<String>? archivosList = controlLocal.getArchivesList();
 
-                  // 🔓 Descomprimir imágenes GZIP antes de enviar a HighBond
-                  List<String>? photosList = controlLocal.getPhotosList();
-                  List<String>? videosList = controlLocal.getVideosList();
-                  List<String>? archivosList = controlLocal.getArchivesList();
+                final tieneAdjuntos = (photosList != null && photosList.isNotEmpty) ||
+                    (videosList != null && videosList.isNotEmpty) ||
+                    (archivosList != null && archivosList.isNotEmpty);
+
+                if (controlLocal.findingStatus == 0 || tieneAdjuntos) {
+                  print('🔄 Llamando API de evidencias para $idControl (findingStatus=${controlLocal.findingStatus}, adjuntos=$tieneAdjuntos)');
 
                   final apiInefectivoResponse = await SupabaseFunctionsGroup
                       .updateControlHighbondInefectivoCall
@@ -284,13 +300,13 @@ Future<String> syncControlesToSupabase(
                     imagesList: functions.decompressGzipBase64List(photosList),
                     videosList: functions.decompressGzipBase64List(videosList),
                     archivosList: functions.decompressGzipBase64List(archivosList),
-                    projectName: FFAppState().projectName,
+                    projectName: projectName,
                     controlText: controlLocal.title,
                   );
 
                   if (!apiInefectivoResponse.succeeded) {
                     print(
-                        '⚠️ API Inefectivo HighBond falló para $idControl, continuando...');
+                        '⚠️ API evidencias HighBond falló para $idControl, continuando...');
                     highbondFallo = true;
                   }
                 }
@@ -299,7 +315,9 @@ Future<String> syncControlesToSupabase(
                 final apiResponse =
                     await SupabaseFunctionsGroup.updateControlHighbondCall.call(
                   idWalkthrough: controlLocal.walkthroughId,
-                  walkthroughResults: controlLocal.description,
+                  walkthroughResults: (controlLocal.controlText != null && controlLocal.controlText!.isNotEmpty)
+                      ? controlLocal.controlText!
+                      : controlLocal.description,
                   controlDesign: controlLocal.findingStatus ==
                       1, // 1 = Efectivo, 0 = Inefectivo
                 );

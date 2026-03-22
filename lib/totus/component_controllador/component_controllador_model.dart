@@ -155,6 +155,8 @@ class ComponentControlladorModel
   ApiCallResponse? updateControlAPIEfectgivo;
   // Stores action output result for [Backend Call - API (Update Control Highbond)] action in btnGuardarControl widget.
   ApiCallResponse? updateControlInefectivosinImagenes;
+  // Stores action output result for [Backend Call - API (Update Control Highbond Inefectivo)] action in btnGuardarControl widget.
+  ApiCallResponse? apiResultInefectivoSinAdjuntos;
   // Stores action output result for [Custom Action - sqlLiteListControles] action in btnGuardarControl widget.
   List<dynamic>? sqliListInefectivono;
   // Stores action output result for [Custom Action - sqlLiteListControles] action in btnGuardarControl widget.

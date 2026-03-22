@@ -221,7 +221,7 @@ class DBProyectos {
       if (db == null) return "Error: DB no disponible";
 
       int nuevos = 0;
-      int ignorados = 0;
+      int actualizados = 0;
 
       for (final proyecto in proyectos) {
         final existe = await existeProyecto(proyecto.idProject);
@@ -234,11 +234,23 @@ class DBProyectos {
           );
           nuevos++;
         } else {
-          ignorados++;
+          // ✅ Actualizar progress desde Supabase para mantenerlo sincronizado
+          // Esto evita que el modo offline muestre progreso incorrecto (ej: 100% cuando es 78%)
+          await db.update(
+            'Proyectos',
+            {
+              'progress': proyecto.progress,
+              'state_proyecto': proyecto.projectState,
+              'status_proyecto': proyecto.projectStatus,
+            },
+            where: 'idProyecto = ?',
+            whereArgs: [proyecto.idProject],
+          );
+          actualizados++;
         }
       }
 
-      return "✅ $nuevos nuevos | $ignorados ya existían";
+      return "✅ $nuevos nuevos | $actualizados actualizados";
     } catch (e) {
       print('Error insertProyectosIncrementales: $e');
       return "Error: $e";

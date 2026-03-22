@@ -19,6 +19,19 @@ class HallazgoStruct extends BaseStruct {
     String? observacion,
     String? tituloHallazgo,
     String? nivelRiesgo,
+    String? riskLevelId, // UUID del nivel de riesgo (para dropdown)
+    // v19 fields
+    String? publicationStatusId,
+    String? impactTypeId,
+    String? ecosystemSupportId,
+    String? riskTypeId,
+    String? riskTypologyId,
+    String? observationScopeId,
+    String? riskActualLevelId,
+    String? gerenteResponsable,
+    String? auditorResponsable,
+    String? descripcionRiesgo,
+    String? causaRaiz,
   })  : _titulo = titulo,
         _gerencia = gerencia,
         _ecosistema = ecosistema,
@@ -29,7 +42,19 @@ class HallazgoStruct extends BaseStruct {
         _procesoPropuesto = procesoPropuesto,
         _observacion = observacion,
         _tituloHallazgo = tituloHallazgo,
-        _nivelRiesgo = nivelRiesgo;
+        _nivelRiesgo = nivelRiesgo,
+        _riskLevelId = riskLevelId,
+        _publicationStatusId = publicationStatusId,
+        _impactTypeId = impactTypeId,
+        _ecosystemSupportId = ecosystemSupportId,
+        _riskTypeId = riskTypeId,
+        _riskTypologyId = riskTypologyId,
+        _observationScopeId = observationScopeId,
+        _riskActualLevelId = riskActualLevelId,
+        _gerenteResponsable = gerenteResponsable,
+        _auditorResponsable = auditorResponsable,
+        _descripcionRiesgo = descripcionRiesgo,
+        _causaRaiz = causaRaiz;
 
   // "titulo" field.
   String? _titulo;
@@ -108,6 +133,90 @@ class HallazgoStruct extends BaseStruct {
 
   bool hasNivelRiesgo() => _nivelRiesgo != null;
 
+  // "riskLevelId" field (UUID del nivel de riesgo seleccionado en el dropdown).
+  String? _riskLevelId;
+  String get riskLevelId => _riskLevelId ?? '';
+  set riskLevelId(String? val) => _riskLevelId = val;
+
+  bool hasRiskLevelId() => _riskLevelId != null;
+
+  // "publicationStatusId" field.
+  String? _publicationStatusId;
+  String get publicationStatusId => _publicationStatusId ?? '';
+  set publicationStatusId(String? val) => _publicationStatusId = val;
+
+  bool hasPublicationStatusId() => _publicationStatusId != null;
+
+  // "impactTypeId" field.
+  String? _impactTypeId;
+  String get impactTypeId => _impactTypeId ?? '';
+  set impactTypeId(String? val) => _impactTypeId = val;
+
+  bool hasImpactTypeId() => _impactTypeId != null;
+
+  // "ecosystemSupportId" field.
+  String? _ecosystemSupportId;
+  String get ecosystemSupportId => _ecosystemSupportId ?? '';
+  set ecosystemSupportId(String? val) => _ecosystemSupportId = val;
+
+  bool hasEcosystemSupportId() => _ecosystemSupportId != null;
+
+  // "riskTypeId" field.
+  String? _riskTypeId;
+  String get riskTypeId => _riskTypeId ?? '';
+  set riskTypeId(String? val) => _riskTypeId = val;
+
+  bool hasRiskTypeId() => _riskTypeId != null;
+
+  // "riskTypologyId" field.
+  String? _riskTypologyId;
+  String get riskTypologyId => _riskTypologyId ?? '';
+  set riskTypologyId(String? val) => _riskTypologyId = val;
+
+  bool hasRiskTypologyId() => _riskTypologyId != null;
+
+  // "observationScopeId" field.
+  String? _observationScopeId;
+  String get observationScopeId => _observationScopeId ?? '';
+  set observationScopeId(String? val) => _observationScopeId = val;
+
+  bool hasObservationScopeId() => _observationScopeId != null;
+
+  // "riskActualLevelId" field.
+  String? _riskActualLevelId;
+  String get riskActualLevelId => _riskActualLevelId ?? '';
+  set riskActualLevelId(String? val) => _riskActualLevelId = val;
+
+  bool hasRiskActualLevelId() => _riskActualLevelId != null;
+
+  // "gerenteResponsable" field.
+  String? _gerenteResponsable;
+  String get gerenteResponsable => _gerenteResponsable ?? '';
+  set gerenteResponsable(String? val) => _gerenteResponsable = val;
+
+  bool hasGerenteResponsable() => _gerenteResponsable != null;
+
+  // "auditorResponsable" field.
+  String? _auditorResponsable;
+  String get auditorResponsable => _auditorResponsable ?? '';
+  set auditorResponsable(String? val) => _auditorResponsable = val;
+
+  bool hasAuditorResponsable() => _auditorResponsable != null;
+
+  // "descripcionRiesgo" field.
+  String? _descripcionRiesgo;
+  String get descripcionRiesgo => _descripcionRiesgo ?? '';
+  set descripcionRiesgo(String? val) => _descripcionRiesgo = val;
+
+  bool hasDescripcionRiesgo() => _descripcionRiesgo != null;
+
+  // "causaRaiz" field.
+  String? _causaRaiz;
+  String get causaRaiz => _causaRaiz ?? '';
+  set causaRaiz(String? val) => _causaRaiz = val;
+
+  bool hasCausaRaiz() => _causaRaiz != null;
+
   static HallazgoStruct fromMap(Map<String, dynamic> data) => HallazgoStruct(
         titulo: data['titulo'] as String?,
         gerencia: data['gerencia'] as String?,
@@ -120,6 +229,18 @@ class HallazgoStruct extends BaseStruct {
         observacion: data['observacion'] as String?,
         tituloHallazgo: data['tituloHallazgo'] as String?,
         nivelRiesgo: data['nivelRiesgo'] as String?,
+        riskLevelId: data['riskLevelId'] as String?,
+        publicationStatusId: data['publicationStatusId'] as String?,
+        impactTypeId: data['impactTypeId'] as String?,
+        ecosystemSupportId: data['ecosystemSupportId'] as String?,
+        riskTypeId: data['riskTypeId'] as String?,
+        riskTypologyId: data['riskTypologyId'] as String?,
+        observationScopeId: data['observationScopeId'] as String?,
+        riskActualLevelId: data['riskActualLevelId'] as String?,
+        gerenteResponsable: data['gerenteResponsable'] as String?,
+        auditorResponsable: data['auditorResponsable'] as String?,
+        descripcionRiesgo: data['descripcionRiesgo'] as String?,
+        causaRaiz: data['causaRaiz'] as String?,
       );
 
   static HallazgoStruct? maybeFromMap(dynamic data) =>
@@ -137,113 +258,72 @@ class HallazgoStruct extends BaseStruct {
         'observacion': _observacion,
         'tituloHallazgo': _tituloHallazgo,
         'nivelRiesgo': _nivelRiesgo,
+        'riskLevelId': _riskLevelId,
+        'publicationStatusId': _publicationStatusId,
+        'impactTypeId': _impactTypeId,
+        'ecosystemSupportId': _ecosystemSupportId,
+        'riskTypeId': _riskTypeId,
+        'riskTypologyId': _riskTypologyId,
+        'observationScopeId': _observationScopeId,
+        'riskActualLevelId': _riskActualLevelId,
+        'gerenteResponsable': _gerenteResponsable,
+        'auditorResponsable': _auditorResponsable,
+        'descripcionRiesgo': _descripcionRiesgo,
+        'causaRaiz': _causaRaiz,
       }.withoutNulls;
 
   @override
   Map<String, dynamic> toSerializableMap() => {
-        'titulo': serializeParam(
-          _titulo,
-          ParamType.String,
-        ),
-        'gerencia': serializeParam(
-          _gerencia,
-          ParamType.String,
-        ),
-        'ecosistema': serializeParam(
-          _ecosistema,
-          ParamType.String,
-        ),
-        'fecha': serializeParam(
-          _fecha,
-          ParamType.String,
-        ),
-        'nivelriesgo': serializeParam(
-          _nivelriesgo,
-          ParamType.String,
-        ),
-        'descripcion': serializeParam(
-          _descripcion,
-          ParamType.String,
-        ),
-        'recomendacion': serializeParam(
-          _recomendacion,
-          ParamType.String,
-        ),
-        'procesoPropuesto': serializeParam(
-          _procesoPropuesto,
-          ParamType.String,
-        ),
-        'observacion': serializeParam(
-          _observacion,
-          ParamType.String,
-        ),
-        'tituloHallazgo': serializeParam(
-          _tituloHallazgo,
-          ParamType.String,
-        ),
-        'nivelRiesgo': serializeParam(
-          _nivelRiesgo,
-          ParamType.String,
-        ),
+        'titulo': serializeParam(_titulo, ParamType.String),
+        'gerencia': serializeParam(_gerencia, ParamType.String),
+        'ecosistema': serializeParam(_ecosistema, ParamType.String),
+        'fecha': serializeParam(_fecha, ParamType.String),
+        'nivelriesgo': serializeParam(_nivelriesgo, ParamType.String),
+        'descripcion': serializeParam(_descripcion, ParamType.String),
+        'recomendacion': serializeParam(_recomendacion, ParamType.String),
+        'procesoPropuesto': serializeParam(_procesoPropuesto, ParamType.String),
+        'observacion': serializeParam(_observacion, ParamType.String),
+        'tituloHallazgo': serializeParam(_tituloHallazgo, ParamType.String),
+        'nivelRiesgo': serializeParam(_nivelRiesgo, ParamType.String),
+        'riskLevelId': serializeParam(_riskLevelId, ParamType.String),
+        'publicationStatusId': serializeParam(_publicationStatusId, ParamType.String),
+        'impactTypeId': serializeParam(_impactTypeId, ParamType.String),
+        'ecosystemSupportId': serializeParam(_ecosystemSupportId, ParamType.String),
+        'riskTypeId': serializeParam(_riskTypeId, ParamType.String),
+        'riskTypologyId': serializeParam(_riskTypologyId, ParamType.String),
+        'observationScopeId': serializeParam(_observationScopeId, ParamType.String),
+        'riskActualLevelId': serializeParam(_riskActualLevelId, ParamType.String),
+        'gerenteResponsable': serializeParam(_gerenteResponsable, ParamType.String),
+        'auditorResponsable': serializeParam(_auditorResponsable, ParamType.String),
+        'descripcionRiesgo': serializeParam(_descripcionRiesgo, ParamType.String),
+        'causaRaiz': serializeParam(_causaRaiz, ParamType.String),
       }.withoutNulls;
 
   static HallazgoStruct fromSerializableMap(Map<String, dynamic> data) =>
       HallazgoStruct(
-        titulo: deserializeParam(
-          data['titulo'],
-          ParamType.String,
-          false,
-        ),
-        gerencia: deserializeParam(
-          data['gerencia'],
-          ParamType.String,
-          false,
-        ),
-        ecosistema: deserializeParam(
-          data['ecosistema'],
-          ParamType.String,
-          false,
-        ),
-        fecha: deserializeParam(
-          data['fecha'],
-          ParamType.String,
-          false,
-        ),
-        nivelriesgo: deserializeParam(
-          data['nivelriesgo'],
-          ParamType.String,
-          false,
-        ),
-        descripcion: deserializeParam(
-          data['descripcion'],
-          ParamType.String,
-          false,
-        ),
-        recomendacion: deserializeParam(
-          data['recomendacion'],
-          ParamType.String,
-          false,
-        ),
-        procesoPropuesto: deserializeParam(
-          data['procesoPropuesto'],
-          ParamType.String,
-          false,
-        ),
-        observacion: deserializeParam(
-          data['observacion'],
-          ParamType.String,
-          false,
-        ),
-        tituloHallazgo: deserializeParam(
-          data['tituloHallazgo'],
-          ParamType.String,
-          false,
-        ),
-        nivelRiesgo: deserializeParam(
-          data['nivelRiesgo'],
-          ParamType.String,
-          false,
-        ),
+        titulo: deserializeParam(data['titulo'], ParamType.String, false),
+        gerencia: deserializeParam(data['gerencia'], ParamType.String, false),
+        ecosistema: deserializeParam(data['ecosistema'], ParamType.String, false),
+        fecha: deserializeParam(data['fecha'], ParamType.String, false),
+        nivelriesgo: deserializeParam(data['nivelriesgo'], ParamType.String, false),
+        descripcion: deserializeParam(data['descripcion'], ParamType.String, false),
+        recomendacion: deserializeParam(data['recomendacion'], ParamType.String, false),
+        procesoPropuesto: deserializeParam(data['procesoPropuesto'], ParamType.String, false),
+        observacion: deserializeParam(data['observacion'], ParamType.String, false),
+        tituloHallazgo: deserializeParam(data['tituloHallazgo'], ParamType.String, false),
+        nivelRiesgo: deserializeParam(data['nivelRiesgo'], ParamType.String, false),
+        riskLevelId: deserializeParam(data['riskLevelId'], ParamType.String, false),
+        publicationStatusId: deserializeParam(data['publicationStatusId'], ParamType.String, false),
+        impactTypeId: deserializeParam(data['impactTypeId'], ParamType.String, false),
+        ecosystemSupportId: deserializeParam(data['ecosystemSupportId'], ParamType.String, false),
+        riskTypeId: deserializeParam(data['riskTypeId'], ParamType.String, false),
+        riskTypologyId: deserializeParam(data['riskTypologyId'], ParamType.String, false),
+        observationScopeId: deserializeParam(data['observationScopeId'], ParamType.String, false),
+        riskActualLevelId: deserializeParam(data['riskActualLevelId'], ParamType.String, false),
+        gerenteResponsable: deserializeParam(data['gerenteResponsable'], ParamType.String, false),
+        auditorResponsable: deserializeParam(data['auditorResponsable'], ParamType.String, false),
+        descripcionRiesgo: deserializeParam(data['descripcionRiesgo'], ParamType.String, false),
+        causaRaiz: deserializeParam(data['causaRaiz'], ParamType.String, false),
       );
 
   @override
@@ -262,7 +342,18 @@ class HallazgoStruct extends BaseStruct {
         procesoPropuesto == other.procesoPropuesto &&
         observacion == other.observacion &&
         tituloHallazgo == other.tituloHallazgo &&
-        nivelRiesgo == other.nivelRiesgo;
+        nivelRiesgo == other.nivelRiesgo &&
+        publicationStatusId == other.publicationStatusId &&
+        impactTypeId == other.impactTypeId &&
+        ecosystemSupportId == other.ecosystemSupportId &&
+        riskTypeId == other.riskTypeId &&
+        riskTypologyId == other.riskTypologyId &&
+        observationScopeId == other.observationScopeId &&
+        riskActualLevelId == other.riskActualLevelId &&
+        gerenteResponsable == other.gerenteResponsable &&
+        auditorResponsable == other.auditorResponsable &&
+        descripcionRiesgo == other.descripcionRiesgo &&
+        causaRaiz == other.causaRaiz;
   }
 
   @override
@@ -277,7 +368,18 @@ class HallazgoStruct extends BaseStruct {
         procesoPropuesto,
         observacion,
         tituloHallazgo,
-        nivelRiesgo
+        nivelRiesgo,
+        publicationStatusId,
+        impactTypeId,
+        ecosystemSupportId,
+        riskTypeId,
+        riskTypologyId,
+        observationScopeId,
+        riskActualLevelId,
+        gerenteResponsable,
+        auditorResponsable,
+        descripcionRiesgo,
+        causaRaiz,
       ]);
 }
 
@@ -293,6 +395,17 @@ HallazgoStruct createHallazgoStruct({
   String? observacion,
   String? tituloHallazgo,
   String? nivelRiesgo,
+  String? publicationStatusId,
+  String? impactTypeId,
+  String? ecosystemSupportId,
+  String? riskTypeId,
+  String? riskTypologyId,
+  String? observationScopeId,
+  String? riskActualLevelId,
+  String? gerenteResponsable,
+  String? auditorResponsable,
+  String? descripcionRiesgo,
+  String? causaRaiz,
 }) =>
     HallazgoStruct(
       titulo: titulo,
@@ -306,4 +419,15 @@ HallazgoStruct createHallazgoStruct({
       observacion: observacion,
       tituloHallazgo: tituloHallazgo,
       nivelRiesgo: nivelRiesgo,
+      publicationStatusId: publicationStatusId,
+      impactTypeId: impactTypeId,
+      ecosystemSupportId: ecosystemSupportId,
+      riskTypeId: riskTypeId,
+      riskTypologyId: riskTypologyId,
+      observationScopeId: observationScopeId,
+      riskActualLevelId: riskActualLevelId,
+      gerenteResponsable: gerenteResponsable,
+      auditorResponsable: auditorResponsable,
+      descripcionRiesgo: descripcionRiesgo,
+      causaRaiz: causaRaiz,
     );

@@ -75,7 +75,7 @@ class _PublicationStatusWidgetState extends State<PublicationStatusWidget> with 
     context: ctx, barrierDismissible: false,
     builder: (dc) => Dialog(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)), child: Padding(padding: const EdgeInsets.all(24.0), child: Column(mainAxisSize: MainAxisSize.min, children: [
       Container(width: 64.0, height: 64.0, decoration: const BoxDecoration(color: Color(0xFFFFEBEB), shape: BoxShape.circle), child: const Icon(Icons.delete_outline, color: Color(0xFFE53935), size: 32.0)),
-      const SizedBox(height: 16.0), const Text('Eliminar estado de publicacion', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+      const SizedBox(height: 16.0), const Text('Eliminar estado de publicación', style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
       const SizedBox(height: 8.0), Text('Eliminar "$name"?', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[600], fontSize: 14.0)),
       const SizedBox(height: 24.0), Row(children: [
         Expanded(child: OutlinedButton(onPressed: () => Navigator.pop(dc, false), style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 12.0), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0))), child: const Text('Cancelar'))),
@@ -123,7 +123,7 @@ class _PublicationStatusWidgetState extends State<PublicationStatusWidget> with 
         decoration: BoxDecoration(color: FlutterFlowTheme.of(ctx).containerColorPrimary, borderRadius: BorderRadius.circular(8.0), border: Border.all(color: FlutterFlowTheme.of(ctx).customColor4bbbbb)),
         child: Padding(padding: const EdgeInsets.all(16.0), child: Column(mainAxisSize: MainAxisSize.min, children: [
           Padding(padding: const EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text('Crear Estado de Publicacion', style: FlutterFlowTheme.of(ctx).bodyMedium.override(font: TextStyle(fontWeight: FontWeight.bold, fontStyle: FlutterFlowTheme.of(ctx).bodyMedium.fontStyle), fontSize: 20.0, letterSpacing: 0.0, fontWeight: FontWeight.bold, fontStyle: FlutterFlowTheme.of(ctx).bodyMedium.fontStyle)),
+            Text('Crear Estado de Publicación', style: FlutterFlowTheme.of(ctx).bodyMedium.override(font: TextStyle(fontWeight: FontWeight.bold, fontStyle: FlutterFlowTheme.of(ctx).bodyMedium.fontStyle), fontSize: 20.0, letterSpacing: 0.0, fontWeight: FontWeight.bold, fontStyle: FlutterFlowTheme.of(ctx).bodyMedium.fontStyle)),
             IconButton(onPressed: () => Navigator.pop(ctx), icon: Icon(Icons.close, color: FlutterFlowTheme.of(ctx).primaryText, size: 24.0)),
           ])),
           Form(key: _model.formKey, autovalidateMode: AutovalidateMode.disabled, child: Padding(padding: const EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0), child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -135,7 +135,7 @@ class _PublicationStatusWidgetState extends State<PublicationStatusWidget> with 
             Row(children: [Expanded(child: Padding(padding: const EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 10.0), child: FFButtonWidget(
               onPressed: () async {
                 final nombreIngresado = _model.txtnombreTextController.text.trim();
-                if (nombreIngresado.isEmpty) { mostrarError('Ingresa el nombre del estado de publicacion'); return; }
+                if (nombreIngresado.isEmpty) { mostrarError('Ingresa el nombre del estado de publicación'); return; }
                 if (_model.estaconectado ?? false) {
                   final nuevoId = random_data.randomString(1, 5, true, false, true);
                   await SupaFlow.client.from('PublicationStatuses').insert({'publication_status_id': nuevoId, 'name': nombreIngresado, 'status': true, 'created_at': DateTime.now().toIso8601String(), 'updated_at': DateTime.now().toIso8601String()});
@@ -148,7 +148,7 @@ class _PublicationStatusWidgetState extends State<PublicationStatusWidget> with 
                 }
                 safeSetState(() { _model.txtnombreTextController?.clear(); });
                 Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Estado de Publicacion creado exitosamente', style: TextStyle(color: FlutterFlowTheme.of(context).secondaryBackground)), duration: const Duration(milliseconds: 3000), backgroundColor: FlutterFlowTheme.of(context).secondary));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Estado de Publicación creado exitosamente', style: TextStyle(color: FlutterFlowTheme.of(context).secondaryBackground)), duration: const Duration(milliseconds: 3000), backgroundColor: FlutterFlowTheme.of(context).secondary));
               },
               text: 'Guardar', icon: FaIcon(FontAwesomeIcons.save, size: 15.0),
               options: FFButtonOptions(height: 40.0, padding: const EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0), iconPadding: const EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0), color: FlutterFlowTheme.of(ctx).primaryText, textStyle: FlutterFlowTheme.of(ctx).titleSmall.override(font: TextStyle(fontWeight: FlutterFlowTheme.of(ctx).titleSmall.fontWeight, fontStyle: FlutterFlowTheme.of(ctx).titleSmall.fontStyle), color: Colors.white, letterSpacing: 0.0, fontWeight: FlutterFlowTheme.of(ctx).titleSmall.fontWeight, fontStyle: FlutterFlowTheme.of(ctx).titleSmall.fontStyle), elevation: 0.0, borderRadius: BorderRadius.circular(8.0)),

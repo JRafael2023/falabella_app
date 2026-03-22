@@ -370,24 +370,6 @@ class _HallazgosWidgetState extends State<HallazgosWidget> with TickerProviderSt
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                context.pushNamed(ProcesosWidget.routeName);
-                              },
-                              child: wrapWithModel(
-                                model: _model.containerAdminModel2,
-                                updateCallback: () => safeSetState(() {}),
-                                child: ContainerAdminWidget(
-                                  icontext: '⚙️',
-                                  name: 'Procesos',
-                                  description: 'Crear Procesos',
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              hoverColor: Colors.transparent,
-                              highlightColor: Colors.transparent,
-                              onTap: () async {
                                 context.pushNamed(
                                   GerenciaWidget.routeName,
                                   extra: <String, dynamic>{
@@ -458,8 +440,8 @@ class _HallazgosWidgetState extends State<HallazgosWidget> with TickerProviderSt
                                 updateCallback: () => safeSetState(() {}),
                                 child: ContainerAdminWidget(
                                   icontext: '📋',
-                                  name: 'Estado de Publicacion',
-                                  description: 'Crear Estados de Publicacion',
+                                  name: 'Estado de Publicación',
+                                  description: 'Crear Estados de Publicación',
                                 ),
                               ),
                             ),
@@ -530,8 +512,8 @@ class _HallazgosWidgetState extends State<HallazgosWidget> with TickerProviderSt
                                 updateCallback: () => safeSetState(() {}),
                                 child: ContainerAdminWidget(
                                   icontext: '🗂️',
-                                  name: 'Tipologia de Riesgo',
-                                  description: 'Crear Tipologias de Riesgo',
+                                  name: 'Tipología de Riesgo',
+                                  description: 'Crear Tipologías de Riesgo',
                                 ),
                               ),
                             ),
@@ -548,8 +530,8 @@ class _HallazgosWidgetState extends State<HallazgosWidget> with TickerProviderSt
                                 updateCallback: () => safeSetState(() {}),
                                 child: ContainerAdminWidget(
                                   icontext: '🔍',
-                                  name: 'Alcance de Observacion',
-                                  description: 'Crear Alcances de Observacion',
+                                  name: 'Alcance de Observación',
+                                  description: 'Crear Alcances de Observación',
                                 ),
                               ),
                             ),

@@ -579,7 +579,8 @@ Future<SyncAdminResult> sincronizarAdmin() async {
 
       try {
         // Campos a seleccionar de Supabase
-        final selectFields = ['$idSupaField, name, status, orden, created_at, updated_at', ...extraFields].join(', ');
+        // ⚠️ 'orden' column was removed from Supabase v19 maestro tables (SQLite migration v20 also dropped it)
+        final selectFields = ['$idSupaField, name, status, created_at, updated_at', ...extraFields].join(', ');
         final supaResponse = await SupaFlow.client
             .from(supaTable)
             .select(selectFields)
@@ -614,7 +615,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
             idSqliteField: id,
             'name': row['name'] ?? '',
             'status': (row['status'] as bool? ?? true) ? 1 : 0,
-            'orden': row['orden'] ?? 0,
             'sincronizadoNube': 1,
             'sincronizadoLocal': 1,
             'pendienteEliminar': 0,

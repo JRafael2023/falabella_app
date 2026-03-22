@@ -668,6 +668,12 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                               ),
                                               showLoadingIndicator: true,
                                               onPressed: () async {
+                                                // Validar que el ID no esté vacío
+                                                final idBusqueda = _model.txtidTextController.text.trim();
+                                                if (idBusqueda.isEmpty) {
+                                                  mostrarError('Ingresa el ID del proyecto de Highbond antes de buscar');
+                                                  return;
+                                                }
                                                 _model.apiProyects =
                                                     await SupabaseFunctionsGroup
                                                         .getProjectsHighbondCall
@@ -675,14 +681,11 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
 
                                                 if ((_model.apiProyects
                                                         ?.succeeded ??
-                                                    true)) {
+                                                    false)) {
                                                   // Pasar el jsonBody completo — filterAPI navega la estructura internamente
                                                   _model.jsonSearchProyect =
                                                       functions.filterAPI(
-                                                          _model
-                                                              .txtidTextController
-                                                              .text
-                                                              .trim(),
+                                                          idBusqueda,
                                                           (_model.apiProyects
                                                                   ?.jsonBody ??
                                                               ''));
@@ -698,7 +701,7 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                           ?.text = (resultMap['name'] ?? '').toString();
                                                     });
                                                   } else {
-                                                    mostrarError('Proyecto no encontrado');
+                                                    mostrarError('El ID "$idBusqueda" no existe en Highbond. Verifica el ID e intenta nuevamente.');
                                                   }
                                                 } else {
                                                   mostrarError('Error de conexión con Highbond');

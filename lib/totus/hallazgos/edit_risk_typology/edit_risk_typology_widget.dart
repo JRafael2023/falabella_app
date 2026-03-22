@@ -88,7 +88,7 @@ class _EditRiskTypologyWidgetState extends State<EditRiskTypologyWidget> {
         decoration: BoxDecoration(color: FlutterFlowTheme.of(context).containerColorPrimary, borderRadius: BorderRadius.circular(8.0), border: Border.all(color: FlutterFlowTheme.of(context).customColor4bbbbb, width: 2.0)),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Padding(padding: const EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 0.0),
-            child: Text('Editar Tipologia de Riesgo', style: FlutterFlowTheme.of(context).bodyMedium.override(font: TextStyle(fontWeight: FontWeight.bold, fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle), fontSize: 24.0, letterSpacing: 0.0, fontWeight: FontWeight.bold, fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle))),
+            child: Text('Editar Tipología de Riesgo', style: FlutterFlowTheme.of(context).bodyMedium.override(font: TextStyle(fontWeight: FontWeight.bold, fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle), fontSize: 24.0, letterSpacing: 0.0, fontWeight: FontWeight.bold, fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle))),
           Padding(padding: const EdgeInsetsDirectional.fromSTEB(4.0, 4.0, 4.0, 4.0),
             child: Form(key: _model.formKey, autovalidateMode: AutovalidateMode.disabled,
               child: Padding(padding: const EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),

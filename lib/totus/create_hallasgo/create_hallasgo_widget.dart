@@ -148,10 +148,13 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         }
       }
 
-      // 5. Nivel Riesgo
-      if (widget.hallazgo?.nivelRiesgo != null && widget.hallazgo!.nivelRiesgo!.isNotEmpty) {
-        _model.cmdriesgoValue = widget.hallazgo!.nivelRiesgo;
-        _model.cmdriesgoValueController = FormFieldController<String>(widget.hallazgo!.nivelRiesgo);
+      // 5. Nivel Riesgo — usar riskLevelId (UUID) para que coincida con las opciones del dropdown
+      final riskLevelIdToRestore = widget.hallazgo!.riskLevelId.isNotEmpty
+          ? widget.hallazgo!.riskLevelId
+          : null;
+      if (riskLevelIdToRestore != null) {
+        _model.cmdriesgoValue = riskLevelIdToRestore;
+        _model.cmdriesgoValueController = FormFieldController<String>(riskLevelIdToRestore);
       }
 
       // 6. Fecha - parsear string a DateTime
@@ -162,7 +165,64 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
           _model.datePicked = parsedDate;
         }
       }
+
+      // 7. v19 fields pre-population
+      if (widget.hallazgo!.publicationStatusId.isNotEmpty) {
+        _model.cmdPublicationStatusValue = widget.hallazgo!.publicationStatusId;
+      }
+      if (widget.hallazgo!.impactTypeId.isNotEmpty) {
+        _model.cmdImpactTypeValue = widget.hallazgo!.impactTypeId;
+      }
+      if (widget.hallazgo!.ecosystemSupportId.isNotEmpty) {
+        _model.cmdEcosystemSupportValue = widget.hallazgo!.ecosystemSupportId;
+      }
+      if (widget.hallazgo!.riskTypeId.isNotEmpty) {
+        _model.cmdRiskTypeValue = widget.hallazgo!.riskTypeId;
+      }
+      if (widget.hallazgo!.riskTypologyId.isNotEmpty) {
+        _model.cmdRiskTypologyValue = widget.hallazgo!.riskTypologyId;
+      }
+      if (widget.hallazgo!.observationScopeId.isNotEmpty) {
+        _model.cmdObservationScopeValue = widget.hallazgo!.observationScopeId;
+      }
+      if (widget.hallazgo!.riskActualLevelId.isNotEmpty) {
+        _model.cmdRiskActualLevelValue = widget.hallazgo!.riskActualLevelId;
+      }
+      if (widget.hallazgo!.gerenteResponsable.isNotEmpty) {
+        _model.txtGerenteResponsableController =
+            TextEditingController(text: widget.hallazgo!.gerenteResponsable);
+      }
+      if (widget.hallazgo!.auditorResponsable.isNotEmpty) {
+        _model.txtAuditorResponsableController =
+            TextEditingController(text: widget.hallazgo!.auditorResponsable);
+      }
+      if (widget.hallazgo!.descripcionRiesgo.isNotEmpty) {
+        _model.txtDescripcionRiesgoController =
+            TextEditingController(text: widget.hallazgo!.descripcionRiesgo);
+      }
+      if (widget.hallazgo!.causaRaiz.isNotEmpty) {
+        _model.txtCausaRaizController =
+            TextEditingController(text: widget.hallazgo!.causaRaiz);
+      }
     }
+
+    // Initialize all dropdown controllers so they are stable across rebuilds
+    _model.cmdriesgoValueController ??=
+        FormFieldController<String>(_model.cmdriesgoValue);
+    _model.cmdPublicationStatusController ??=
+        FormFieldController<String>(_model.cmdPublicationStatusValue);
+    _model.cmdImpactTypeController ??=
+        FormFieldController<String>(_model.cmdImpactTypeValue);
+    _model.cmdEcosystemSupportController ??=
+        FormFieldController<String>(_model.cmdEcosystemSupportValue);
+    _model.cmdRiskTypeController ??=
+        FormFieldController<String>(_model.cmdRiskTypeValue);
+    _model.cmdRiskTypologyController ??=
+        FormFieldController<String>(_model.cmdRiskTypologyValue);
+    _model.cmdObservationScopeController ??=
+        FormFieldController<String>(_model.cmdObservationScopeValue);
+    _model.cmdRiskActualLevelController ??=
+        FormFieldController<String>(_model.cmdRiskActualLevelValue);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       safeSetState(() {});
@@ -223,6 +283,57 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
       } catch (e) {
         print('⚠️ Error sincronizando maestros v19 desde Supabase: $e');
       }
+    }
+
+    // ⭐ Después de cargar los maestros, refrescar los controllers de dropdowns
+    // que se pre-popularon en initState (los valores son correctos pero las opciones
+    // no existían aún cuando se crearon los controllers).
+    if (widget.hallazgo != null) {
+      void _refreshController(
+        String? value,
+        FormFieldController<String>? Function() getter,
+        void Function(FormFieldController<String>) setter,
+      ) {
+        if (value != null && value.isNotEmpty) {
+          setter(FormFieldController<String>(value));
+        }
+      }
+
+      // Si cmdriesgoValue está vacío pero hay nivelRiesgo por nombre, buscar el ID
+      if ((_model.cmdriesgoValue == null || _model.cmdriesgoValue!.isEmpty) &&
+          widget.hallazgo!.nivelRiesgo.isNotEmpty) {
+        final match = _model.riskLevels.where(
+          (r) => (r.name ?? '').toUpperCase() == widget.hallazgo!.nivelRiesgo.toUpperCase(),
+        ).firstOrNull;
+        if (match?.riskLevelId != null && match!.riskLevelId!.isNotEmpty) {
+          _model.cmdriesgoValue = match.riskLevelId;
+          _model.cmdriesgoValueController = FormFieldController<String>(match.riskLevelId!);
+        }
+      }
+      _refreshController(_model.cmdriesgoValue,
+          () => _model.cmdriesgoValueController,
+          (c) => _model.cmdriesgoValueController = c);
+      _refreshController(_model.cmdPublicationStatusValue,
+          () => _model.cmdPublicationStatusController,
+          (c) => _model.cmdPublicationStatusController = c);
+      _refreshController(_model.cmdImpactTypeValue,
+          () => _model.cmdImpactTypeController,
+          (c) => _model.cmdImpactTypeController = c);
+      _refreshController(_model.cmdEcosystemSupportValue,
+          () => _model.cmdEcosystemSupportController,
+          (c) => _model.cmdEcosystemSupportController = c);
+      _refreshController(_model.cmdRiskTypeValue,
+          () => _model.cmdRiskTypeController,
+          (c) => _model.cmdRiskTypeController = c);
+      _refreshController(_model.cmdRiskTypologyValue,
+          () => _model.cmdRiskTypologyController,
+          (c) => _model.cmdRiskTypologyController = c);
+      _refreshController(_model.cmdObservationScopeValue,
+          () => _model.cmdObservationScopeController,
+          (c) => _model.cmdObservationScopeController = c);
+      _refreshController(_model.cmdRiskActualLevelValue,
+          () => _model.cmdRiskActualLevelController,
+          (c) => _model.cmdRiskActualLevelController = c);
     }
 
     if (mounted) safeSetState(() {});
@@ -290,7 +401,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
           children: [
             Expanded(
               child: FlutterFlowDropDown<String>(
-                controller: controller ??= FormFieldController<String>(null),
+                controller: controller ?? FormFieldController<String>(currentValue),
                 options: options,
                 optionLabels: optionLabels,
                 onChanged: onChanged,
@@ -531,98 +642,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        // a. Proceso propuesto
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Proceso propuesto',
-                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                          font: TextStyle(
-                                            fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                            fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                          ),
-                                          fontSize: 18.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                          fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                        ),
-                                  ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Expanded(
-                                        child: FlutterFlowDropDown<String>(
-                                          controller: _model.cmdprocesoValueController ??=
-                                              FormFieldController<String>(
-                                            _model.cmdprocesoValue ??= '0',
-                                          ),
-                                          options: List<String>.from(
-                                              FFAppState().listaprocesos.map((e) => e.idProceso).toList()),
-                                          optionLabels: FFAppState().listaprocesos.map((e) => e.nombre).toList(),
-                                          onChanged: (val) => safeSetState(() => _model.cmdprocesoValue = val),
-                                          height: 50.0,
-                                          searchHintTextStyle: FlutterFlowTheme.of(context).labelMedium.override(
-                                                font: TextStyle(
-                                                  fontWeight: FlutterFlowTheme.of(context).labelMedium.fontWeight,
-                                                  fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
-                                                ),
-                                                letterSpacing: 0.0,
-                                                fontWeight: FlutterFlowTheme.of(context).labelMedium.fontWeight,
-                                                fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
-                                              ),
-                                          searchTextStyle: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                font: TextStyle(
-                                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                ),
-                                                letterSpacing: 0.0,
-                                                fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                              ),
-                                          textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                font: TextStyle(
-                                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                ),
-                                                color: FlutterFlowTheme.of(context).secondaryText,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                              ),
-                                          hintText: 'Seleccione',
-                                          searchHintText: 'Buscar...',
-                                          icon: Icon(
-                                            Icons.keyboard_arrow_down_rounded,
-                                            color: FlutterFlowTheme.of(context).secondaryText,
-                                            size: 24.0,
-                                          ),
-                                          fillColor: FlutterFlowTheme.of(context).secondaryBackground,
-                                          elevation: 2.0,
-                                          borderColor: FlutterFlowTheme.of(context).customColor4bbbbb,
-                                          borderWidth: 0.0,
-                                          borderRadius: 8.0,
-                                          margin: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                                          hidesUnderline: true,
-                                          isOverButton: false,
-                                          isSearchable: true,
-                                          isMultiSelect: false,
-                                          maxHeight: 200.0,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ].divide(SizedBox(height: 5.0)),
-                              ),
-                            ),
-                          ].divide(SizedBox(width: 15.0)),
-                        ),
-                        // b. Título Observación
+                        // 1. Título Observación
                         Row(
                           mainAxisSize: MainAxisSize.max,
                           children: [
@@ -711,418 +731,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                             ),
                           ].divide(SizedBox(width: 15.0)),
                         ),
-                        // d. Row: Gerencia | Ecosistema
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Gerencia',
-                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                          font: TextStyle(
-                                            fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                            fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                          ),
-                                          fontSize: 18.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                          fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                        ),
-                                  ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Expanded(
-                                        child: FlutterFlowDropDown<String>(
-                                          controller: _model.cmdgerenciaValueController ??=
-                                              FormFieldController<String>(null),
-                                          options: FFAppState()
-                                              .listagenerencia
-                                              .map((e) => e.nombre)
-                                              .toSet()
-                                              .toList(),
-                                          onChanged: (val) =>
-                                              safeSetState(() => _model.cmdgerenciaValue = val),
-                                          height: 50.0,
-                                          textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                font: TextStyle(
-                                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                ),
-                                                color: FlutterFlowTheme.of(context).secondaryText,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                              ),
-                                          hintText: 'Seleccione',
-                                          icon: Icon(
-                                            Icons.keyboard_arrow_down_rounded,
-                                            color: FlutterFlowTheme.of(context).secondaryText,
-                                            size: 24.0,
-                                          ),
-                                          fillColor: FlutterFlowTheme.of(context).secondaryBackground,
-                                          elevation: 2.0,
-                                          borderColor: FlutterFlowTheme.of(context).customColor4bbbbb,
-                                          borderWidth: 0.0,
-                                          borderRadius: 8.0,
-                                          margin: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                                          hidesUnderline: true,
-                                          isOverButton: false,
-                                          isSearchable: true,
-                                          isMultiSelect: false,
-                                          maxHeight: 200.0,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ].divide(SizedBox(height: 5.0)),
-                              ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Ecosistema',
-                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                          font: TextStyle(
-                                            fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                            fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                          ),
-                                          fontSize: 18.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                          fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                        ),
-                                  ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Expanded(
-                                        child: FlutterFlowDropDown<String>(
-                                          controller: _model.cmdecosistemaValueController ??=
-                                              FormFieldController<String>(null),
-                                          options: FFAppState()
-                                              .listaecosistema
-                                              .map((e) => e.nombre)
-                                              .toSet()
-                                              .toList(),
-                                          onChanged: (val) =>
-                                              safeSetState(() => _model.cmdecosistemaValue = val),
-                                          height: 50.0,
-                                          textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                font: TextStyle(
-                                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                ),
-                                                color: FlutterFlowTheme.of(context).secondaryText,
-                                                letterSpacing: 0.0,
-                                                fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                              ),
-                                          hintText: 'Seleccione',
-                                          icon: Icon(
-                                            Icons.keyboard_arrow_down_rounded,
-                                            color: FlutterFlowTheme.of(context).secondaryText,
-                                            size: 24.0,
-                                          ),
-                                          fillColor: FlutterFlowTheme.of(context).secondaryBackground,
-                                          elevation: 2.0,
-                                          borderColor: FlutterFlowTheme.of(context).customColor4bbbbb,
-                                          borderWidth: 0.0,
-                                          borderRadius: 8.0,
-                                          margin: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                                          hidesUnderline: true,
-                                          isOverButton: false,
-                                          isSearchable: true,
-                                          isMultiSelect: false,
-                                          maxHeight: 200.0,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ].divide(SizedBox(height: 5.0)),
-                              ),
-                            ),
-                          ].divide(SizedBox(width: 8.0)),
-                        ),
-                        // e. Row: Fecha | Nivel de Riesgo
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            // Fecha date picker
-                            Expanded(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Fecha',
-                                    style: FlutterFlowTheme.of(context).bodyMedium.override(
-                                          font: TextStyle(
-                                            fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                            fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                          ),
-                                          fontSize: 18.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                          fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                        ),
-                                  ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Expanded(
-                                        child: InkWell(
-                                          splashColor: Colors.transparent,
-                                          focusColor: Colors.transparent,
-                                          hoverColor: Colors.transparent,
-                                          highlightColor: Colors.transparent,
-                                          onTap: () async {
-                                            final _datePickedDate = await showDatePicker(
-                                              context: context,
-                                              initialDate: getCurrentTimestamp,
-                                              firstDate: DateTime(2000),
-                                              lastDate: DateTime(2050),
-                                              builder: (context, child) {
-                                                return wrapInMaterialDatePickerTheme(
-                                                  context,
-                                                  child!,
-                                                  headerBackgroundColor: FlutterFlowTheme.of(context).primary,
-                                                  headerForegroundColor: FlutterFlowTheme.of(context).info,
-                                                  headerTextStyle: FlutterFlowTheme.of(context).headlineLarge.override(
-                                                        font: GoogleFonts.interTight(
-                                                          fontWeight: FontWeight.w600,
-                                                          fontStyle: FlutterFlowTheme.of(context).headlineLarge.fontStyle,
-                                                        ),
-                                                        fontSize: 32.0,
-                                                        letterSpacing: 0.0,
-                                                        fontWeight: FontWeight.w600,
-                                                        fontStyle: FlutterFlowTheme.of(context).headlineLarge.fontStyle,
-                                                      ),
-                                                  pickerBackgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
-                                                  pickerForegroundColor: FlutterFlowTheme.of(context).primaryText,
-                                                  selectedDateTimeBackgroundColor: FlutterFlowTheme.of(context).primary,
-                                                  selectedDateTimeForegroundColor: FlutterFlowTheme.of(context).info,
-                                                  actionButtonForegroundColor: FlutterFlowTheme.of(context).primaryText,
-                                                  iconSize: 24.0,
-                                                );
-                                              },
-                                            );
-
-                                            if (_datePickedDate != null) {
-                                              safeSetState(() {
-                                                _model.datePicked = DateTime(
-                                                  _datePickedDate.year,
-                                                  _datePickedDate.month,
-                                                  _datePickedDate.day,
-                                                );
-                                              });
-                                            } else if (_model.datePicked != null) {
-                                              safeSetState(() {
-                                                _model.datePicked = getCurrentTimestamp;
-                                              });
-                                            }
-                                            _model.fecha = _model.datePicked;
-                                            safeSetState(() {});
-                                          },
-                                          child: Container(
-                                            decoration: BoxDecoration(),
-                                            child: FlutterFlowDropDown<String>(
-                                              controller: _model.dropDownValueController ??=
-                                                  FormFieldController<String>(null),
-                                              options: <String>[],
-                                              onChanged: (val) =>
-                                                  safeSetState(() => _model.dropDownValue = val),
-                                              height: 50.0,
-                                              textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                    font: TextStyle(
-                                                      fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                    ),
-                                                    color: FlutterFlowTheme.of(context).secondaryText,
-                                                    letterSpacing: 0.0,
-                                                    fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                  ),
-                                              hintText: valueOrDefault<String>(
-                                                _model.fecha != null
-                                                    ? dateTimeFormat(
-                                                        "d/M/y",
-                                                        _model.fecha,
-                                                        locale: FFLocalizations.of(context).languageCode,
-                                                      )
-                                                    : 'Seleccione',
-                                                'Seleccione',
-                                              ),
-                                              icon: Icon(
-                                                Icons.keyboard_arrow_down_rounded,
-                                                color: FlutterFlowTheme.of(context).secondaryText,
-                                                size: 24.0,
-                                              ),
-                                              fillColor: FlutterFlowTheme.of(context).secondaryBackground,
-                                              elevation: 2.0,
-                                              borderColor: FlutterFlowTheme.of(context).customColor4bbbbb,
-                                              borderWidth: 0.0,
-                                              borderRadius: 8.0,
-                                              margin: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                                              hidesUnderline: true,
-                                              disabled: true,
-                                              isOverButton: false,
-                                              isSearchable: true,
-                                              isMultiSelect: false,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ].divide(SizedBox(height: 5.0)),
-                              ),
-                            ),
-                            // Nivel de Riesgo (from DB)
-                            Expanded(
-                              child: _buildDropdownField(
-                                context: context,
-                                label: 'Nivel de Riesgo',
-                                options: _model.riskLevels.map((r) => r.riskLevelId ?? '').toList(),
-                                optionLabels: _model.riskLevels.map((r) => r.name ?? '').toList(),
-                                currentValue: _model.cmdriesgoValue,
-                                controller: _model.cmdriesgoValueController,
-                                onChanged: (val) => safeSetState(() => _model.cmdriesgoValue = val),
-                              ),
-                            ),
-                          ].divide(SizedBox(width: 8.0)),
-                        ),
-                        // f. Estado de Publicación
-                        _buildDropdownField(
-                          context: context,
-                          label: 'Estado de Publicación',
-                          options: _model.publicationStatuses.map((s) => s.publicationStatusId ?? '').toList(),
-                          optionLabels: _model.publicationStatuses.map((s) => s.name ?? '').toList(),
-                          currentValue: _model.cmdPublicationStatusValue,
-                          controller: _model.cmdPublicationStatusController,
-                          onChanged: (val) => safeSetState(() => _model.cmdPublicationStatusValue = val),
-                        ),
-                        // g. Row: Tipo de Impacto | Soporte al Ecosistema
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Expanded(
-                              child: _buildDropdownField(
-                                context: context,
-                                label: 'Tipo de Impacto',
-                                options: _model.impactTypes.map((t) => t.impactTypeId ?? '').toList(),
-                                optionLabels: _model.impactTypes.map((t) => t.name ?? '').toList(),
-                                currentValue: _model.cmdImpactTypeValue,
-                                controller: _model.cmdImpactTypeController,
-                                onChanged: (val) => safeSetState(() => _model.cmdImpactTypeValue = val),
-                              ),
-                            ),
-                            Expanded(
-                              child: _buildDropdownField(
-                                context: context,
-                                label: 'Soporte al Ecosistema',
-                                options: _model.ecosystemSupports.map((e) => e.ecosystemSupportId ?? '').toList(),
-                                optionLabels: _model.ecosystemSupports.map((e) => e.name ?? '').toList(),
-                                currentValue: _model.cmdEcosystemSupportValue,
-                                controller: _model.cmdEcosystemSupportController,
-                                onChanged: (val) => safeSetState(() => _model.cmdEcosystemSupportValue = val),
-                              ),
-                            ),
-                          ].divide(SizedBox(width: 8.0)),
-                        ),
-                        // h. Row: Tipo de Riesgo | Tipología de Riesgo
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Expanded(
-                              child: _buildDropdownField(
-                                context: context,
-                                label: 'Tipo de Riesgo',
-                                options: _model.riskTypes.map((t) => t.riskTypeId ?? '').toList(),
-                                optionLabels: _model.riskTypes.map((t) => t.name ?? '').toList(),
-                                currentValue: _model.cmdRiskTypeValue,
-                                controller: _model.cmdRiskTypeController,
-                                onChanged: (val) {
-                                  safeSetState(() {
-                                    _model.cmdRiskTypeValue = val;
-                                    _model.filteredRiskTypologies = _model.riskTypologies
-                                        .where((t) => t.riskTypeId == val)
-                                        .toList();
-                                    _model.cmdRiskTypologyValue = null;
-                                    _model.cmdRiskTypologyController = null;
-                                  });
-                                },
-                              ),
-                            ),
-                            Expanded(
-                              child: _buildDropdownField(
-                                context: context,
-                                label: 'Tipología de Riesgo',
-                                options: _model.filteredRiskTypologies.map((t) => t.riskTypologyId ?? '').toList(),
-                                optionLabels: _model.filteredRiskTypologies.map((t) => t.name ?? '').toList(),
-                                currentValue: _model.cmdRiskTypologyValue,
-                                controller: _model.cmdRiskTypologyController,
-                                onChanged: (val) => safeSetState(() => _model.cmdRiskTypologyValue = val),
-                              ),
-                            ),
-                          ].divide(SizedBox(width: 8.0)),
-                        ),
-                        // i. Row: Alcance de Observación | Riesgo Actual
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Expanded(
-                              child: _buildDropdownField(
-                                context: context,
-                                label: 'Alcance de Observación',
-                                options: _model.observationScopes.map((s) => s.observationScopeId ?? '').toList(),
-                                optionLabels: _model.observationScopes.map((s) => s.name ?? '').toList(),
-                                currentValue: _model.cmdObservationScopeValue,
-                                controller: _model.cmdObservationScopeController,
-                                onChanged: (val) => safeSetState(() => _model.cmdObservationScopeValue = val),
-                              ),
-                            ),
-                            Expanded(
-                              child: _buildDropdownField(
-                                context: context,
-                                label: 'Riesgo Actual',
-                                options: _model.riskLevels.map((r) => r.riskLevelId ?? '').toList(),
-                                optionLabels: _model.riskLevels.map((r) => r.name ?? '').toList(),
-                                currentValue: _model.cmdRiskActualLevelValue,
-                                controller: _model.cmdRiskActualLevelController,
-                                onChanged: (val) => safeSetState(() => _model.cmdRiskActualLevelValue = val),
-                              ),
-                            ),
-                          ].divide(SizedBox(width: 8.0)),
-                        ),
-                        // j. Gerente Responsable
-                        _buildTextField(
-                          context: context,
-                          label: 'Gerente Responsable',
-                          controller: _model.txtGerenteResponsableController,
-                          focusNode: _model.txtGerenteResponsableFocusNode,
-                          hintText: 'Escribe aquí',
-                          maxLines: 1,
-                          minLines: 1,
-                        ),
-                        // k. Auditor Responsable
-                        _buildTextField(
-                          context: context,
-                          label: 'Auditor Responsable',
-                          controller: _model.txtAuditorResponsableController,
-                          focusNode: _model.txtAuditorResponsableFocusNode,
-                          hintText: 'Escribe aquí',
-                          maxLines: 1,
-                          minLines: 1,
-                        ),
-                        // l. Descripción (keep EXACTLY as-is with microphone widget)
+                        // 2. Descripción/Hallazgo (with microphone)
                         Column(
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1253,17 +862,268 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                             ),
                           ].divide(SizedBox(height: 5.0)),
                         ),
-                        // m. Descripción del Riesgo
-                        _buildTextField(
-                          context: context,
-                          label: 'Descripción del Riesgo',
-                          controller: _model.txtDescripcionRiesgoController,
-                          focusNode: _model.txtDescripcionRiesgoFocusNode,
-                          hintText: 'Escribe aquí',
-                          maxLines: 3,
-                          minLines: 3,
+                        // 3. Gerencia Responsable (ancho completo)
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Gerencia Responsable',
+                              style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                    font: TextStyle(
+                                      fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                    ),
+                                    fontSize: 18.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                  ),
+                            ),
+                            FlutterFlowDropDown<String>(
+                              controller: _model.cmdgerenciaValueController ??=
+                                  FormFieldController<String>(null),
+                              options: FFAppState()
+                                  .listagenerencia
+                                  .map((e) => e.nombre)
+                                  .toSet()
+                                  .toList(),
+                              onChanged: (val) =>
+                                  safeSetState(() => _model.cmdgerenciaValue = val),
+                              width: double.infinity,
+                              height: 50.0,
+                              textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
+                                    font: TextStyle(
+                                      fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                    ),
+                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                  ),
+                              hintText: 'Seleccione',
+                              icon: Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                color: FlutterFlowTheme.of(context).secondaryText,
+                                size: 24.0,
+                              ),
+                              fillColor: FlutterFlowTheme.of(context).secondaryBackground,
+                              elevation: 2.0,
+                              borderColor: FlutterFlowTheme.of(context).customColor4bbbbb,
+                              borderWidth: 0.0,
+                              borderRadius: 8.0,
+                              margin: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
+                              hidesUnderline: true,
+                              isOverButton: false,
+                              isSearchable: true,
+                              isMultiSelect: false,
+                              maxHeight: 200.0,
+                            ),
+                          ].divide(SizedBox(height: 5.0)),
                         ),
-                        // n. Recomendación (keep exactly as-is)
+                        // 4. Ecosistema Físico Digital (ancho completo)
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Ecosistema Físico Digital',
+                              style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                    font: TextStyle(
+                                      fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                    ),
+                                    fontSize: 18.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                  ),
+                            ),
+                            FlutterFlowDropDown<String>(
+                              controller: _model.cmdecosistemaValueController ??=
+                                  FormFieldController<String>(null),
+                              options: FFAppState()
+                                  .listaecosistema
+                                  .map((e) => e.nombre)
+                                  .toSet()
+                                  .toList(),
+                              onChanged: (val) =>
+                                  safeSetState(() => _model.cmdecosistemaValue = val),
+                              width: double.infinity,
+                              height: 50.0,
+                              textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
+                                    font: TextStyle(
+                                      fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                    ),
+                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                  ),
+                              hintText: 'Seleccione',
+                              icon: Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                color: FlutterFlowTheme.of(context).secondaryText,
+                                size: 24.0,
+                              ),
+                              fillColor: FlutterFlowTheme.of(context).secondaryBackground,
+                              elevation: 2.0,
+                              borderColor: FlutterFlowTheme.of(context).customColor4bbbbb,
+                              borderWidth: 0.0,
+                              borderRadius: 8.0,
+                              margin: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
+                              hidesUnderline: true,
+                              isOverButton: false,
+                              isSearchable: true,
+                              isMultiSelect: false,
+                              maxHeight: 200.0,
+                            ),
+                          ].divide(SizedBox(height: 5.0)),
+                        ),
+                        // 5. Fecha Identificación hallazgo (ancho completo)
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Fecha Identificación hallazgo',
+                              style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                    font: TextStyle(
+                                      fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                    ),
+                                    fontSize: 18.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                  ),
+                            ),
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                final _datePickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: getCurrentTimestamp,
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2050),
+                                  builder: (context, child) {
+                                    return wrapInMaterialDatePickerTheme(
+                                      context,
+                                      child!,
+                                      headerBackgroundColor: FlutterFlowTheme.of(context).primary,
+                                      headerForegroundColor: FlutterFlowTheme.of(context).info,
+                                      headerTextStyle: FlutterFlowTheme.of(context).headlineLarge.override(
+                                            font: GoogleFonts.interTight(
+                                              fontWeight: FontWeight.w600,
+                                              fontStyle: FlutterFlowTheme.of(context).headlineLarge.fontStyle,
+                                            ),
+                                            fontSize: 32.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.w600,
+                                            fontStyle: FlutterFlowTheme.of(context).headlineLarge.fontStyle,
+                                          ),
+                                      pickerBackgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+                                      pickerForegroundColor: FlutterFlowTheme.of(context).primaryText,
+                                      selectedDateTimeBackgroundColor: FlutterFlowTheme.of(context).primary,
+                                      selectedDateTimeForegroundColor: FlutterFlowTheme.of(context).info,
+                                      actionButtonForegroundColor: FlutterFlowTheme.of(context).primaryText,
+                                      iconSize: 24.0,
+                                    );
+                                  },
+                                );
+                                if (_datePickedDate != null) {
+                                  safeSetState(() {
+                                    _model.datePicked = DateTime(
+                                      _datePickedDate.year,
+                                      _datePickedDate.month,
+                                      _datePickedDate.day,
+                                    );
+                                  });
+                                } else if (_model.datePicked != null) {
+                                  safeSetState(() {
+                                    _model.datePicked = getCurrentTimestamp;
+                                  });
+                                }
+                                _model.fecha = _model.datePicked;
+                                safeSetState(() {});
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(),
+                                child: FlutterFlowDropDown<String>(
+                                  controller: _model.dropDownValueController ??=
+                                      FormFieldController<String>(null),
+                                  options: <String>[],
+                                  onChanged: (val) =>
+                                      safeSetState(() => _model.dropDownValue = val),
+                                  width: double.infinity,
+                                  height: 50.0,
+                                  textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
+                                        font: TextStyle(
+                                          fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                          fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                        ),
+                                        color: FlutterFlowTheme.of(context).secondaryText,
+                                        letterSpacing: 0.0,
+                                        fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                        fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                      ),
+                                  hintText: valueOrDefault<String>(
+                                    _model.fecha != null
+                                        ? dateTimeFormat(
+                                            "d/M/y",
+                                            _model.fecha,
+                                            locale: FFLocalizations.of(context).languageCode,
+                                          )
+                                        : 'Seleccione fecha',
+                                    'Seleccione fecha',
+                                  ),
+                                  icon: Icon(
+                                    Icons.calendar_today,
+                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                    size: 24.0,
+                                  ),
+                                  fillColor: FlutterFlowTheme.of(context).secondaryBackground,
+                                  elevation: 2.0,
+                                  borderColor: FlutterFlowTheme.of(context).customColor4bbbbb,
+                                  borderWidth: 0.0,
+                                  borderRadius: 8.0,
+                                  margin: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
+                                  hidesUnderline: true,
+                                  disabled: true,
+                                  isOverButton: false,
+                                  isSearchable: true,
+                                  isMultiSelect: false,
+                                ),
+                              ),
+                            ),
+                          ].divide(SizedBox(height: 5.0)),
+                        ),
+                        // 6. Nivel de Riesgo (ancho completo)
+                        _buildDropdownField(
+                          context: context,
+                          label: 'Nivel de Riesgo',
+                          options: _model.riskLevels.map((r) => r.riskLevelId ?? '').toList(),
+                          optionLabels: _model.riskLevels.map((r) => r.name ?? '').toList(),
+                          currentValue: _model.cmdriesgoValue,
+                          controller: _model.cmdriesgoValueController,
+                          onChanged: (val) => safeSetState(() => _model.cmdriesgoValue = val),
+                        ),
+                        // 7. Estado de Publicación (Publicado/a) (ancho completo)
+                        _buildDropdownField(
+                          context: context,
+                          label: 'Estado de Publicación',
+                          options: _model.publicationStatuses.map((s) => s.publicationStatusId ?? '').toList(),
+                          optionLabels: _model.publicationStatuses.map((s) => s.name ?? '').toList(),
+                          currentValue: _model.cmdPublicationStatusValue,
+                          controller: _model.cmdPublicationStatusController,
+                          onChanged: (val) => safeSetState(() => _model.cmdPublicationStatusValue = val),
+                        ),
+                        // 8. Recomendaciones (ancho completo)
                         Column(
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1364,7 +1224,108 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                             ),
                           ].divide(SizedBox(height: 5.0)),
                         ),
-                        // o. Causa Raíz
+                        // 9. Tipo de Impacto (ancho completo)
+                        _buildDropdownField(
+                          context: context,
+                          label: 'Tipo de Impacto',
+                          options: _model.impactTypes.map((t) => t.impactTypeId ?? '').toList(),
+                          optionLabels: _model.impactTypes.map((t) => t.name ?? '').toList(),
+                          currentValue: _model.cmdImpactTypeValue,
+                          controller: _model.cmdImpactTypeController,
+                          onChanged: (val) => safeSetState(() => _model.cmdImpactTypeValue = val),
+                        ),
+                        // 10. Soporte al Ecosistema (ancho completo)
+                        _buildDropdownField(
+                          context: context,
+                          label: 'Soporte al Ecosistema',
+                          options: _model.ecosystemSupports.map((e) => e.ecosystemSupportId ?? '').toList(),
+                          optionLabels: _model.ecosystemSupports.map((e) => e.name ?? '').toList(),
+                          currentValue: _model.cmdEcosystemSupportValue,
+                          controller: _model.cmdEcosystemSupportController,
+                          onChanged: (val) => safeSetState(() => _model.cmdEcosystemSupportValue = val),
+                        ),
+                        // 11. Tipo de Riesgo (ancho completo)
+                        _buildDropdownField(
+                          context: context,
+                          label: 'Tipo de Riesgo',
+                          options: _model.riskTypes.map((t) => t.riskTypeId ?? '').toList(),
+                          optionLabels: _model.riskTypes.map((t) => t.name ?? '').toList(),
+                          currentValue: _model.cmdRiskTypeValue,
+                          controller: _model.cmdRiskTypeController,
+                          onChanged: (val) {
+                            safeSetState(() {
+                              _model.cmdRiskTypeValue = val;
+                              final filtered = _model.riskTypologies
+                                  .where((t) => t.riskTypeId == val)
+                                  .toList();
+                              // Si no hay tipologías con ese riskTypeId, mostrar todas
+                              _model.filteredRiskTypologies = filtered.isNotEmpty ? filtered : _model.riskTypologies;
+                              _model.cmdRiskTypologyValue = null;
+                              _model.cmdRiskTypologyController = FormFieldController<String>(null);
+                            });
+                          },
+                        ),
+                        // 12. Tipología de Riesgo (ancho completo)
+                        _buildDropdownField(
+                          context: context,
+                          label: 'Tipología de Riesgo',
+                          options: _model.filteredRiskTypologies.map((t) => t.riskTypologyId ?? '').toList(),
+                          optionLabels: _model.filteredRiskTypologies.map((t) => t.name ?? '').toList(),
+                          currentValue: _model.cmdRiskTypologyValue,
+                          controller: _model.cmdRiskTypologyController,
+                          onChanged: (val) => safeSetState(() => _model.cmdRiskTypologyValue = val),
+                        ),
+                        // 13. Alcance de Observación (ancho completo)
+                        _buildDropdownField(
+                          context: context,
+                          label: 'Alcance de Observación',
+                          options: _model.observationScopes.map((s) => s.observationScopeId ?? '').toList(),
+                          optionLabels: _model.observationScopes.map((s) => s.name ?? '').toList(),
+                          currentValue: _model.cmdObservationScopeValue,
+                          controller: _model.cmdObservationScopeController,
+                          onChanged: (val) => safeSetState(() => _model.cmdObservationScopeValue = val),
+                        ),
+                        // 14. Riesgo Actual (ancho completo)
+                        _buildDropdownField(
+                          context: context,
+                          label: 'Riesgo Actual',
+                          options: _model.riskLevels.map((r) => r.riskLevelId ?? '').toList(),
+                          optionLabels: _model.riskLevels.map((r) => r.name ?? '').toList(),
+                          currentValue: _model.cmdRiskActualLevelValue,
+                          controller: _model.cmdRiskActualLevelController,
+                          onChanged: (val) => safeSetState(() => _model.cmdRiskActualLevelValue = val),
+                        ),
+                        // 15. Gerente Responsable (ancho completo)
+                        _buildTextField(
+                          context: context,
+                          label: 'Gerente Responsable',
+                          controller: _model.txtGerenteResponsableController,
+                          focusNode: _model.txtGerenteResponsableFocusNode,
+                          hintText: 'Escribe aquí',
+                          maxLines: 1,
+                          minLines: 1,
+                        ),
+                        // 16. Auditor Responsable (ancho completo)
+                        _buildTextField(
+                          context: context,
+                          label: 'Auditor Responsable',
+                          controller: _model.txtAuditorResponsableController,
+                          focusNode: _model.txtAuditorResponsableFocusNode,
+                          hintText: 'Escribe aquí',
+                          maxLines: 1,
+                          minLines: 1,
+                        ),
+                        // 17. Descripción del Riesgo (ancho completo)
+                        _buildTextField(
+                          context: context,
+                          label: 'Descripción del Riesgo',
+                          controller: _model.txtDescripcionRiesgoController,
+                          focusNode: _model.txtDescripcionRiesgoFocusNode,
+                          hintText: 'Escribe aquí',
+                          maxLines: 3,
+                          minLines: 3,
+                        ),
+                        // 18. Causa Raíz (ancho completo)
                         _buildTextField(
                           context: context,
                           label: 'Causa Raíz',

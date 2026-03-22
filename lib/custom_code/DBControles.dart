@@ -213,6 +213,13 @@ class DBControles {
         return "Error: No se pudo acceder a la base de datos";
       }
 
+      // 🛡️ SAFETY: Never delete existing controls if the new list is empty.
+      // This prevents data loss when a Supabase fetch times out or returns nothing.
+      if (controles.isEmpty) {
+        print('⚠️ insertControlesMasivos: lista vacía para $objectiveId — sin cambios para proteger datos existentes');
+        return 'Sin cambios (lista vacía)';
+      }
+
       // Primero eliminar attachments de todos los controles del objetivo
       final controlesExistentes = await database.query(
         'Controles',

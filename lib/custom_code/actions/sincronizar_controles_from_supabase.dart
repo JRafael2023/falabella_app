@@ -91,22 +91,72 @@ Future<String> sincronizarControlesFromSupabase(
             }
 
             // Actualizar campos desde Supabase (con conversión de formato)
-            control.completed = controlSupabase.completed ?? false;
-            control.description = controlSupabase.description ?? '';
-            control.findingStatus = controlSupabase.findingStatus;
-            control.photos = photosSupabaseConvertido; // ✅ Ya convertido a formato SQLite
-            control.video = videoSupabaseConvertido; // ✅ Ya convertido a formato SQLite
-            control.archives = archivesSupabaseConvertido; // ✅ Ya convertido a formato SQLite
-            control.observacion = limpiarNull(controlSupabase.observacion);
-            control.gerencia = limpiarNull(controlSupabase.gerencia);
-            control.ecosistema = limpiarNull(controlSupabase.ecosistema);
-            control.fecha = limpiarNull(controlSupabase.fecha);
-            control.descripcionHallazgo = limpiarNull(controlSupabase.descripcionHallazgo);
-            control.recomendacion = limpiarNull(controlSupabase.recomendacion);
-            control.procesoPropuesto = limpiarNull(controlSupabase.procesoPropuesto);
-            control.titulo = limpiarNull(controlSupabase.titulo);
-            control.nivelRiesgo = limpiarNull(controlSupabase.nivelRiesgo);
-            control.controlText = limpiarNull(controlSupabase.controlText);
+            // ⚡ CRÍTICO: NO sobrescribir completed/description/finding_status locales
+            // si el control fue completado localmente pero Supabase aún no tiene los datos
+            // (puede pasar cuando la sincronización local→Supabase aún no se ejecutó).
+            bool localCompletado = control.completed == true;
+            bool supabaseCompletado = controlSupabase.completed ?? false;
+
+            // Solo actualizar completed si Supabase dice que está completado,
+            // o si localmente no estaba completado (para no revertir progreso local).
+            if (supabaseCompletado || !localCompletado) {
+              control.completed = supabaseCompletado;
+            }
+
+            // Solo actualizar description desde Supabase si tiene valor,
+            // o si localmente estaba vacío (para no borrar el comentario del auditor).
+            final supabaseDescription = controlSupabase.description ?? '';
+            if (supabaseDescription.isNotEmpty) {
+              control.description = supabaseDescription;
+            }
+
+            // Solo actualizar finding_status desde Supabase si el control fue
+            // completado en Supabase, o si localmente no fue completado.
+            // Evita revertir EFECTIVO→INEFECTIVO cuando Supabase aún no fue actualizado.
+            if (supabaseCompletado && controlSupabase.findingStatus != null) {
+              control.findingStatus = controlSupabase.findingStatus;
+            } else if (!localCompletado) {
+              control.findingStatus = controlSupabase.findingStatus;
+            }
+            // ⚡ CRÍTICO: Solo sobrescribir adjuntos si Supabase tiene datos,
+            // o si localmente no había adjuntos (evitar borrar adjuntos locales pendientes de sincronizar).
+            if (photosSupabaseConvertido != null && photosSupabaseConvertido.isNotEmpty) {
+              control.photos = photosSupabaseConvertido;
+            } else if (control.photos == null || control.photos!.isEmpty) {
+              control.photos = photosSupabaseConvertido; // null o vacío desde Supabase cuando local también vacío
+            }
+            if (videoSupabaseConvertido != null && videoSupabaseConvertido.isNotEmpty) {
+              control.video = videoSupabaseConvertido;
+            } else if (control.video == null || control.video!.isEmpty) {
+              control.video = videoSupabaseConvertido;
+            }
+            if (archivesSupabaseConvertido != null && archivesSupabaseConvertido.isNotEmpty) {
+              control.archives = archivesSupabaseConvertido;
+            } else if (control.archives == null || control.archives!.isEmpty) {
+              control.archives = archivesSupabaseConvertido;
+            }
+            // ⚡ CRÍTICO: Solo sobrescribir campos de hallazgo si Supabase tiene valor,
+            // o si localmente estaba vacío (evitar borrar datos locales pendientes de sincronizar).
+            void _actualizarSiTieneValor(String? supabaseValor, void Function(String?) setter, String? valorLocal) {
+              final valorLimpio = limpiarNull(supabaseValor);
+              if (valorLimpio != null && valorLimpio.isNotEmpty) {
+                setter(valorLimpio);
+              } else if (valorLocal == null || valorLocal.isEmpty) {
+                setter(null);
+              }
+              // Si Supabase no tiene valor pero local sí → no tocar (preservar local)
+            }
+
+            _actualizarSiTieneValor(controlSupabase.observacion, (v) => control.observacion = v, control.observacion);
+            _actualizarSiTieneValor(controlSupabase.gerencia, (v) => control.gerencia = v, control.gerencia);
+            _actualizarSiTieneValor(controlSupabase.ecosistema, (v) => control.ecosistema = v, control.ecosistema);
+            _actualizarSiTieneValor(controlSupabase.fecha, (v) => control.fecha = v, control.fecha);
+            _actualizarSiTieneValor(controlSupabase.descripcionHallazgo, (v) => control.descripcionHallazgo = v, control.descripcionHallazgo);
+            _actualizarSiTieneValor(controlSupabase.recomendacion, (v) => control.recomendacion = v, control.recomendacion);
+            _actualizarSiTieneValor(controlSupabase.procesoPropuesto, (v) => control.procesoPropuesto = v, control.procesoPropuesto);
+            _actualizarSiTieneValor(controlSupabase.titulo, (v) => control.titulo = v, control.titulo);
+            _actualizarSiTieneValor(controlSupabase.nivelRiesgo, (v) => control.nivelRiesgo = v, control.nivelRiesgo);
+            _actualizarSiTieneValor(controlSupabase.controlText, (v) => control.controlText = v, control.controlText);
             control.updatedAt = DateTime.now().toIso8601String();
 
             // Guardar en SQLite

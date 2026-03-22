@@ -330,6 +330,25 @@ class UpdateControlHighbondInefectivoCall {
     List<String>? archivosList,
     String? projectName = '',
     String? controlText = '',
+    // ⭐ v19
+    String? publicationStatusId = '',
+    String? estadoPublicacion = '',
+    String? impactTypeId = '',
+    String? tipoImpacto = '',
+    String? ecosystemSupportId = '',
+    String? soporteEcosistema = '',
+    String? riskTypeId = '',
+    String? tipoRiesgo = '',
+    String? riskTypologyId = '',
+    String? tipologiaRiesgo = '',
+    String? observationScopeId = '',
+    String? alcanceObservacion = '',
+    String? riskActualLevelId = '',
+    String? riesgoActual = '',
+    String? gerenteResponsable = '',
+    String? auditorResponsable = '',
+    String? descripcionRiesgo = '',
+    String? causaRaiz = '',
   }) async {
     final baseUrl = SupabaseFunctionsGroup.getBaseUrl();
     final images = _serializeList(imagesList);
@@ -353,7 +372,25 @@ class UpdateControlHighbondInefectivoCall {
   "recomendacion": "${escapeStringForJson(recomendacion)}",
   "images": ${images},
   "videos": ${videos},
-  "archivos": ${archivos}
+  "archivos": ${archivos},
+  "publication_status_id": "${escapeStringForJson(publicationStatusId)}",
+  "estado_publicacion": "${escapeStringForJson(estadoPublicacion)}",
+  "impact_type_id": "${escapeStringForJson(impactTypeId)}",
+  "tipo_impacto": "${escapeStringForJson(tipoImpacto)}",
+  "ecosystem_support_id": "${escapeStringForJson(ecosystemSupportId)}",
+  "soporte_ecosistema": "${escapeStringForJson(soporteEcosistema)}",
+  "risk_type_id": "${escapeStringForJson(riskTypeId)}",
+  "tipo_riesgo": "${escapeStringForJson(tipoRiesgo)}",
+  "risk_typology_id": "${escapeStringForJson(riskTypologyId)}",
+  "tipologia_riesgo": "${escapeStringForJson(tipologiaRiesgo)}",
+  "observation_scope_id": "${escapeStringForJson(observationScopeId)}",
+  "alcance_observacion": "${escapeStringForJson(alcanceObservacion)}",
+  "risk_actual_level_id": "${escapeStringForJson(riskActualLevelId)}",
+  "riesgo_actual": "${escapeStringForJson(riesgoActual)}",
+  "gerente_responsable": "${escapeStringForJson(gerenteResponsable)}",
+  "auditor_responsable": "${escapeStringForJson(auditorResponsable)}",
+  "descripcion_riesgo": "${escapeStringForJson(descripcionRiesgo)}",
+  "causa_raiz": "${escapeStringForJson(causaRaiz)}"
 }''';
     return ApiManager.instance.makeApiCall(
       callName: 'Update Control Highbond Inefectivo',

@@ -52,9 +52,21 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
       for (var map in controlesJson) {
         final control = Control.fromMap(map);
 
-        // Cargar fotos de a una por índice para evitar CursorWindow overflow
+        // ✅ Solo incluir controles INEFECTIVOS (findingStatus == 0)
+        if (control.findingStatus != 0) continue;
+
+        totalInefectivos++;
+
+        // Cargar fotos desde ControlAttachments (fotos tomadas en la app)
         final List<String> fotosBase64 =
             await _obtenerFotosSeguro(control.idControl);
+
+        // Si no hay fotos en ControlAttachments, intentar desde campo photos del control
+        if (fotosBase64.isEmpty && (control.photos?.isNotEmpty ?? false)) {
+          final fotosDesdeControl =
+              _extraerFotosDesdeControlPhotos(control.photos!);
+          fotosBase64.addAll(fotosDesdeControl);
+        }
 
         final List<Uint8List> fotosBytes = [];
         for (final b64 in fotosBase64) {
@@ -64,15 +76,13 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
           }
         }
 
-        if (control.findingStatus == 0) totalInefectivos++;
-
         controlesConFotos.add({
           'control': control,
           'fotos': fotosBytes,
         });
       }
 
-      // Solo agregar objetivos que tienen controles
+      // Solo agregar objetivos que tienen controles inefectivos
       if (controlesConFotos.isNotEmpty) {
         seccionesPorObjetivo.add({
           'objetivo': objetivo,
@@ -409,6 +419,35 @@ Future<List<String>> _obtenerFotosSeguro(String idControl) async {
     print('⚠️ Error obteniendo fotos de $idControl: $e');
     return [];
   }
+}
+
+/// Extrae fotos base64 desde el campo photos del control
+/// El campo puede ser JSON array: [{"name":..., "base64":...}]
+/// o strings separados por |||
+List<String> _extraerFotosDesdeControlPhotos(String photosField) {
+  final result = <String>[];
+  try {
+    // Intentar parsear como JSON array de Supabase
+    final trimmed = photosField.trim();
+    if (trimmed.startsWith('[')) {
+      final List<dynamic> lista = json.decode(trimmed);
+      for (final item in lista) {
+        if (item is Map) {
+          final b64 = item['base64']?.toString() ?? '';
+          if (b64.isNotEmpty) result.add(b64);
+        }
+      }
+      return result;
+    }
+    // Fallback: separado por |||
+    final partes = photosField.split('|||');
+    for (final p in partes) {
+      if (p.isNotEmpty) result.add(p);
+    }
+  } catch (e) {
+    print('⚠️ Error parseando photos del control: $e');
+  }
+  return result;
 }
 
 /// Decodifica base64 con soporte GZIP y prefijo "GZIP:"

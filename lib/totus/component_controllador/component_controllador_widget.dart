@@ -173,6 +173,26 @@ class _ComponentControlladorWidgetState
           _model.tituloHallazgo = datosTemporales['titulo'];
           _model.nivelRiesgo = datosTemporales['nivelRiesgo'];
           _model.titulo = datosTemporales['observacion']; // titulo observación
+          // ⭐ v19 campos adicionales
+          _model.riskLevelId = datosTemporales['riskLevelId'];
+          _model.publicationStatusId = datosTemporales['publicationStatusId'];
+          _model.estadoPublicacion = datosTemporales['estadoPublicacion'];
+          _model.impactTypeId = datosTemporales['impactTypeId'];
+          _model.tipoImpacto = datosTemporales['tipoImpacto'];
+          _model.ecosystemSupportId = datosTemporales['ecosystemSupportId'];
+          _model.soporteEcosistema = datosTemporales['soporteEcosistema'];
+          _model.riskTypeId = datosTemporales['riskTypeId'];
+          _model.tipoRiesgo = datosTemporales['tipoRiesgo'];
+          _model.riskTypologyId = datosTemporales['riskTypologyId'];
+          _model.tipologiaRiesgo = datosTemporales['tipologiaRiesgo'];
+          _model.gerenteResponsable = datosTemporales['gerenteResponsable'];
+          _model.auditorResponsable = datosTemporales['auditorResponsable'];
+          _model.descripcionRiesgo = datosTemporales['descripcionRiesgo'];
+          _model.observationScopeId = datosTemporales['observationScopeId'];
+          _model.alcanceObservacion = datosTemporales['alcanceObservacion'];
+          _model.riskActualLevelId = datosTemporales['riskActualLevelId'];
+          _model.riesgoActual = datosTemporales['riesgoActual'];
+          _model.causaRaiz = datosTemporales['causaRaiz'];
         } else {
           // No hay datos temporales - cargar desde SQLite (datos guardados)
           _model.observacion = controlCompleto['observacion'];
@@ -185,6 +205,26 @@ class _ComponentControlladorWidgetState
           _model.tituloHallazgo = controlCompleto['titulo'];
           _model.nivelRiesgo = controlCompleto['nivel_riesgo'];
           _model.titulo = controlCompleto['observacion']; // titulo observación
+          // ⭐ v19 campos adicionales
+          _model.riskLevelId = controlCompleto['risk_level_id'];
+          _model.publicationStatusId = controlCompleto['publication_status_id'];
+          _model.estadoPublicacion = controlCompleto['estado_publicacion'];
+          _model.impactTypeId = controlCompleto['impact_type_id'];
+          _model.tipoImpacto = controlCompleto['tipo_impacto'];
+          _model.ecosystemSupportId = controlCompleto['ecosystem_support_id'];
+          _model.soporteEcosistema = controlCompleto['soporte_ecosistema'];
+          _model.riskTypeId = controlCompleto['risk_type_id'];
+          _model.tipoRiesgo = controlCompleto['tipo_riesgo'];
+          _model.riskTypologyId = controlCompleto['risk_typology_id'];
+          _model.tipologiaRiesgo = controlCompleto['tipologia_riesgo'];
+          _model.gerenteResponsable = controlCompleto['gerente_responsable'];
+          _model.auditorResponsable = controlCompleto['auditor_responsable'];
+          _model.descripcionRiesgo = controlCompleto['descripcion_riesgo'];
+          _model.observationScopeId = controlCompleto['observation_scope_id'];
+          _model.alcanceObservacion = controlCompleto['alcance_observacion'];
+          _model.riskActualLevelId = controlCompleto['risk_actual_level_id'];
+          _model.riesgoActual = controlCompleto['riesgo_actual'];
+          _model.causaRaiz = controlCompleto['causa_raiz'];
         }
 
         // ⭐ CARGAR datos temporales COMPLETOS del control (imágenes, texto, estado, etc.)
@@ -1425,7 +1465,14 @@ class _ComponentControlladorWidgetState
                                                    _model.descripcion != null ||
                                                    _model.recomendacion != null ||
                                                    _model.tituloHallazgo != null ||
-                                                   _model.nivelRiesgo != null)
+                                                   _model.nivelRiesgo != null ||
+                                                   _model.publicationStatusId != null ||
+                                                   _model.impactTypeId != null ||
+                                                   _model.ecosystemSupportId != null ||
+                                                   _model.riskTypeId != null ||
+                                                   _model.observationScopeId != null ||
+                                                   _model.riskActualLevelId != null ||
+                                                   _model.gerenteResponsable != null)
                                             ? () {
                                                 // 🔍 Convertir nombres (texto) a IDs para los dropdowns
                                                 String? procesoPropuestoId;
@@ -1437,16 +1484,29 @@ class _ComponentControlladorWidgetState
                                                 }
 
                                                 return HallazgoStruct(
-                                                  observacion: _model.titulo, // Título observación
+                                                  observacion: _model.titulo,
                                                   gerencia: _model.gerencia,
                                                   ecosistema: _model.ecosistema,
                                                   fecha: _model.fecha,
                                                   descripcion: _model.descripcion,
                                                   recomendacion: _model.recomendacion,
                                                   procesoPropuesto: procesoPropuestoId ?? _model.procesoPropuesto,
-                                                  titulo: _model.tituloHallazgo, // Título del formulario
+                                                  titulo: _model.tituloHallazgo,
                                                   tituloHallazgo: _model.tituloHallazgo,
                                                   nivelRiesgo: _model.nivelRiesgo,
+                                                  riskLevelId: _model.riskLevelId ?? '',
+                                                  // ⭐ v19
+                                                  publicationStatusId: _model.publicationStatusId ?? '',
+                                                  impactTypeId: _model.impactTypeId ?? '',
+                                                  ecosystemSupportId: _model.ecosystemSupportId ?? '',
+                                                  riskTypeId: _model.riskTypeId ?? '',
+                                                  riskTypologyId: _model.riskTypologyId ?? '',
+                                                  observationScopeId: _model.observationScopeId ?? '',
+                                                  riskActualLevelId: _model.riskActualLevelId ?? '',
+                                                  gerenteResponsable: _model.gerenteResponsable ?? '',
+                                                  auditorResponsable: _model.auditorResponsable ?? '',
+                                                  descripcionRiesgo: _model.descripcionRiesgo ?? '',
+                                                  causaRaiz: _model.causaRaiz ?? '',
                                                 );
                                               }()
                                             : null,
@@ -1650,10 +1710,8 @@ class _ComponentControlladorWidgetState
                         if (estadoControl != null) {
                           if (estadoControl == 1) {
                             if ((_model.listImagesData.isNotEmpty) ||
-                                (widget.listVideos != null &&
-                                    (widget.listVideos)!.isNotEmpty) ||
-                                (widget.listArchives != null &&
-                                    (widget.listArchives)!.isNotEmpty)) {
+                                (_model.listvideomp4Data.isNotEmpty) ||
+                                (_model.listarchiveData.isNotEmpty)) {
                               // 🔓 Descomprimir imágenes GZIP antes de enviar a HighBond
                               var compressedImages = functions.convertListUploadFIletoBase64List(
                                   _model.listImagesData.toList());
@@ -1682,6 +1740,24 @@ class _ComponentControlladorWidgetState
                                 archivosList: functions.decompressGzipBase64List(compressedArchivos),
                                 projectName: FFAppState().projectName.isNotEmpty ? FFAppState().projectName : widget.nameProyect,
                                 controlText: widget.nameControl,
+                                publicationStatusId: _model.publicationStatusId,
+                                estadoPublicacion: _model.estadoPublicacion,
+                                impactTypeId: _model.impactTypeId,
+                                tipoImpacto: _model.tipoImpacto,
+                                ecosystemSupportId: _model.ecosystemSupportId,
+                                soporteEcosistema: _model.soporteEcosistema,
+                                riskTypeId: _model.riskTypeId,
+                                tipoRiesgo: _model.tipoRiesgo,
+                                riskTypologyId: _model.riskTypologyId,
+                                tipologiaRiesgo: _model.tipologiaRiesgo,
+                                observationScopeId: _model.observationScopeId,
+                                alcanceObservacion: _model.alcanceObservacion,
+                                riskActualLevelId: _model.riskActualLevelId,
+                                riesgoActual: _model.riesgoActual,
+                                gerenteResponsable: _model.gerenteResponsable,
+                                auditorResponsable: _model.auditorResponsable,
+                                descripcionRiesgo: _model.descripcionRiesgo,
+                                causaRaiz: _model.causaRaiz,
                               );
 
                               _shouldSetState = true;
@@ -2042,6 +2118,24 @@ class _ComponentControlladorWidgetState
                                 archivosList: functions.decompressGzipBase64List(compressedArchivos2),
                                 projectName: FFAppState().projectName.isNotEmpty ? FFAppState().projectName : widget.nameProyect,
                                 controlText: widget.nameControl,
+                                publicationStatusId: _model.publicationStatusId,
+                                estadoPublicacion: _model.estadoPublicacion,
+                                impactTypeId: _model.impactTypeId,
+                                tipoImpacto: _model.tipoImpacto,
+                                ecosystemSupportId: _model.ecosystemSupportId,
+                                soporteEcosistema: _model.soporteEcosistema,
+                                riskTypeId: _model.riskTypeId,
+                                tipoRiesgo: _model.tipoRiesgo,
+                                riskTypologyId: _model.riskTypologyId,
+                                tipologiaRiesgo: _model.tipologiaRiesgo,
+                                observationScopeId: _model.observationScopeId,
+                                alcanceObservacion: _model.alcanceObservacion,
+                                riskActualLevelId: _model.riskActualLevelId,
+                                riesgoActual: _model.riesgoActual,
+                                gerenteResponsable: _model.gerenteResponsable,
+                                auditorResponsable: _model.auditorResponsable,
+                                descripcionRiesgo: _model.descripcionRiesgo,
+                                causaRaiz: _model.causaRaiz,
                               );
 
                               _shouldSetState = true;
@@ -2220,6 +2314,62 @@ class _ComponentControlladorWidgetState
                                 return;
                               }
                             } else {
+                              // ⭐ Sin adjuntos: primero crear hallazgo en HighBond con listas vacías
+                              _model.apiResultInefectivoSinAdjuntos =
+                                  await SupabaseFunctionsGroup
+                                      .updateControlHighbondInefectivoCall
+                                      .call(
+                                projectId: FFAppState().idproyect,
+                                idControl: widget.idControl,
+                                procesoPropuesto: _model.procesoPropuesto,
+                                tituloObservacion: _model.titulo,
+                                titulo: _model.tituloHallazgo,
+                                gerencia: _model.gerencia,
+                                ecosistema: _model.ecosistema,
+                                fecha: _model.fecha,
+                                nivelRiesgo: _model.nivelRiesgo,
+                                descripcion: _model.descripcion,
+                                recomendacion: _model.recomendacion,
+                                imagesList: [],
+                                videosList: [],
+                                archivosList: [],
+                                projectName: FFAppState().projectName.isNotEmpty ? FFAppState().projectName : widget.nameProyect,
+                                controlText: widget.nameControl,
+                                publicationStatusId: _model.publicationStatusId,
+                                estadoPublicacion: _model.estadoPublicacion,
+                                impactTypeId: _model.impactTypeId,
+                                tipoImpacto: _model.tipoImpacto,
+                                ecosystemSupportId: _model.ecosystemSupportId,
+                                soporteEcosistema: _model.soporteEcosistema,
+                                riskTypeId: _model.riskTypeId,
+                                tipoRiesgo: _model.tipoRiesgo,
+                                riskTypologyId: _model.riskTypologyId,
+                                tipologiaRiesgo: _model.tipologiaRiesgo,
+                                observationScopeId: _model.observationScopeId,
+                                alcanceObservacion: _model.alcanceObservacion,
+                                riskActualLevelId: _model.riskActualLevelId,
+                                riesgoActual: _model.riesgoActual,
+                                gerenteResponsable: _model.gerenteResponsable,
+                                auditorResponsable: _model.auditorResponsable,
+                                descripcionRiesgo: _model.descripcionRiesgo,
+                                causaRaiz: _model.causaRaiz,
+                              );
+                              _shouldSetState = true;
+                              if (!(_model.apiResultInefectivoSinAdjuntos?.succeeded ?? true)) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'No se pudo registrar el hallazgo en HighBond. Por favor intente nuevamente.',
+                                      style: TextStyle(color: FlutterFlowTheme.of(context).secondaryBackground),
+                                    ),
+                                    duration: Duration(milliseconds: 4000),
+                                    backgroundColor: FlutterFlowTheme.of(context).error,
+                                  ),
+                                );
+                                if (_shouldSetState) safeSetState(() {});
+                                return;
+                              }
+
                               _model.updateControlInefectivosinImagenes =
                                   await SupabaseFunctionsGroup
                                       .updateControlHighbondCall
