@@ -1,3 +1,4 @@
+import '/backend/api_requests/api_calls.dart';
 import '/components/exit_component_widget.dart';
 import '/components/no_internet_dialog_widget_widget.dart';
 import '/components/wifi_component_widget.dart';
@@ -55,6 +56,9 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
+      // 🌐 Cargar proyectos Highbond en paralelo (solo si hay internet)
+      _cargarProyectosHighbondEnParalelo();
+
       // Cargar última sincronización desde SQLite
       try {
         final ultimoSync = await DBSyncLogs.getUltimoSync();
@@ -107,6 +111,43 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
     _model.dispose();
 
     super.dispose();
+  }
+
+  /// Carga y cachea los proyectos de Highbond en segundo plano.
+  /// No bloquea el UI — si falla, se mantiene la lista anterior.
+  void _cargarProyectosHighbondEnParalelo() {
+    SupabaseFunctionsGroup.getProjectsHighbondCall.call().then((resp) {
+      if (!mounted) return;
+      if (!resp.succeeded) return;
+      final body = resp.jsonBody;
+      List<dynamic> raw = [];
+      if (body is Map) {
+        final d1 = body['data'];
+        if (d1 is Map) {
+          final d2 = d1['data'];
+          if (d2 is List) raw = d2;
+        } else if (d1 is List) {
+          raw = d1;
+        }
+      } else if (body is List) {
+        raw = body;
+      }
+      final projects = raw
+          .whereType<Map>()
+          .map((p) => {
+                'id': p['id']?.toString() ?? '',
+                'name': (p['attributes']?['name'] ?? p['id'] ?? '').toString(),
+              })
+          .where((p) => (p['id'] as String).isNotEmpty)
+          .toList()
+          .cast<dynamic>();
+      if (projects.isNotEmpty) {
+        FFAppState().jsonHighbondProjects = projects;
+        print('✅ Highbond projects cacheados: ${projects.length}');
+      }
+    }).catchError((e) {
+      print('⚠️ No se pudo cargar proyectos Highbond: $e');
+    });
   }
 
   @override

@@ -145,7 +145,9 @@ class _ControlesWidgetState extends State<ControlesWidget> with WidgetsBindingOb
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.titleProject,
+                              widget.titleProject.isNotEmpty
+                                  ? widget.titleProject
+                                  : FFAppState().projectName,
                               textAlign: TextAlign.start,
                               maxLines: 3,
                               softWrap: true,

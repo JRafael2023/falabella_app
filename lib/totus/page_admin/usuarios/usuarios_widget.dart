@@ -1,4 +1,5 @@
 import '/backend/supabase/supabase.dart';
+import 'dart:math';
 import '/components/exit_component_widget.dart';
 import '/components/no_internet_dialog_widget_widget.dart';
 import '/components/wifi_component_widget.dart';
@@ -42,6 +43,28 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
 
   // Mensaje de error visible dentro del formulario
   String? _errorMsg;
+
+  /// Genera un ID numérico aleatorio de 4-6 dígitos único contra los usuarios existentes.
+  String _generarIdUnico() {
+    final rng = Random();
+    final existentes = FFAppState().jsonUsers
+        .map((u) => (u as Map)['user_uid']?.toString() ?? '')
+        .toSet();
+    String id;
+    do {
+      final digitos = 4 + rng.nextInt(3); // 4, 5 o 6 dígitos
+      final min = _pow10(digitos - 1);
+      final max = _pow10(digitos) - 1;
+      id = (min + rng.nextInt(max - min + 1)).toString();
+    } while (existentes.contains(id));
+    return id;
+  }
+
+  int _pow10(int exp) {
+    int result = 1;
+    for (int i = 0; i < exp; i++) result *= 10;
+    return result;
+  }
 
   void _mostrarError(String msg, {VoidCallback? refresh}) {
     _errorMsg = msg;
@@ -284,28 +307,44 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                               ),
                             ].divide(SizedBox(height: 5.0)),
                           ),
-                          // ── Id Usuario ──────────────────────────────────
+                          // ── Id Usuario (auto-generado, solo lectura) ────
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Id Usuario', style: _labelTextStyle(context)),
-                              Container(
-                                decoration: BoxDecoration(),
-                                child: TextFormField(
-                                  controller: _model.txtidTextController,
-                                  focusNode: _model.txtidFocusNode,
-                                  autofocus: false,
-                                  obscureText: false,
-                                  maxLength: 100,
-                                  maxLines: 1,
-                                  buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
-                                  decoration: _inputDeco(context),
-                                  style: _fieldTextStyle(context),
-                                  cursorColor: FlutterFlowTheme.of(context).primaryText,
-                                  enableInteractiveSelection: true,
-                                  validator: _model.txtidTextControllerValidator.asValidator(context),
-                                ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: _model.txtidTextController,
+                                      focusNode: _model.txtidFocusNode,
+                                      autofocus: false,
+                                      readOnly: true,
+                                      obscureText: false,
+                                      maxLines: 1,
+                                      decoration: _inputDeco(context),
+                                      style: _fieldTextStyle(context).copyWith(
+                                        color: FlutterFlowTheme.of(context).secondaryText,
+                                      ),
+                                      validator: _model.txtidTextControllerValidator.asValidator(context),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8.0),
+                                  IconButton(
+                                    tooltip: 'Generar nuevo ID',
+                                    onPressed: () {
+                                      _model.txtidTextController?.text = _generarIdUnico();
+                                      refresh?.call();
+                                    },
+                                    icon: Icon(Icons.refresh, color: FlutterFlowTheme.of(context).primary),
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: FlutterFlowTheme.of(context).primary.withOpacity(0.1),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ].divide(SizedBox(height: 5.0)),
                           ),
@@ -760,6 +799,8 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                         onPressed: () {
                           // Guardamos el context del Scaffold ANTES de abrir el modal
                           final rootContext = context;
+                          // Auto-generar ID único al abrir el formulario
+                          _model.txtidTextController?.text = _generarIdUnico();
                           showModalBottomSheet(
                             context: rootContext,
                             isScrollControlled: true,

@@ -446,6 +446,37 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
+                                      // ── Toggle: Escribir ID / Seleccionar de Highbond ──────────────
+                                      if (_model.estaconectado ?? false)
+                                        Row(
+                                          children: [
+                                            _buildToggleChip(
+                                              context: context,
+                                              label: 'Escribir ID',
+                                              icon: Icons.edit_outlined,
+                                              selected: !_model.usarDropdownHighbond,
+                                              onTap: () {
+                                                setModalState(() {
+                                                  _model.usarDropdownHighbond = false;
+                                                });
+                                              },
+                                            ),
+                                            const SizedBox(width: 8.0),
+                                            _buildToggleChip(
+                                              context: context,
+                                              label: 'Seleccionar de Highbond',
+                                              icon: Icons.list_alt_outlined,
+                                              selected: _model.usarDropdownHighbond,
+                                              onTap: () {
+                                                setModalState(() {
+                                                  _model.usarDropdownHighbond = true;
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      // ── Modo manual: campo de texto + lupa ─────────────────────────
+                                      if (!_model.usarDropdownHighbond)
                                       Row(
                                         mainAxisSize: MainAxisSize.max,
                                         crossAxisAlignment:
@@ -711,6 +742,93 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                             ),
                                         ].divide(SizedBox(width: 8.0)),
                                       ),
+                                      // ── Modo dropdown: cargar proyectos de Highbond ─────────────
+                                      if (_model.usarDropdownHighbond)
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Proyecto Highbond',
+                                              style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                font: GoogleFonts.interTight(
+                                                  fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                ),
+                                                fontSize: 18.0,
+                                                letterSpacing: 0.0,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 5.0),
+                                            Row(
+                                              children: [
+                                                ConstrainedBox(
+                                                  constraints: const BoxConstraints(maxWidth: 250.0),
+                                                  child: FFAppState().jsonHighbondProjects.isEmpty
+                                                      ? Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
+                                                            const SizedBox(width: 8),
+                                                            Text('Cargando proyectos...', style: FlutterFlowTheme.of(context).bodySmall),
+                                                          ],
+                                                        )
+                                                      : DropdownButtonFormField<String>(
+                                                          value: _model.selectedHighbondProjectId,
+                                                          isExpanded: true,
+                                                          menuMaxHeight: 300.0,
+                                                          decoration: InputDecoration(
+                                                            isDense: true,
+                                                            contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+                                                            enabledBorder: OutlineInputBorder(
+                                                              borderSide: BorderSide(color: FlutterFlowTheme.of(context).customColor4bbbbb, width: 2.0),
+                                                              borderRadius: BorderRadius.circular(8.0),
+                                                            ),
+                                                            focusedBorder: OutlineInputBorder(
+                                                              borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary, width: 2.0),
+                                                              borderRadius: BorderRadius.circular(8.0),
+                                                            ),
+                                                          ),
+                                                          hint: Text('Selecciona un proyecto', style: FlutterFlowTheme.of(context).labelMedium),
+                                                          items: FFAppState().jsonHighbondProjects.map((p) {
+                                                            final pm = p as Map;
+                                                            return DropdownMenuItem<String>(
+                                                              value: pm['id']?.toString() ?? '',
+                                                              child: Text(
+                                                                pm['name']?.toString() ?? '',
+                                                                overflow: TextOverflow.ellipsis,
+                                                                style: FlutterFlowTheme.of(context).bodyMedium,
+                                                              ),
+                                                            );
+                                                          }).toList(),
+                                                          onChanged: (val) {
+                                                            if (val == null) return;
+                                                            final proyecto = FFAppState().jsonHighbondProjects.firstWhere((p) => (p as Map)['id']?.toString() == val);
+                                                            final pm = proyecto as Map;
+                                                            setModalState(() {
+                                                              _model.selectedHighbondProjectId = val;
+                                                              _model.selectedHighbondProjectName = pm['name']?.toString();
+                                                              _model.txtidTextController?.text = val;
+                                                              _model.txtnombreTextController?.text = pm['name']?.toString() ?? '';
+                                                            });
+                                                          },
+                                                        ),
+                                                ),
+                                              ],
+                                            ),
+                                            if (_model.selectedHighbondProjectId != null)
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 4.0),
+                                                child: Text(
+                                                  'ID: ${_model.selectedHighbondProjectId}',
+                                                  style: FlutterFlowTheme.of(context).bodySmall.override(
+                                                    font: TextStyle(),
+                                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                                    letterSpacing: 0.0,
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
                                       Column(
                                         mainAxisSize: MainAxisSize.min,
                                         crossAxisAlignment:
@@ -1410,6 +1528,10 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                         ?.reset();
                                                     _model.cboUserAssignValue =
                                                         null;
+                                                    // Reset estado dropdown Highbond
+                                                    _model.usarDropdownHighbond = false;
+                                                    _model.selectedHighbondProjectId = null;
+                                                    _model.selectedHighbondProjectName = null;
                                                   });
                                                   // Cerrar el formulario primero
                                                   Navigator.pop(context);
@@ -1502,6 +1624,44 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                         ),
                       ),
                     ),
+      ),
+    );
+  }
+
+  Widget _buildToggleChip({
+    required BuildContext context,
+    required String label,
+    required IconData icon,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    final primary = FlutterFlowTheme.of(context).primary;
+    final border = FlutterFlowTheme.of(context).customColor4bbbbb;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+        decoration: BoxDecoration(
+          color: selected ? primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(20.0),
+          border: Border.all(color: selected ? primary : border, width: 1.5),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14.0, color: selected ? Colors.white : FlutterFlowTheme.of(context).secondaryText),
+            const SizedBox(width: 5.0),
+            Text(
+              label,
+              style: FlutterFlowTheme.of(context).bodySmall.override(
+                font: TextStyle(),
+                color: selected ? Colors.white : FlutterFlowTheme.of(context).secondaryText,
+                letterSpacing: 0.0,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

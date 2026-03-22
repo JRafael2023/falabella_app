@@ -44,6 +44,12 @@ class CreateProyectosModel extends FlutterFlowModel<CreateProyectosWidget> {
 
   Usuario? test;
 
+  // ── Selector Highbond ──────────────────────────────────────────────────────
+  /// true = mostrar dropdown de proyectos Highbond, false = ingresar ID manual
+  bool usarDropdownHighbond = false;
+  String? selectedHighbondProjectId;
+  String? selectedHighbondProjectName;
+
   ///  State fields for stateful widgets in this page.
 
   final formKey = GlobalKey<FormState>();

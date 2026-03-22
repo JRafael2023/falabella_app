@@ -150,6 +150,16 @@ class FFAppState extends ChangeNotifier {
           _jsonMatrices;
     });
     _safeInit(() {
+      _jsonHighbondProjects = prefs.getStringList('ff_jsonHighbondProjects')?.map((x) {
+            try {
+              return jsonDecode(x);
+            } catch (e) {
+              return {};
+            }
+          }).toList() ??
+          _jsonHighbondProjects;
+    });
+    _safeInit(() {
       if (prefs.containsKey('ff_currentUser')) {
         try {
           final serializedData = prefs.getString('ff_currentUser') ?? '{}';
@@ -622,6 +632,15 @@ class FFAppState extends ChangeNotifier {
     jsonMatrices.insert(index, value);
     prefs.setStringList(
         'ff_jsonMatrices', _jsonMatrices.map((x) => jsonEncode(x)).toList());
+  }
+
+  // 🌐 Proyectos de Highbond cacheados (persistente, se refresca online en Home)
+  List<dynamic> _jsonHighbondProjects = [];
+  List<dynamic> get jsonHighbondProjects => _jsonHighbondProjects;
+  set jsonHighbondProjects(List<dynamic> value) {
+    _jsonHighbondProjects = value;
+    prefs.setStringList(
+        'ff_jsonHighbondProjects', value.map((x) => jsonEncode(x)).toList());
   }
 
   UserStruct _currentUser = UserStruct();
