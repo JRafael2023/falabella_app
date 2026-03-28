@@ -17,6 +17,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '/custom_code/Control.dart';
 import '/custom_code/DBControles.dart';
+import '/custom_code/DBControlAttachments.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
 
 Future<String> combineAndSyncControls(
@@ -140,9 +141,11 @@ Future<String> combineAndSyncControls(
           // ⚡ PRESERVAR finding_status SOLO si el control fue completado (evaluado por auditor)
           // Si completed=false, el control nunca fue evaluado → finding_status debe ser null
           findingStatus: existingCompleted ? existing['finding_status'] : null,
-          photos: photosConvertido,
-          video: videoConvertido,
-          archives: archivesConvertido,
+          // ⚡ CRÍTICO: Si Supabase tiene null para adjuntos/control_text, preservar datos
+          // locales de SQLite (pueden ser cambios offline pendientes de subir a Supabase).
+          photos: await _resolveAttachment(photosConvertido, () => DBControlAttachments.obtenerPhotos(controlId)),
+          video: await _resolveAttachment(videoConvertido, () => DBControlAttachments.obtenerVideos(controlId)),
+          archives: await _resolveAttachment(archivesConvertido, () => DBControlAttachments.obtenerArchives(controlId)),
           status: existing['status'] ?? true,
           completed: existingCompleted,
           createdAt: existing['created_at']?.toString() ?? DateTime.now().toIso8601String(),
@@ -157,7 +160,10 @@ Future<String> combineAndSyncControls(
           procesoPropuesto: existing['proceso_propuesto']?.toString(),
           titulo: existing['titulo']?.toString(),
           nivelRiesgo: existing['nivel_riesgo']?.toString(),
-          controlText: existing['control_text']?.toString(),
+          // ⚡ CRÍTICO: Preservar control_text local si Supabase tiene null
+          controlText: (existing['control_text'] != null && existing['control_text'].toString().isNotEmpty)
+              ? existing['control_text'].toString()
+              : await DBControles.obtenerControlText(controlId),
           // ⭐ CAMPOS v19 - preservar
           tituloObservacion: existing['titulo_observacion']?.toString(),
           riskLevelId: existing['risk_level_id']?.toString(),
@@ -284,4 +290,25 @@ Future<String> combineAndSyncControls(
     print('📋 Stack: $stackTrace');
     return 'Error: $e';
   }
+}
+
+/// Resuelve el valor final de un adjunto:
+/// - Si Supabase tiene datos → usar esos (son la fuente de verdad una vez sincronizados)
+/// - Si Supabase tiene null → preservar datos locales de SQLite (offline pendiente de subir)
+Future<String?> _resolveAttachment(
+  String? supabaseValue,
+  Future<List<String>> Function() loadLocal,
+) async {
+  if (supabaseValue != null && supabaseValue.isNotEmpty) {
+    return supabaseValue; // Supabase tiene datos → usar esos
+  }
+  // Supabase no tiene datos → preservar local si existe
+  try {
+    final localList = await loadLocal();
+    if (localList.isNotEmpty) {
+      print('⚡ Preservando ${localList.length} adjuntos locales (Supabase tiene null)');
+      return localList.join(Control.separator);
+    }
+  } catch (_) {}
+  return null;
 }

@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'index.dart'; // Imports other custom actions
+import 'dart:convert';
 import 'package:tottus/custom_code/DBControles.dart';
 import 'package:tottus/custom_code/DBControlAttachments.dart';
 import 'package:tottus/custom_code/DBObjetivos.dart';
@@ -19,6 +20,20 @@ import 'package:tottus/custom_code/DBProyectos.dart';
 import 'package:tottus/custom_code/Control.dart';
 import 'package:tottus/custom_code/Objetivo.dart';
 import 'package:tottus/custom_code/Proyecto.dart';
+
+/// Cuenta los elementos de un campo JSON array de Supabase.
+/// Retorna 0 si null/vacío, o la cantidad de elementos en el array.
+int _countJsonList(dynamic campo) {
+  if (campo == null) return 0;
+  final s = campo.toString().trim();
+  if (s.isEmpty || s == '[]' || s == 'null') return 0;
+  try {
+    final list = jsonDecode(s) as List;
+    return list.length;
+  } catch (_) {
+    return s.isNotEmpty ? 1 : 0;
+  }
+}
 
 Future<List<dynamic>> obtenerControlesSQLitePorUsuario(String userId) async {
   try {
@@ -72,7 +87,7 @@ Future<List<dynamic>> obtenerControlesSQLitePorUsuario(String userId) async {
     final controlesSupabase = await SupaFlow.client.from('Controls').select(
         'id_control, completed, finding_status, description, photos, video, archives, '
         'observacion, gerencia, ecosistema, fecha, descripcion_hallazgo, '
-        'recomendacion, proceso_propuesto, titulo, nivel_riesgo');
+        'recomendacion, proceso_propuesto, titulo, nivel_riesgo, control_text');
 
     print('📊 Total controles en Supabase: ${controlesSupabase.length}');
 
@@ -142,19 +157,29 @@ Future<List<dynamic>> obtenerControlesSQLitePorUsuario(String userId) async {
       final bool nivelRiesgoDif =
           norm(controlSQLite['nivel_riesgo']) != norm(controlSupabase['nivel_riesgo']);
 
-      // Attachments: comparar conteos locales vs existencia en Supabase
+      // Attachments: comparar conteos locales vs conteos en Supabase
       final int localPhotos = await DBControlAttachments.contarPhotos(idControl);
       final int localArchives = await DBControlAttachments.contarArchives(idControl);
       final bool localVideo = await DBControlAttachments.tieneVideo(idControl);
 
-      final bool photosDif = (localPhotos > 0) != supabaseTieneArchivos(controlSupabase['photos']);
-      final bool videoDif = localVideo != supabaseTieneArchivos(controlSupabase['video']);
-      final bool archivesDif = (localArchives > 0) != supabaseTieneArchivos(controlSupabase['archives']);
+      // ⚡ CRÍTICO: comparar CANTIDAD, no solo existencia binaria.
+      // Si local tiene 3 fotos y Supabase tiene 1, es una diferencia real.
+      final int supabasePhotosCount = _countJsonList(controlSupabase['photos']);
+      final int supabaseArchivesCount = _countJsonList(controlSupabase['archives']);
+      final bool supabaseHasVideo = supabaseTieneArchivos(controlSupabase['video']);
+
+      final bool photosDif = localPhotos != supabasePhotosCount;
+      final bool videoDif = localVideo != supabaseHasVideo;
+      final bool archivesDif = localArchives != supabaseArchivesCount;
+
+      // ⚡ Comparar control_text (campo grande cargado por separado)
+      final String? localControlText = await DBControles.obtenerControlText(idControl);
+      final bool controlTextDif = norm(localControlText) != norm(controlSupabase['control_text']);
 
       final bool hayDiferencia = completedDif || findingDif || descriptionDif ||
           observacionDif || gerenciaDif || ecosistemaDif || fechaDif ||
           descripcionDif || recomendacionDif || procesoDif || tituloDif ||
-          nivelRiesgoDif || photosDif || videoDif || archivesDif;
+          nivelRiesgoDif || photosDif || videoDif || archivesDif || controlTextDif;
 
       if (hayDiferencia) {
         print('🔄 Control modificado: $idControl');
