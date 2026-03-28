@@ -125,12 +125,19 @@ Future<String> combineAndSyncControls(
         print(
             '🔄 Control $controlId existente - preservando completed=${existing['completed']}, finding=${existing['finding_status']}');
 
+        // 🔒 CARGAR DATOS LOCALES DE SQLITE (fuente de verdad para campos editados offline)
+        // Supabase puede tener datos desactualizados si el usuario modificó offline sin sincronizar
+        final localData = await DBControles.obtenerControlCompleto(controlId);
+
+        // Helper: prefiere valor local si existe, sino usa Supabase como fallback
+        String? _localFirst(String? localVal, dynamic supabaseVal) {
+          if (localVal != null && localVal.isNotEmpty) return localVal;
+          final s = supabaseVal?.toString();
+          return (s != null && s.isNotEmpty) ? s : null;
+        }
+
         // Crear Control con TODOS los datos de SQLite, actualizando solo campos de API
         final existingCompleted = existing['completed'] == true || existing['completed'] == 1;
-        // ⚡ Convertir fotos/videos/archivos de formato JSON (Supabase) a formato SQLite (|||)
-        final photosConvertido = functions.convertirJSONaFormatoSQLite(existing['photos']);
-        final videoConvertido = functions.convertirJSONaFormatoSQLite(existing['video']);
-        final archivesConvertido = functions.convertirJSONaFormatoSQLite(existing['archives']);
 
         final control = Control(
           idControl: controlId,
@@ -141,50 +148,51 @@ Future<String> combineAndSyncControls(
           // ⚡ PRESERVAR finding_status SOLO si el control fue completado (evaluado por auditor)
           // Si completed=false, el control nunca fue evaluado → finding_status debe ser null
           findingStatus: existingCompleted ? existing['finding_status'] : null,
-          // ⚡ CRÍTICO: Si Supabase tiene null para adjuntos/control_text, preservar datos
-          // locales de SQLite (pueden ser cambios offline pendientes de subir a Supabase).
-          photos: await _resolveAttachment(photosConvertido, () => DBControlAttachments.obtenerPhotos(controlId)),
-          video: await _resolveAttachment(videoConvertido, () => DBControlAttachments.obtenerVideos(controlId)),
-          archives: await _resolveAttachment(archivesConvertido, () => DBControlAttachments.obtenerArchives(controlId)),
+          // 🔒 ADJUNTOS: local siempre tiene prioridad sobre Supabase.
+          // El auditor puede haber agregado fotos offline; Supabase puede tener versión anterior.
+          photos: await _resolveAttachment(() => DBControlAttachments.obtenerPhotos(controlId),
+              functions.convertirJSONaFormatoSQLite(existing['photos'])),
+          video: await _resolveAttachment(() => DBControlAttachments.obtenerVideos(controlId),
+              functions.convertirJSONaFormatoSQLite(existing['video'])),
+          archives: await _resolveAttachment(() => DBControlAttachments.obtenerArchives(controlId),
+              functions.convertirJSONaFormatoSQLite(existing['archives'])),
           status: existing['status'] ?? true,
           completed: existingCompleted,
           createdAt: existing['created_at']?.toString() ?? DateTime.now().toIso8601String(),
           updatedAt: existing['updated_at']?.toString() ?? DateTime.now().toIso8601String(),
-          // ⚡ PRESERVAR campos de hallazgo
-          observacion: existing['observacion']?.toString(),
-          gerencia: existing['gerencia']?.toString(),
-          ecosistema: existing['ecosistema']?.toString(),
-          fecha: existing['fecha']?.toString(),
-          descripcionHallazgo: existing['descripcion_hallazgo']?.toString(),
-          recomendacion: existing['recomendacion']?.toString(),
-          procesoPropuesto: existing['proceso_propuesto']?.toString(),
-          titulo: existing['titulo']?.toString(),
-          nivelRiesgo: existing['nivel_riesgo']?.toString(),
-          // ⚡ CRÍTICO: Preservar control_text local si Supabase tiene null
-          controlText: (existing['control_text'] != null && existing['control_text'].toString().isNotEmpty)
-              ? existing['control_text'].toString()
-              : await DBControles.obtenerControlText(controlId),
-          // ⭐ CAMPOS v19 - preservar
-          tituloObservacion: existing['titulo_observacion']?.toString(),
-          riskLevelId: existing['risk_level_id']?.toString(),
-          publicationStatusId: existing['publication_status_id']?.toString(),
-          estadoPublicacion: existing['estado_publicacion']?.toString(),
-          impactTypeId: existing['impact_type_id']?.toString(),
-          tipoImpacto: existing['tipo_impacto']?.toString(),
-          ecosystemSupportId: existing['ecosystem_support_id']?.toString(),
-          soporteEcosistema: existing['soporte_ecosistema']?.toString(),
-          riskTypeId: existing['risk_type_id']?.toString(),
-          tipoRiesgo: existing['tipo_riesgo']?.toString(),
-          riskTypologyId: existing['risk_typology_id']?.toString(),
-          tipologiaRiesgo: existing['tipologia_riesgo']?.toString(),
-          gerenteResponsable: existing['gerente_responsable']?.toString(),
-          auditorResponsable: existing['auditor_responsable']?.toString(),
-          descripcionRiesgo: existing['descripcion_riesgo']?.toString(),
-          observationScopeId: existing['observation_scope_id']?.toString(),
-          alcanceObservacion: existing['alcance_observacion']?.toString(),
-          riskActualLevelId: existing['risk_actual_level_id']?.toString(),
-          riesgoActual: existing['riesgo_actual']?.toString(),
-          causaRaiz: existing['causa_raiz']?.toString(),
+          // 🔒 CAMPOS DE HALLAZGO: preferir local (puede tener datos offline no sincronizados)
+          observacion: _localFirst(localData?['observacion']?.toString(), existing['observacion']),
+          gerencia: _localFirst(localData?['gerencia']?.toString(), existing['gerencia']),
+          ecosistema: _localFirst(localData?['ecosistema']?.toString(), existing['ecosistema']),
+          fecha: _localFirst(localData?['fecha']?.toString(), existing['fecha']),
+          descripcionHallazgo: _localFirst(localData?['descripcion_hallazgo']?.toString(), existing['descripcion_hallazgo']),
+          recomendacion: _localFirst(localData?['recomendacion']?.toString(), existing['recomendacion']),
+          procesoPropuesto: _localFirst(localData?['proceso_propuesto']?.toString(), existing['proceso_propuesto']),
+          titulo: _localFirst(localData?['titulo']?.toString(), existing['titulo']),
+          nivelRiesgo: _localFirst(localData?['nivel_riesgo']?.toString(), existing['nivel_riesgo']),
+          // 🔒 CONTROL TEXT: preferir local (usuario puede haber escrito offline)
+          controlText: _localFirst(localData?['control_text']?.toString(), existing['control_text']),
+          // ⭐ CAMPOS v19 - preservar (preferir local)
+          tituloObservacion: _localFirst(localData?['titulo_observacion']?.toString(), existing['titulo_observacion']),
+          riskLevelId: _localFirst(localData?['risk_level_id']?.toString(), existing['risk_level_id']),
+          publicationStatusId: _localFirst(localData?['publication_status_id']?.toString(), existing['publication_status_id']),
+          estadoPublicacion: _localFirst(localData?['estado_publicacion']?.toString(), existing['estado_publicacion']),
+          impactTypeId: _localFirst(localData?['impact_type_id']?.toString(), existing['impact_type_id']),
+          tipoImpacto: _localFirst(localData?['tipo_impacto']?.toString(), existing['tipo_impacto']),
+          ecosystemSupportId: _localFirst(localData?['ecosystem_support_id']?.toString(), existing['ecosystem_support_id']),
+          soporteEcosistema: _localFirst(localData?['soporte_ecosistema']?.toString(), existing['soporte_ecosistema']),
+          riskTypeId: _localFirst(localData?['risk_type_id']?.toString(), existing['risk_type_id']),
+          tipoRiesgo: _localFirst(localData?['tipo_riesgo']?.toString(), existing['tipo_riesgo']),
+          riskTypologyId: _localFirst(localData?['risk_typology_id']?.toString(), existing['risk_typology_id']),
+          tipologiaRiesgo: _localFirst(localData?['tipologia_riesgo']?.toString(), existing['tipologia_riesgo']),
+          gerenteResponsable: _localFirst(localData?['gerente_responsable']?.toString(), existing['gerente_responsable']),
+          auditorResponsable: _localFirst(localData?['auditor_responsable']?.toString(), existing['auditor_responsable']),
+          descripcionRiesgo: _localFirst(localData?['descripcion_riesgo']?.toString(), existing['descripcion_riesgo']),
+          observationScopeId: _localFirst(localData?['observation_scope_id']?.toString(), existing['observation_scope_id']),
+          alcanceObservacion: _localFirst(localData?['alcance_observacion']?.toString(), existing['alcance_observacion']),
+          riskActualLevelId: _localFirst(localData?['risk_actual_level_id']?.toString(), existing['risk_actual_level_id']),
+          riesgoActual: _localFirst(localData?['riesgo_actual']?.toString(), existing['riesgo_actual']),
+          causaRaiz: _localFirst(localData?['causa_raiz']?.toString(), existing['causa_raiz']),
         );
 
         combinedControls.add(control);
@@ -292,23 +300,26 @@ Future<String> combineAndSyncControls(
   }
 }
 
-/// Resuelve el valor final de un adjunto:
-/// - Si Supabase tiene datos → usar esos (son la fuente de verdad una vez sincronizados)
-/// - Si Supabase tiene null → preservar datos locales de SQLite (offline pendiente de subir)
+/// Resuelve el valor final de un adjunto con prioridad a datos locales:
+/// - Local tiene datos → usar local (puede tener fotos offline no sincronizadas aún)
+/// - Local vacío + Supabase tiene datos → usar Supabase (primera carga o datos del servidor)
+/// - Ambos vacíos → null
 Future<String?> _resolveAttachment(
-  String? supabaseValue,
   Future<List<String>> Function() loadLocal,
+  String? supabaseValue,
 ) async {
-  if (supabaseValue != null && supabaseValue.isNotEmpty) {
-    return supabaseValue; // Supabase tiene datos → usar esos
-  }
-  // Supabase no tiene datos → preservar local si existe
+  // 🔒 LOCAL PRIMERO: el auditor pudo agregar fotos offline que Supabase no tiene aún
   try {
     final localList = await loadLocal();
     if (localList.isNotEmpty) {
-      print('⚡ Preservando ${localList.length} adjuntos locales (Supabase tiene null)');
+      print('✅ Usando ${localList.length} adjuntos locales (local tiene prioridad)');
       return localList.join(Control.separator);
     }
   } catch (_) {}
+  // Local vacío → usar Supabase como fuente (primera carga)
+  if (supabaseValue != null && supabaseValue.isNotEmpty) {
+    print('📥 Local vacío, usando adjuntos de Supabase');
+    return supabaseValue;
+  }
   return null;
 }
