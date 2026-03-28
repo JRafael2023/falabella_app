@@ -113,6 +113,8 @@ Future<String> syncControlesToSupabase(
     int omitidos = 0;
     int errores = 0;
     List<String> erroresDetalle = [];
+    // ⚡ Supabase updates se acumulan y corren en paralelo al final
+    final List<Future> supabasePendientes = [];
     bool highbondFallo = false;
 
     for (var controlLocal in controlesSQLite) {
@@ -445,13 +447,13 @@ Future<String> syncControlesToSupabase(
             if (controlLocal.riesgoActual != null && controlLocal.riesgoActual!.isNotEmpty) dataToUpdate['riesgo_actual'] = controlLocal.riesgoActual;
             if (controlLocal.causaRaiz != null && controlLocal.causaRaiz!.isNotEmpty) dataToUpdate['causa_raiz'] = controlLocal.causaRaiz;
 
-            await ControlsTable().update(
-              data: dataToUpdate,
-              matchingRows: (rows) => rows.eqOrNull(
-                'id_control',
-                idControl,
-              ),
-            );
+            // ⚡ Encolar update de Supabase para ejecución paralela
+            final capturedData = Map<String, dynamic>.from(dataToUpdate);
+            final capturedId = idControl;
+            supabasePendientes.add(ControlsTable().update(
+              data: capturedData,
+              matchingRows: (rows) => rows.eqOrNull('id_control', capturedId),
+            ));
 
             sincronizados++;
             print('✅ Control $idControl sincronizado');
@@ -470,6 +472,12 @@ Future<String> syncControlesToSupabase(
         erroresDetalle.add(error);
         print('❌ Error al sincronizar ${controlLocal.idControl}: $e');
       }
+    }
+
+    // ⚡ Ejecutar todos los updates de Supabase en paralelo
+    if (supabasePendientes.isNotEmpty) {
+      print('⚡ Ejecutando ${supabasePendientes.length} updates Supabase en paralelo...');
+      await Future.wait(supabasePendientes);
     }
 
     // 6️⃣ RETORNAR RESULTADO

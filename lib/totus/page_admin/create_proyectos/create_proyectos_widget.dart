@@ -772,37 +772,22 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                             Text('Cargando proyectos...', style: FlutterFlowTheme.of(context).bodySmall),
                                                           ],
                                                         )
-                                                      : DropdownButtonFormField<String>(
-                                                          value: _model.selectedHighbondProjectId,
-                                                          isExpanded: true,
-                                                          menuMaxHeight: 300.0,
-                                                          decoration: InputDecoration(
-                                                            isDense: true,
-                                                            contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
-                                                            enabledBorder: OutlineInputBorder(
-                                                              borderSide: BorderSide(color: FlutterFlowTheme.of(context).customColor4bbbbb, width: 2.0),
-                                                              borderRadius: BorderRadius.circular(8.0),
-                                                            ),
-                                                            focusedBorder: OutlineInputBorder(
-                                                              borderSide: BorderSide(color: FlutterFlowTheme.of(context).primary, width: 2.0),
-                                                              borderRadius: BorderRadius.circular(8.0),
-                                                            ),
-                                                          ),
-                                                          hint: Text('Selecciona un proyecto', style: FlutterFlowTheme.of(context).labelMedium),
-                                                          items: FFAppState().jsonHighbondProjects.map((p) {
-                                                            final pm = p as Map;
-                                                            return DropdownMenuItem<String>(
-                                                              value: pm['id']?.toString() ?? '',
-                                                              child: Text(
-                                                                pm['name']?.toString() ?? '',
-                                                                overflow: TextOverflow.ellipsis,
-                                                                style: FlutterFlowTheme.of(context).bodyMedium,
-                                                              ),
-                                                            );
-                                                          }).toList(),
+                                                      : FlutterFlowDropDown<String>(
+                                                          controller: _model.highbondProjectController ??=
+                                                              FormFieldController<String>(_model.selectedHighbondProjectId),
+                                                          options: FFAppState().jsonHighbondProjects
+                                                              .map((p) => (p as Map)['id']?.toString() ?? '')
+                                                              .toList(),
+                                                          optionLabels: FFAppState().jsonHighbondProjects
+                                                              .map((p) => (p as Map)['name']?.toString() ?? '')
+                                                              .toList(),
                                                           onChanged: (val) {
                                                             if (val == null) return;
-                                                            final proyecto = FFAppState().jsonHighbondProjects.firstWhere((p) => (p as Map)['id']?.toString() == val);
+                                                            final proyecto = FFAppState().jsonHighbondProjects.firstWhere(
+                                                              (p) => (p as Map)['id']?.toString() == val,
+                                                              orElse: () => null,
+                                                            );
+                                                            if (proyecto == null) return;
                                                             final pm = proyecto as Map;
                                                             setModalState(() {
                                                               _model.selectedHighbondProjectId = val;
@@ -811,6 +796,47 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                               _model.txtnombreTextController?.text = pm['name']?.toString() ?? '';
                                                             });
                                                           },
+                                                          height: 50.0,
+                                                          searchHintTextStyle: FlutterFlowTheme.of(context).labelMedium.override(
+                                                            font: TextStyle(
+                                                              fontWeight: FlutterFlowTheme.of(context).labelMedium.fontWeight,
+                                                              fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
+                                                            ),
+                                                            letterSpacing: 0.0,
+                                                          ),
+                                                          searchTextStyle: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                            font: TextStyle(
+                                                              fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                                              fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                            ),
+                                                            letterSpacing: 0.0,
+                                                          ),
+                                                          textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
+                                                            font: TextStyle(
+                                                              fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                                                              fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                                            ),
+                                                            color: FlutterFlowTheme.of(context).secondaryText,
+                                                            letterSpacing: 0.0,
+                                                          ),
+                                                          hintText: 'Selecciona un proyecto',
+                                                          searchHintText: 'Buscar proyecto...',
+                                                          icon: Icon(
+                                                            Icons.keyboard_arrow_down_rounded,
+                                                            color: FlutterFlowTheme.of(context).secondaryText,
+                                                            size: 24.0,
+                                                          ),
+                                                          fillColor: FlutterFlowTheme.of(context).secondaryBackground,
+                                                          elevation: 2.0,
+                                                          borderColor: FlutterFlowTheme.of(context).customColor4bbbbb,
+                                                          borderWidth: 2.0,
+                                                          borderRadius: 8.0,
+                                                          margin: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
+                                                          hidesUnderline: true,
+                                                          isOverButton: false,
+                                                          isSearchable: true,
+                                                          isMultiSelect: false,
+                                                          maxHeight: 300.0,
                                                         ),
                                                 ),
                                               ],

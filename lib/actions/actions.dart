@@ -178,16 +178,14 @@ Future sync(
         FFAppState().ultimaSincronizacion = syncEnd;
       });
 
-      // Solo recargar si hubo cambios pendientes sincronizados.
-      // Sin cambios: Projects/Matrices/Users ya descargados y frescos,
-      // controles verificados iguales en SQLite y Supabase → nada que recargar.
-      if (returnValidateSync == true) {
-        print('🚀 Recargando datos con cache inteligente...');
-        await actions.cargarDatosConCacheInteligente(
-          FFAppState().currentUser!.id,
-          forceFullSync: true,
-        );
-      }
+      // Siempre recargar desde HighBond al sincronizar manualmente.
+      // Garantiza que proyectos nuevos o con datos faltantes se actualicen,
+      // incluso si no había cambios pendientes locales.
+      print('🚀 Recargando datos con cache inteligente...');
+      await actions.cargarDatosConCacheInteligente(
+        FFAppState().currentUser!.id,
+        forceFullSync: true,
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

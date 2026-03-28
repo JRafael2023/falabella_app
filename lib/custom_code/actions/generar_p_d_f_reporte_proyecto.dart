@@ -57,6 +57,13 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
 
         totalInefectivos++;
 
+        // control_text no se carga en listarControlesJson (campo grande),
+        // obtenerlo por separado para el PDF
+        if ((control.controlText ?? '').isEmpty) {
+          control.controlText =
+              await DBControles.obtenerControlText(control.idControl);
+        }
+
         // Cargar fotos desde ControlAttachments (fotos tomadas en la app)
         final List<String> fotosBase64 =
             await _obtenerFotosSeguro(control.idControl);
@@ -217,22 +224,6 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
         if ((ctrl.controlText ?? '').isNotEmpty) {
           camposControl.add(_buildCampo(
               'Resultados del procedimiento', ctrl.controlText, fontBold));
-        }
-
-        // Detalle del hallazgo solo si es inefectivo
-        if (esInefectivo) {
-          if ((ctrl.observacion ?? '').isNotEmpty)
-            camposControl.add(
-                _buildCampo('Título Observación', ctrl.observacion, fontBold));
-          if ((ctrl.descripcionHallazgo ?? '').isNotEmpty)
-            camposControl.add(_buildCampo(
-                'Descripción del Hallazgo', ctrl.descripcionHallazgo, fontBold));
-          if ((ctrl.nivelRiesgo ?? '').isNotEmpty)
-            camposControl
-                .add(_buildCampo('Nivel de Riesgo', ctrl.nivelRiesgo, fontBold));
-          if ((ctrl.recomendacion ?? '').isNotEmpty)
-            camposControl.add(
-                _buildCampo('Recomendación', ctrl.recomendacion, fontBold));
         }
 
         // Fotos

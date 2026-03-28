@@ -328,13 +328,17 @@ class DBControles {
 
       if (result > 0) {
         // Actualizar attachments en tabla separada
-        await DBControlAttachments.guardarPhotos(control.idControl, photos);
+        if (photos.isNotEmpty) {
+          await DBControlAttachments.guardarPhotos(control.idControl, photos);
+        }
         if (videos.isNotEmpty) {
           await DBControlAttachments.guardarVideos(control.idControl, videos);
         } else {
           await DBControlAttachments.eliminarAttachmentsPorTipo(control.idControl, 'video');
         }
-        await DBControlAttachments.guardarArchives(control.idControl, archives);
+        if (archives.isNotEmpty) {
+          await DBControlAttachments.guardarArchives(control.idControl, archives);
+        }
 
         return "Control actualizado correctamente en SQLite";
       } else {

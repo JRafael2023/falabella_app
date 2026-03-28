@@ -35,7 +35,15 @@ class DBObjetivos {
       if (db == null) return "Error: DB no disponible";
 
       await db.transaction((txn) async {
-        await txn.delete('Objetivos');
+        // Borrar solo los objetivos del proyecto específico (no toda la tabla)
+        // Evita race condition cuando múltiples proyectos se sincronizan en paralelo
+        if (objetivos.isNotEmpty) {
+          await txn.delete(
+            'Objetivos',
+            where: 'project_id = ?',
+            whereArgs: [objetivos.first.projectId],
+          );
+        }
 
         for (final objetivo in objetivos) {
           await txn.insert(

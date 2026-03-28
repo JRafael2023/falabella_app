@@ -28,22 +28,37 @@ Future cargarTodosLosDatosUsuario(String userId) async {
     print('👤 Usuario UUID: $userId');
 
     // ============================================
-    // 1️⃣ OBTENER USER_UID DEL USUARIO DESDE TABLA USERS
+    // 1️⃣ OBTENER USER_UID DEL USUARIO
     // ============================================
-    print('\n👤 Paso 1: Obteniendo user_uid desde tabla Users...');
-    final usuarioSupabase = await UsersTable().queryRows(
-      queryFn: (q) => q!.eq('id', userId),
-    );
+    print('\n👤 Paso 1: Obteniendo user_uid...');
 
-    if (usuarioSupabase.isEmpty) {
-      print('⚠️ No se encontró usuario con UUID: $userId');
+    // Usar uidUsuario de FFAppState directamente (evita query con userId nulo)
+    String userUid = FFAppState().currentUser.uidUsuario ?? '';
+
+    if (userUid.isEmpty || userUid == 'null') {
+      // Fallback: consultar Supabase solo si userId es un UUID válido
+      if (userId.isNotEmpty && userId != 'null') {
+        try {
+          final usuarioSupabase = await UsersTable().queryRows(
+            queryFn: (q) => q!.eq('id', userId),
+          );
+          if (usuarioSupabase.isNotEmpty) {
+            userUid = usuarioSupabase.first.userUid ?? '';
+          }
+        } catch (e) {
+          print('⚠️ Error obteniendo user_uid desde Supabase: $e');
+        }
+      }
+    }
+
+    if (userUid.isEmpty || userUid == 'null') {
+      print('⚠️ No se pudo obtener user_uid válido');
       FFAppState().jsonObjetivos = [];
       FFAppState().jsonControles = [];
       return;
     }
 
-    final userUid = usuarioSupabase.first.userUid ?? '';
-    print('✅ user_uid encontrado: $userUid');
+    print('✅ user_uid: $userUid');
 
     // ============================================
     // 2️⃣ OBTENER PROYECTOS DEL USUARIO DESDE SUPABASE
@@ -79,8 +94,11 @@ Future cargarTodosLosDatosUsuario(String userId) async {
     List<String> proyectosConObjetivos = [];
     int totalObjetivos = 0;
 
+    // ⚡ Cache de controles por objetivo: evita doble consulta SQLite en paso 4
+    final Map<String, List<Map<String, dynamic>>> controlesCache = {};
+
     // ⚡ OPTIMIZACIÓN: Procesar proyectos en PARALELO (máximo 5 a la vez)
-    final batchSize = 5; // Aumentado de 3 a 5
+    final batchSize = 5;
     for (var i = 0; i < idsProyectos.length; i += batchSize) {
       final batch = idsProyectos.skip(i).take(batchSize).toList();
 
@@ -112,6 +130,8 @@ Future cargarTodosLosDatosUsuario(String userId) async {
               final objetivosJSON = await Future.wait(objetivosSQLite.map((obj) async {
                 // Calcular progress desde controles en SQLite
                 final controles = await DBControles.listarControlesJson(obj.idObjetivo);
+                // ⚡ Guardar en cache para reusar en paso 4 (evita segunda consulta)
+                controlesCache[obj.idObjetivo] = controles;
                 final totalControles = controles.length;
                 final completados = controles.where((c) => c['completed'] == 1 || c['completed'] == true).length;
                 final progressReal = totalControles > 0 ? (completados / totalControles) : 0.0;
@@ -135,7 +155,32 @@ Future cargarTodosLosDatosUsuario(String userId) async {
                   '  ✓ Proyecto $idProyecto: ${objetivosJSON.length} objetivos');
             }
           } else {
-            print('  ⚠️ API falló para $idProyecto');
+            // ⚡ API falló (offline o error) → cargar desde SQLite directamente
+            print('  ⚠️ API falló para $idProyecto - usando SQLite como fallback');
+            final objetivosSQLite =
+                await DBObjetivos.listarObjetivosPorProyecto(idProyecto);
+            if (objetivosSQLite.isNotEmpty) {
+              proyectosConObjetivos.add(idProyecto);
+              final objetivosJSON = await Future.wait(objetivosSQLite.map((obj) async {
+                final controles = await DBControles.listarControlesJson(obj.idObjetivo);
+                controlesCache[obj.idObjetivo] = controles;
+                final totalControles = controles.length;
+                final completados = controles.where((c) => c['completed'] == 1 || c['completed'] == true).length;
+                final progressReal = totalControles > 0 ? (completados / totalControles) : 0.0;
+                return {
+                  'id_objective': obj.idObjetivo,
+                  'id_project': obj.projectId,
+                  'title': obj.title,
+                  'category': obj.divisionDepartment,
+                  'description': obj.description,
+                  'progress': progressReal,
+                  'completed': obj.status,
+                };
+              })).then((list) => list.toList());
+              todosObjetivosJSON.addAll(objetivosJSON);
+              totalObjetivos += objetivosJSON.length;
+              print('  ✓ Proyecto $idProyecto (SQLite): ${objetivosJSON.length} objetivos');
+            }
           }
         } catch (e) {
           print('  ❌ Error en proyecto $idProyecto: $e');
@@ -151,7 +196,7 @@ Future cargarTodosLosDatosUsuario(String userId) async {
     FFAppState().jsonObjetivos = todosObjetivosJSON;
 
     // ============================================
-    // 4️⃣ CARGAR CONTROLES - VALIDAR CON API PRIMERO
+    // 4️⃣ CARGAR CONTROLES - REUSAR CACHE DEL PASO 3
     // ============================================
     print('\n🎮 Paso 4: Cargando controles de $totalObjetivos objetivos...');
 
@@ -170,15 +215,21 @@ Future cargarTodosLosDatosUsuario(String userId) async {
       return;
     }
 
-    // ⚡⚡⚡ SUPER OPTIMIZACIÓN: Procesar controles en PARALELO (lotes de 10)
-    // Si hay datos locales, usarlos DIRECTAMENTE sin llamar API
-    // Solo llamar API si es primera vez (SQLite vacío)
-    final batchSizeControles = 10; // Procesar 10 objetivos a la vez (aumentado de 5)
+    // ⚡ Procesar controles en PARALELO (lotes de 10)
+    // Si están en cache del paso 3, usarlos directamente (sin consulta SQLite)
+    // Solo llama API si es primera vez (SQLite vacío y no en cache)
+    final batchSizeControles = 10;
     for (var i = 0; i < idsObjetivos.length; i += batchSizeControles) {
       final batch = idsObjetivos.skip(i).take(batchSizeControles).toList();
 
       final resultados = await Future.wait(batch.map((idObjetivo) async {
         try {
+          // ⚡ Usar cache del paso 3 si está disponible (evita segunda consulta SQLite)
+          final controlesCached = controlesCache[idObjetivo];
+          if (controlesCached != null && controlesCached.isNotEmpty) {
+            return controlesCached;
+          }
+
           // 1️⃣ Verificar si ya existen controles en SQLite
           final controlesSQLite =
               await DBControles.listarControlesJson(idObjetivo);

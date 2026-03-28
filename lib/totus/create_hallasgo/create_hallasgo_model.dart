@@ -84,7 +84,12 @@ class CreateHallasgoModel extends FlutterFlowModel<CreateHallasgoWidget> {
   String? cmdRiskActualLevelValue;
   FormFieldController<String>? cmdRiskActualLevelController;
 
-  // ⭐ NUEVOS CAMPOS DE TEXTO v19
+  // ⭐ NUEVOS CAMPOS v19 - Gerente/Auditor como dropdowns
+  String? cmdGerenteValue;
+  FormFieldController<String>? cmdGerenteController;
+  String? cmdAuditorValue;
+  FormFieldController<String>? cmdAuditorController;
+  // Legacy text controllers (mantenidos para compatibilidad)
   FocusNode? txtGerenteResponsableFocusNode;
   TextEditingController? txtGerenteResponsableController;
   FocusNode? txtAuditorResponsableFocusNode;

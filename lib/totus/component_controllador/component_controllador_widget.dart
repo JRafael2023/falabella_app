@@ -12,6 +12,7 @@ import '/totus/description_control/description_control_widget.dart';
 import '/totus/view_files/view_files_widget.dart';
 import 'dart:ui';
 import '/custom_code/actions/index.dart' as actions;
+import '/custom_code/DBProyectos.dart';
 import '/custom_code/widgets/index.dart' as custom_widgets;
 import '/flutter_flow/custom_functions.dart' as functions;
 import 'package:easy_debounce/easy_debounce.dart';
@@ -41,7 +42,7 @@ class ComponentControlladorWidget extends StatefulWidget {
     this.listImages,
     this.listArchives,
     this.listVideos,
-  })  : this.nameProyect = nameProyect ?? 'null',
+  })  : this.nameProyect = nameProyect ?? '',
         this.nameControl = nameControl ?? 'null',
         this.estado = estado ?? false,
         this.categoria = categoria ?? 'null';
@@ -1703,6 +1704,18 @@ class _ComponentControlladorWidgetState
                       }
                       // ⚠️ NO resetear selectStateControl aquí - ya fue actualizado al presionar el botón
 
+                      // 🔍 Resolver project_name con fallback robusto (igual que sync)
+                      String resolvedProjectName = FFAppState().projectName.isNotEmpty
+                          ? FFAppState().projectName
+                          : widget.nameProyect;
+                      if (resolvedProjectName.isEmpty) {
+                        final proyecto = await DBProyectos.getProyectoByIdProject(FFAppState().idproyect);
+                        resolvedProjectName = proyecto?.name ?? '';
+                        if (resolvedProjectName.isNotEmpty) {
+                          print('📦 projectName resuelto desde SQLite: $resolvedProjectName');
+                        }
+                      }
+
                       if (_model.estaconectado!) {
                         // ✅ Validar: si selectStateControl es null, usar widget.findingStatus como fallback
                         int? estadoControl = _model.selectStateControl ?? widget.findingStatus;
@@ -1738,7 +1751,7 @@ class _ComponentControlladorWidgetState
                                 imagesList: functions.decompressGzipBase64List(compressedImages),
                                 videosList: functions.decompressGzipBase64List(compressedVideos),
                                 archivosList: functions.decompressGzipBase64List(compressedArchivos),
-                                projectName: FFAppState().projectName.isNotEmpty ? FFAppState().projectName : widget.nameProyect,
+                                projectName: resolvedProjectName,
                                 controlText: widget.nameControl,
                                 publicationStatusId: _model.publicationStatusId,
                                 estadoPublicacion: _model.estadoPublicacion,
@@ -2116,7 +2129,7 @@ class _ComponentControlladorWidgetState
                                 imagesList: functions.decompressGzipBase64List(compressedImages2),
                                 videosList: functions.decompressGzipBase64List(compressedVideos2),
                                 archivosList: functions.decompressGzipBase64List(compressedArchivos2),
-                                projectName: FFAppState().projectName.isNotEmpty ? FFAppState().projectName : widget.nameProyect,
+                                projectName: resolvedProjectName,
                                 controlText: widget.nameControl,
                                 publicationStatusId: _model.publicationStatusId,
                                 estadoPublicacion: _model.estadoPublicacion,
@@ -2333,7 +2346,7 @@ class _ComponentControlladorWidgetState
                                 imagesList: [],
                                 videosList: [],
                                 archivosList: [],
-                                projectName: FFAppState().projectName.isNotEmpty ? FFAppState().projectName : widget.nameProyect,
+                                projectName: resolvedProjectName,
                                 controlText: widget.nameControl,
                                 publicationStatusId: _model.publicationStatusId,
                                 estadoPublicacion: _model.estadoPublicacion,

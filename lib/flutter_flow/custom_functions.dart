@@ -624,9 +624,9 @@ dynamic filterAPI(
     // Extraer solo los campos necesarios
     final result = {
       'id': project['id'],
-      'description': project['attributes']?['description'],
-      'name': project['attributes']?['name'],
-      'opinion': project['attributes']?['opinion'],
+      'description': project['attributes']?['description'] ?? project['description'],
+      'name': project['attributes']?['name'] ?? project['name'],
+      'opinion': project['attributes']?['opinion'] ?? project['opinion'],
     };
 
     print('✅ Resultado extraído:');

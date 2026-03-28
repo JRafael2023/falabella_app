@@ -105,20 +105,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
 
     // Precargar datos del hallazgo si existen
     if (widget.hallazgo != null) {
-      // 1. Proceso Propuesto - buscar por idProceso O por nombre (backward compat)
-      final procesoPropuestoValue = widget.hallazgo?.procesoPropuesto;
-      if (procesoPropuestoValue != null && procesoPropuestoValue.isNotEmpty) {
-        final procesoMatch = FFAppState().listaprocesos.where(
-          (e) => e.idProceso == procesoPropuestoValue || e.nombre == procesoPropuestoValue,
-        ).firstOrNull;
-        if (procesoMatch != null) {
-          final value = procesoMatch.idProceso.isNotEmpty ? procesoMatch.idProceso : procesoMatch.nombre;
-          _model.cmdprocesoValue = value;
-          _model.cmdprocesoValueController = FormFieldController<String>(value);
-        }
-      }
-
-      // 2. Observación - buscar por nombre en todos los títulos
+      // 1. Observación - buscar por nombre en todos los títulos
       final observacionValue = widget.hallazgo?.observacion;
       if (observacionValue != null && observacionValue.isNotEmpty) {
         final tituloExists = FFAppState().listatitulos.any((e) => e.nombre == observacionValue);
@@ -189,12 +176,10 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         _model.cmdRiskActualLevelValue = widget.hallazgo!.riskActualLevelId;
       }
       if (widget.hallazgo!.gerenteResponsable.isNotEmpty) {
-        _model.txtGerenteResponsableController =
-            TextEditingController(text: widget.hallazgo!.gerenteResponsable);
+        _model.cmdGerenteValue = widget.hallazgo!.gerenteResponsable;
       }
       if (widget.hallazgo!.auditorResponsable.isNotEmpty) {
-        _model.txtAuditorResponsableController =
-            TextEditingController(text: widget.hallazgo!.auditorResponsable);
+        _model.cmdAuditorValue = widget.hallazgo!.auditorResponsable;
       }
       if (widget.hallazgo!.descripcionRiesgo.isNotEmpty) {
         _model.txtDescripcionRiesgoController =
@@ -223,6 +208,10 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         FormFieldController<String>(_model.cmdObservationScopeValue);
     _model.cmdRiskActualLevelController ??=
         FormFieldController<String>(_model.cmdRiskActualLevelValue);
+    _model.cmdGerenteController ??=
+        FormFieldController<String>(_model.cmdGerenteValue);
+    _model.cmdAuditorController ??=
+        FormFieldController<String>(_model.cmdAuditorValue);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       safeSetState(() {});
@@ -285,17 +274,17 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
       }
     }
 
-    // ⭐ Después de cargar los maestros, refrescar los controllers de dropdowns
-    // que se pre-popularon en initState (los valores son correctos pero las opciones
-    // no existían aún cuando se crearon los controllers).
+    // ⭐ Después de cargar los maestros, refrescar los valores de los dropdowns
+    // que se pre-popularon en initState. Actualizar el valor en el controller
+    // existente (sin reemplazarlo) para que el listener de FlutterFlowDropDown
+    // siga funcionando.
     if (widget.hallazgo != null) {
-      void _refreshController(
+      void _refreshControllerValue(
         String? value,
-        FormFieldController<String>? Function() getter,
-        void Function(FormFieldController<String>) setter,
+        FormFieldController<String>? controller,
       ) {
-        if (value != null && value.isNotEmpty) {
-          setter(FormFieldController<String>(value));
+        if (value != null && value.isNotEmpty && controller != null) {
+          controller.value = value;
         }
       }
 
@@ -307,33 +296,19 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         ).firstOrNull;
         if (match?.riskLevelId != null && match!.riskLevelId!.isNotEmpty) {
           _model.cmdriesgoValue = match.riskLevelId;
-          _model.cmdriesgoValueController = FormFieldController<String>(match.riskLevelId!);
+          _model.cmdriesgoValueController?.value = match.riskLevelId!;
         }
       }
-      _refreshController(_model.cmdriesgoValue,
-          () => _model.cmdriesgoValueController,
-          (c) => _model.cmdriesgoValueController = c);
-      _refreshController(_model.cmdPublicationStatusValue,
-          () => _model.cmdPublicationStatusController,
-          (c) => _model.cmdPublicationStatusController = c);
-      _refreshController(_model.cmdImpactTypeValue,
-          () => _model.cmdImpactTypeController,
-          (c) => _model.cmdImpactTypeController = c);
-      _refreshController(_model.cmdEcosystemSupportValue,
-          () => _model.cmdEcosystemSupportController,
-          (c) => _model.cmdEcosystemSupportController = c);
-      _refreshController(_model.cmdRiskTypeValue,
-          () => _model.cmdRiskTypeController,
-          (c) => _model.cmdRiskTypeController = c);
-      _refreshController(_model.cmdRiskTypologyValue,
-          () => _model.cmdRiskTypologyController,
-          (c) => _model.cmdRiskTypologyController = c);
-      _refreshController(_model.cmdObservationScopeValue,
-          () => _model.cmdObservationScopeController,
-          (c) => _model.cmdObservationScopeController = c);
-      _refreshController(_model.cmdRiskActualLevelValue,
-          () => _model.cmdRiskActualLevelController,
-          (c) => _model.cmdRiskActualLevelController = c);
+      _refreshControllerValue(_model.cmdriesgoValue, _model.cmdriesgoValueController);
+      _refreshControllerValue(_model.cmdPublicationStatusValue, _model.cmdPublicationStatusController);
+      _refreshControllerValue(_model.cmdImpactTypeValue, _model.cmdImpactTypeController);
+      _refreshControllerValue(_model.cmdEcosystemSupportValue, _model.cmdEcosystemSupportController);
+      _refreshControllerValue(_model.cmdRiskTypeValue, _model.cmdRiskTypeController);
+      _refreshControllerValue(_model.cmdRiskTypologyValue, _model.cmdRiskTypologyController);
+      _refreshControllerValue(_model.cmdObservationScopeValue, _model.cmdObservationScopeController);
+      _refreshControllerValue(_model.cmdRiskActualLevelValue, _model.cmdRiskActualLevelController);
+      _refreshControllerValue(_model.cmdGerenteValue, _model.cmdGerenteController);
+      _refreshControllerValue(_model.cmdAuditorValue, _model.cmdAuditorController);
     }
 
     if (mounted) safeSetState(() {});
@@ -598,7 +573,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                 Align(
                   alignment: AlignmentDirectional(0.0, 0.0),
                   child: Text(
-                    'Registrar Hallazgos',
+                    'Registro de Observación',
                     textAlign: TextAlign.center,
                     style: FlutterFlowTheme.of(context).bodyMedium.override(
                           font: TextStyle(
@@ -618,7 +593,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                   child: Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(0.0, 5.0, 0.0, 5.0),
                     child: Text(
-                      'Completa la información del hallazgo detectado',
+                      'Completa la información de la observación detectada',
                       textAlign: TextAlign.center,
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
                             font: TextStyle(
@@ -737,7 +712,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Descripción',
+                              'Hallazgo',
                               style: FlutterFlowTheme.of(context).bodyMedium.override(
                                     font: TextStyle(
                                       fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
@@ -1116,7 +1091,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                         // 7. Estado de Publicación (Publicado/a) (ancho completo)
                         _buildDropdownField(
                           context: context,
-                          label: 'Estado de Publicación',
+                          label: 'Publicado/a',
                           options: _model.publicationStatuses.map((s) => s.publicationStatusId ?? '').toList(),
                           optionLabels: _model.publicationStatuses.map((s) => s.name ?? '').toList(),
                           currentValue: _model.cmdPublicationStatusValue,
@@ -1129,7 +1104,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Recomendación',
+                              'Recomendaciones',
                               style: FlutterFlowTheme.of(context).bodyMedium.override(
                                     font: TextStyle(
                                       fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
@@ -1295,25 +1270,45 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdRiskActualLevelController,
                           onChanged: (val) => safeSetState(() => _model.cmdRiskActualLevelValue = val),
                         ),
-                        // 15. Gerente Responsable (ancho completo)
-                        _buildTextField(
+                        // 15. Gerente Responsable (dropdown de usuarios)
+                        _buildDropdownField(
                           context: context,
                           label: 'Gerente Responsable',
-                          controller: _model.txtGerenteResponsableController,
-                          focusNode: _model.txtGerenteResponsableFocusNode,
-                          hintText: 'Escribe aquí',
-                          maxLines: 1,
-                          minLines: 1,
+                          options: FFAppState().jsonUsers
+                              .where((e) {
+                                final uid = getJsonField(e, r'''$.user_uid''');
+                                return uid != null && uid.toString() != 'null' && uid.toString().isNotEmpty;
+                              })
+                              .map((e) {
+                                final name = getJsonField(e, r'''$.display_name''');
+                                return (name != null && name.toString() != 'null' && name.toString().isNotEmpty)
+                                    ? name.toString()
+                                    : getJsonField(e, r'''$.email''').toString();
+                              })
+                              .toList(),
+                          currentValue: _model.cmdGerenteValue,
+                          controller: _model.cmdGerenteController,
+                          onChanged: (val) => safeSetState(() => _model.cmdGerenteValue = val),
                         ),
-                        // 16. Auditor Responsable (ancho completo)
-                        _buildTextField(
+                        // 16. Auditor Responsable (dropdown de usuarios)
+                        _buildDropdownField(
                           context: context,
                           label: 'Auditor Responsable',
-                          controller: _model.txtAuditorResponsableController,
-                          focusNode: _model.txtAuditorResponsableFocusNode,
-                          hintText: 'Escribe aquí',
-                          maxLines: 1,
-                          minLines: 1,
+                          options: FFAppState().jsonUsers
+                              .where((e) {
+                                final uid = getJsonField(e, r'''$.user_uid''');
+                                return uid != null && uid.toString() != 'null' && uid.toString().isNotEmpty;
+                              })
+                              .map((e) {
+                                final name = getJsonField(e, r'''$.display_name''');
+                                return (name != null && name.toString() != 'null' && name.toString().isNotEmpty)
+                                    ? name.toString()
+                                    : getJsonField(e, r'''$.email''').toString();
+                              })
+                              .toList(),
+                          currentValue: _model.cmdAuditorValue,
+                          controller: _model.cmdAuditorController,
+                          onChanged: (val) => safeSetState(() => _model.cmdAuditorValue = val),
                         ),
                         // 17. Descripción del Riesgo (ancho completo)
                         _buildTextField(
@@ -1355,11 +1350,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                               _model.fecha?.toIso8601String().split('T')[0],
                               _model.txtdescripcionTextController?.text ?? '',
                               _model.txtrecomendacionTextController?.text,
-                              FFAppState()
-                                  .listaprocesos
-                                  .where((e) => _model.cmdprocesoValue == e.idProceso)
-                                  .firstOrNull
-                                  ?.nombre,
+                              null,
                               _model.cmdobservacionValue,
                               _model.riskLevels
                                       .where((r) => r.riskLevelId == _model.cmdriesgoValue)
@@ -1392,8 +1383,8 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                                   .where((t) => t.riskTypologyId == _model.cmdRiskTypologyValue)
                                   .firstOrNull
                                   ?.name,
-                              _model.txtGerenteResponsableController?.text,
-                              _model.txtAuditorResponsableController?.text,
+                              _model.cmdGerenteValue,
+                              _model.cmdAuditorValue,
                               _model.txtDescripcionRiesgoController?.text,
                               _model.cmdObservationScopeValue,
                               _model.observationScopes
@@ -1409,7 +1400,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                             );
                             Navigator.pop(context);
                           },
-                          text: 'Guardar Hallazgo',
+                          text: 'Guardar Observación',
                           options: FFButtonOptions(
                             height: 47.8,
                             padding: EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),

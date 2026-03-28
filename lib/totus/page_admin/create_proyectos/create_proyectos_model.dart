@@ -49,6 +49,7 @@ class CreateProyectosModel extends FlutterFlowModel<CreateProyectosWidget> {
   bool usarDropdownHighbond = false;
   String? selectedHighbondProjectId;
   String? selectedHighbondProjectName;
+  FormFieldController<String>? highbondProjectController;
 
   ///  State fields for stateful widgets in this page.
 

@@ -54,6 +54,7 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
   late HomeProyectsModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _isAuditStatusExpanded = false;
 
   final animationsMap = <String, AnimationInfo>{};
 
@@ -346,18 +347,37 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                     .primaryBackground,
                                 icon: Icon(
                                   Icons.cached_sharp,
-                                  color: FlutterFlowTheme.of(context).primary,
+                                  color: (_model.estaconectado ?? false)
+                                      ? FlutterFlowTheme.of(context).primary
+                                      : FlutterFlowTheme.of(context)
+                                          .secondaryText,
                                   size: 24.0,
                                 ),
                                 showLoadingIndicator: true,
-                                onPressed: () async {
-                                  await action_blocks.sync(
-                                    context,
-                                    connect: _model.estaconectado,
-                                  );
-                                  await _loadUltimaSync();
-                                  safeSetState(() {});
-                                },
+                                onPressed: (_model.estaconectado ?? false)
+                                    ? () async {
+                                        await action_blocks.sync(
+                                          context,
+                                          connect: _model.estaconectado,
+                                        );
+                                        await _loadUltimaSync();
+                                        safeSetState(() {});
+                                      }
+                                    : () {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                            'Sin conexión. Conéctate a internet para sincronizar.',
+                                            style: TextStyle(
+                                                color: Colors.white),
+                                          ),
+                                          duration:
+                                              Duration(milliseconds: 3000),
+                                          backgroundColor:
+                                              FlutterFlowTheme.of(context)
+                                                  .error,
+                                        ));
+                                      },
                               ).animateOnPageLoad(animationsMap[
                                   'iconButtonOnPageLoadAnimation']!),
                             ],
@@ -945,7 +965,8 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                     8.0, 0.0, 0.0, 0.0),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     FaIcon(
                                       FontAwesomeIcons.fileAlt,
@@ -953,7 +974,7 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                           .secondary,
                                       size: 24.0,
                                     ),
-                                    Flexible(
+                                    Expanded(
                                       child: Text(
                                         'Estatus por Auditoría',
                                         style: FlutterFlowTheme.of(context)
@@ -976,10 +997,32 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                             ),
                                       ),
                                     ),
+                                    FlutterFlowIconButton(
+                                      borderColor: Colors.transparent,
+                                      borderRadius: 20.0,
+                                      borderWidth: 1.0,
+                                      buttonSize: 36.0,
+                                      icon: Icon(
+                                        _isAuditStatusExpanded
+                                            ? Icons.keyboard_arrow_up_rounded
+                                            : Icons
+                                                .keyboard_arrow_down_rounded,
+                                        color: FlutterFlowTheme.of(context)
+                                            .secondaryText,
+                                        size: 22.0,
+                                      ),
+                                      onPressed: () async {
+                                        safeSetState(() {
+                                          _isAuditStatusExpanded =
+                                              !_isAuditStatusExpanded;
+                                        });
+                                      },
+                                    ),
                                   ].divide(SizedBox(width: 10.0)),
                                 ),
                               ),
-                              Builder(
+                              if (_isAuditStatusExpanded)
+                                Builder(
                                 builder: (context) {
                                   if (_model.estaconectado ?? false) {
                                     return FutureBuilder<ApiCallResponse>(
@@ -2658,8 +2701,7 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                       style: TextStyle(),
                                                     ),
                                                     TextSpan(
-                                                      text: valueOrDefault<
-                                                          String>(
+                                                      text: '(${valueOrDefault<String>(
                                                         functions
                                                             .getProyectsProgressCount(
                                                                 functions.getProyectosSearchCodigoNombre(
@@ -2669,7 +2711,7 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                                 assignUser: FFAppState().currentUser.uidUsuario)
                                                             .toString(),
                                                         '0',
-                                                      ),
+                                                      )})',
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w600,

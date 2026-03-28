@@ -40,16 +40,27 @@ Future cargarDatosConCacheInteligente(
     // ============================================
     // VERIFICAR ROL DEL USUARIO
     // ============================================
-    final usuarioData = await UsersTable().queryRows(
-      queryFn: (q) => q!.eq('id', userId),
-    );
-
-    if (usuarioData.isEmpty) {
-      print('❌ Usuario no encontrado');
-      return;
+    // Usar el rol ya disponible en FFAppState (evita query con userId nulo)
+    final userRole = FFAppState().currentUser.rol;
+    if (userRole.isEmpty) {
+      // Fallback: intentar obtener de Supabase solo si userId es válido
+      if (userId.isEmpty || userId == 'null') {
+        print('❌ userId inválido y sin rol en FFAppState - abortando');
+        return;
+      }
+      try {
+        final usuarioData = await UsersTable().queryRows(
+          queryFn: (q) => q!.eq('id', userId),
+        );
+        if (usuarioData.isEmpty) {
+          print('❌ Usuario no encontrado');
+          return;
+        }
+      } catch (e) {
+        print('❌ Error obteniendo usuario: $e');
+        return;
+      }
     }
-
-    final userRole = usuarioData.first.role ?? '';
 
     // SOLO usuarios con role = 'usuario' pueden hacer sync completa con APIs
     final puedeUsarAPIs = userRole.toLowerCase() == 'usuario';
@@ -116,19 +127,26 @@ Future cargarDatosConCacheInteligente(
 /// Carga rápida desde SQLite + validación con Supabase
 Future _cargarRapidoDesdeCache(String userId) async {
   try {
-    // Los datos ya están en FFAppState desde la sesión anterior
-    // Solo necesitamos validar con Supabase si hay cambios
-
-    // Obtener user_uid
-    final usuarioSupabase = await UsersTable().queryRows(
-      queryFn: (q) => q!.eq('id', userId),
-    );
-
-    if (usuarioSupabase.isEmpty) {
-      return;
+    // Obtener user_uid desde FFAppState (evita query con userId potencialmente nulo)
+    String userUid = FFAppState().currentUser.uidUsuario ?? '';
+    if (userUid.isEmpty || userUid == 'null') {
+      if (userId.isNotEmpty && userId != 'null') {
+        try {
+          final usuarioSupabase = await UsersTable().queryRows(
+            queryFn: (q) => q!.eq('id', userId),
+          );
+          if (usuarioSupabase.isNotEmpty) {
+            userUid = usuarioSupabase.first.userUid ?? '';
+          }
+        } catch (e) {
+          print('⚠️ Error obteniendo user_uid en carga rápida: $e');
+        }
+      }
     }
 
-    final userUid = usuarioSupabase.first.userUid ?? '';
+    if (userUid.isEmpty || userUid == 'null') {
+      return;
+    }
 
     // Obtener proyectos
     final proyectosSupabase = await ProjectsTable().queryRows(
