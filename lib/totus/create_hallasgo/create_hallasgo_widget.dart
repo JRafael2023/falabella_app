@@ -1250,27 +1250,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdRiskTypologyController,
                           onChanged: (val) => safeSetState(() => _model.cmdRiskTypologyValue = val),
                         ),
-                        // 13. Alcance de Observación (ancho completo)
-                        _buildDropdownField(
-                          context: context,
-                          label: 'Alcance de Observación',
-                          options: _model.observationScopes.map((s) => s.observationScopeId ?? '').toList(),
-                          optionLabels: _model.observationScopes.map((s) => s.name ?? '').toList(),
-                          currentValue: _model.cmdObservationScopeValue,
-                          controller: _model.cmdObservationScopeController,
-                          onChanged: (val) => safeSetState(() => _model.cmdObservationScopeValue = val),
-                        ),
-                        // 14. Riesgo Actual (ancho completo)
-                        _buildDropdownField(
-                          context: context,
-                          label: 'Riesgo Actual',
-                          options: _model.riskLevels.map((r) => r.riskLevelId ?? '').toList(),
-                          optionLabels: _model.riskLevels.map((r) => r.name ?? '').toList(),
-                          currentValue: _model.cmdRiskActualLevelValue,
-                          controller: _model.cmdRiskActualLevelController,
-                          onChanged: (val) => safeSetState(() => _model.cmdRiskActualLevelValue = val),
-                        ),
-                        // 15. Gerente Responsable (dropdown de usuarios)
+                        // 13. Gerente Responsable (dropdown de usuarios)
                         _buildDropdownField(
                           context: context,
                           label: 'Gerente Responsable',
@@ -1290,7 +1270,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdGerenteController,
                           onChanged: (val) => safeSetState(() => _model.cmdGerenteValue = val),
                         ),
-                        // 16. Auditor Responsable (dropdown de usuarios)
+                        // 14. Auditor Responsable (dropdown de usuarios)
                         _buildDropdownField(
                           context: context,
                           label: 'Auditor Responsable',
@@ -1310,7 +1290,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdAuditorController,
                           onChanged: (val) => safeSetState(() => _model.cmdAuditorValue = val),
                         ),
-                        // 17. Descripción del Riesgo (ancho completo)
+                        // 15. Descripción del Riesgo (ancho completo)
                         _buildTextField(
                           context: context,
                           label: 'Descripción del Riesgo',
@@ -1319,6 +1299,26 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           hintText: 'Escribe aquí',
                           maxLines: 3,
                           minLines: 3,
+                        ),
+                        // 16. Alcance de Observación (ancho completo)
+                        _buildDropdownField(
+                          context: context,
+                          label: 'Alcance de Observación',
+                          options: _model.observationScopes.map((s) => s.observationScopeId ?? '').toList(),
+                          optionLabels: _model.observationScopes.map((s) => s.name ?? '').toList(),
+                          currentValue: _model.cmdObservationScopeValue,
+                          controller: _model.cmdObservationScopeController,
+                          onChanged: (val) => safeSetState(() => _model.cmdObservationScopeValue = val),
+                        ),
+                        // 17. Riesgo Actual (ancho completo)
+                        _buildDropdownField(
+                          context: context,
+                          label: 'Riesgo Actual',
+                          options: _model.riskLevels.map((r) => r.riskLevelId ?? '').toList(),
+                          optionLabels: _model.riskLevels.map((r) => r.name ?? '').toList(),
+                          currentValue: _model.cmdRiskActualLevelValue,
+                          controller: _model.cmdRiskActualLevelController,
+                          onChanged: (val) => safeSetState(() => _model.cmdRiskActualLevelValue = val),
                         ),
                         // 18. Causa Raíz (ancho completo)
                         _buildTextField(

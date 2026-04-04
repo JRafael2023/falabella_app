@@ -38,6 +38,8 @@ class FlutterFlowDropDown<T> extends StatefulWidget {
     this.labelText,
     this.labelTextStyle,
     this.optionsHasValueKeys = false,
+    this.searchMatchFn,
+    this.onSearchChanged,
   }) : assert(
           isMultiSelect
               ? (controller == null &&
@@ -81,6 +83,8 @@ class FlutterFlowDropDown<T> extends StatefulWidget {
   final String? labelText;
   final TextStyle? labelTextStyle;
   final bool optionsHasValueKeys;
+  final bool Function(DropdownMenuItem<T>, String)? searchMatchFn;
+  final void Function(String)? onSearchChanged;
 
   @override
   State<FlutterFlowDropDown<T>> createState() => _FlutterFlowDropDownState<T>();
@@ -108,17 +112,7 @@ class _FlutterFlowDropDownState<T> extends State<FlutterFlowDropDown<T>> {
         .intersection(multiSelectController.value!.toSet());
   }
 
-  Map<T, String> get optionLabels => Map.fromEntries(
-        widget.options.asMap().entries.map(
-              (option) => MapEntry(
-                option.value,
-                widget.optionLabels == null ||
-                        widget.optionLabels!.length < option.key + 1
-                    ? option.value.toString()
-                    : widget.optionLabels![option.key],
-              ),
-            ),
-      );
+  Map<T, String> get optionLabels => _cachedOptionLabels;
 
   EdgeInsetsGeometry get horizontalMargin => widget.margin.clamp(
         EdgeInsetsDirectional.zero,
@@ -127,10 +121,23 @@ class _FlutterFlowDropDownState<T> extends State<FlutterFlowDropDown<T>> {
 
   late void Function() _listener;
   final TextEditingController _textEditingController = TextEditingController();
+  late List<T> _displayedOptions;
+  late Map<T, String> _cachedOptionLabels;
 
   @override
   void initState() {
     super.initState();
+    _displayedOptions = widget.options.take(100).toList();
+    _cachedOptionLabels = Map.fromEntries(
+      widget.options.asMap().entries.map(
+        (option) => MapEntry(
+          option.value,
+          widget.optionLabels == null || widget.optionLabels!.length < option.key + 1
+              ? option.value.toString()
+              : widget.optionLabels![option.key],
+        ),
+      ),
+    );
     if (isMultiSelect) {
       _listener =
           () => widget.onMultiSelectChanged!(multiSelectController.value);
@@ -217,7 +224,7 @@ class _FlutterFlowDropDownState<T> extends State<FlutterFlowDropDown<T>> {
     return ValueKey('$widgetKey ${widget.options.indexOf(option)}');
   }
 
-  List<DropdownMenuItem<T>> _createMenuItems() => widget.options
+  List<DropdownMenuItem<T>> _createMenuItems() => _displayedOptions
       .map(
         (option) => DropdownMenuItem<T>(
             key: widget.optionsHasValueKeys ? _getItemKey(option) : null,
@@ -346,6 +353,22 @@ class _FlutterFlowDropDownState<T> extends State<FlutterFlowDropDown<T>> {
                   controller: _textEditingController,
                   cursorColor: widget.searchCursorColor,
                   style: widget.searchTextStyle,
+                  onChanged: (query) {
+                    widget.onSearchChanged?.call(query);
+                    if (widget.searchMatchFn != null) {
+                      // Filtrar desde todos los options usando searchMatchFn
+                      setState(() {
+                        _displayedOptions = query.isEmpty
+                            ? widget.options.take(100).toList()
+                            : widget.options
+                                .where((opt) => widget.searchMatchFn!(
+                                    DropdownMenuItem<T>(value: opt, child: const SizedBox()),
+                                    query))
+                                .take(100)
+                                .toList();
+                      });
+                    }
+                  },
                   decoration: InputDecoration(
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(
@@ -360,7 +383,7 @@ class _FlutterFlowDropDownState<T> extends State<FlutterFlowDropDown<T>> {
                   ),
                 ),
               ),
-              searchMatchFn: (item, searchValue) {
+              searchMatchFn: widget.searchMatchFn ?? (item, searchValue) {
                 return (optionLabels[item.value] ?? '')
                     .toLowerCase()
                     .contains(searchValue.toLowerCase());

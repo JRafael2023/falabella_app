@@ -50,6 +50,7 @@ class CreateProyectosModel extends FlutterFlowModel<CreateProyectosWidget> {
   String? selectedHighbondProjectId;
   String? selectedHighbondProjectName;
   FormFieldController<String>? highbondProjectController;
+  List<Map> displayedHighbondProjects = [];
 
   ///  State fields for stateful widgets in this page.
 

@@ -145,7 +145,7 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                             model: _model.wifiComponentModel,
                             updateCallback: () => safeSetState(() {}),
                             child: WifiComponentWidget(
-                              conexion: _model.estaconectado!,
+                              conexion: _model.estaconectado ?? true,
                             ),
                           ),
                         ),
@@ -705,38 +705,23 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                   mostrarError('Ingresa el ID del proyecto de Highbond antes de buscar');
                                                   return;
                                                 }
-                                                _model.apiProyects =
-                                                    await SupabaseFunctionsGroup
-                                                        .getProjectsHighbondCall
-                                                        .call();
+                                                final cacheResult = await SupaFlow.client
+                                                    .from('highbond_projects_cache')
+                                                    .select('id_highbond, name')
+                                                    .eq('id_highbond', idBusqueda)
+                                                    .maybeSingle();
 
-                                                if ((_model.apiProyects
-                                                        ?.succeeded ??
-                                                    false)) {
-                                                  // Pasar el jsonBody completo — filterAPI navega la estructura internamente
-                                                  _model.jsonSearchProyect =
-                                                      functions.filterAPI(
-                                                          idBusqueda,
-                                                          (_model.apiProyects
-                                                                  ?.jsonBody ??
-                                                              ''));
-                                                  setModalState(() {});
-                                                  if (_model
-                                                          .jsonSearchProyect !=
-                                                      null) {
-                                                    // Acceso directo al Map para evitar problemas de getJsonField
-                                                    final resultMap = _model.jsonSearchProyect as Map<String, dynamic>;
-                                                    setModalState(() {
-                                                      _model
-                                                          .txtnombreTextController
-                                                          ?.text = (resultMap['name'] ?? '').toString();
-                                                    });
-                                                  } else {
-                                                    mostrarError('El ID "$idBusqueda" no existe en Highbond. Verifica el ID e intenta nuevamente.');
-                                                  }
+                                                if (cacheResult != null) {
+                                                  _model.jsonSearchProyect = {
+                                                    'id': cacheResult['id_highbond'],
+                                                    'name': cacheResult['name'] ?? '',
+                                                  };
+                                                  setModalState(() {
+                                                    _model.txtnombreTextController?.text =
+                                                        (cacheResult['name'] ?? '').toString();
+                                                  });
                                                 } else {
-                                                  mostrarError('Error de conexión con Highbond');
-                                                  return;
+                                                  mostrarError('El ID "$idBusqueda" no existe en Highbond. Verifica el ID e intenta nuevamente.');
                                                 }
                                               },
                                             ),
@@ -772,71 +757,16 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                             Text('Cargando proyectos...', style: FlutterFlowTheme.of(context).bodySmall),
                                                           ],
                                                         )
-                                                      : FlutterFlowDropDown<String>(
-                                                          controller: _model.highbondProjectController ??=
-                                                              FormFieldController<String>(_model.selectedHighbondProjectId),
-                                                          options: FFAppState().jsonHighbondProjects
-                                                              .map((p) => (p as Map)['id']?.toString() ?? '')
-                                                              .toList(),
-                                                          optionLabels: FFAppState().jsonHighbondProjects
-                                                              .map((p) => (p as Map)['name']?.toString() ?? '')
-                                                              .toList(),
-                                                          onChanged: (val) {
-                                                            if (val == null) return;
-                                                            final proyecto = FFAppState().jsonHighbondProjects.firstWhere(
-                                                              (p) => (p as Map)['id']?.toString() == val,
-                                                              orElse: () => null,
-                                                            );
-                                                            if (proyecto == null) return;
-                                                            final pm = proyecto as Map;
-                                                            setModalState(() {
-                                                              _model.selectedHighbondProjectId = val;
-                                                              _model.selectedHighbondProjectName = pm['name']?.toString();
-                                                              _model.txtidTextController?.text = val;
-                                                              _model.txtnombreTextController?.text = pm['name']?.toString() ?? '';
-                                                            });
-                                                          },
-                                                          height: 50.0,
-                                                          searchHintTextStyle: FlutterFlowTheme.of(context).labelMedium.override(
-                                                            font: TextStyle(
-                                                              fontWeight: FlutterFlowTheme.of(context).labelMedium.fontWeight,
-                                                              fontStyle: FlutterFlowTheme.of(context).labelMedium.fontStyle,
-                                                            ),
-                                                            letterSpacing: 0.0,
-                                                          ),
-                                                          searchTextStyle: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                            font: TextStyle(
-                                                              fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                              fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                            ),
-                                                            letterSpacing: 0.0,
-                                                          ),
-                                                          textStyle: FlutterFlowTheme.of(context).bodyMedium.override(
-                                                            font: TextStyle(
-                                                              fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
-                                                              fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
-                                                            ),
-                                                            color: FlutterFlowTheme.of(context).secondaryText,
-                                                            letterSpacing: 0.0,
-                                                          ),
-                                                          hintText: 'Selecciona un proyecto',
-                                                          searchHintText: 'Buscar proyecto...',
-                                                          icon: Icon(
-                                                            Icons.keyboard_arrow_down_rounded,
-                                                            color: FlutterFlowTheme.of(context).secondaryText,
-                                                            size: 24.0,
-                                                          ),
-                                                          fillColor: FlutterFlowTheme.of(context).secondaryBackground,
-                                                          elevation: 2.0,
-                                                          borderColor: FlutterFlowTheme.of(context).customColor4bbbbb,
-                                                          borderWidth: 2.0,
-                                                          borderRadius: 8.0,
-                                                          margin: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 12.0, 0.0),
-                                                          hidesUnderline: true,
-                                                          isOverButton: false,
-                                                          isSearchable: true,
-                                                          isMultiSelect: false,
-                                                          maxHeight: 300.0,
+                                                      : _HighbondDropdown(
+                                                          selectedId: _model.selectedHighbondProjectId,
+                                                          selectedName: _model.selectedHighbondProjectName,
+                                                          projects: FFAppState().jsonHighbondProjects.cast<Map>(),
+                                                          onSelected: (p) => setModalState(() {
+                                                            _model.selectedHighbondProjectId = p['id']?.toString();
+                                                            _model.selectedHighbondProjectName = p['name']?.toString();
+                                                            _model.txtidTextController?.text = p['id']?.toString() ?? '';
+                                                            _model.txtnombreTextController?.text = p['name']?.toString() ?? '';
+                                                          }),
                                                         ),
                                                 ),
                                               ],
@@ -1384,22 +1314,18 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                   }
                                                   if (_model.estaconectado ?? false) {
                                                     try {
-                                                    _model.apiProyectsCREATE =
-                                                        await SupabaseFunctionsGroup
-                                                            .getProjectsHighbondCall
-                                                            .call();
+                                                    final cacheResultCreate = await SupaFlow.client
+                                                        .from('highbond_projects_cache')
+                                                        .select('id_highbond, name')
+                                                        .eq('id_highbond', _model.txtidTextController.text.trim())
+                                                        .maybeSingle();
 
-                                                    _model.jsonSearchProyect =
-                                                        functions.filterAPI(
-                                                            _model
-                                                                .txtidTextController
-                                                                .text,
-                                                            getJsonField(
-                                                              (_model.apiProyectsCREATE
-                                                                      ?.jsonBody ??
-                                                                  ''),
-                                                              r'''$.data.data''',
-                                                            ));
+                                                    _model.jsonSearchProyect = cacheResultCreate != null
+                                                        ? {
+                                                            'id': cacheResultCreate['id_highbond'],
+                                                            'name': cacheResultCreate['name'] ?? '',
+                                                          }
+                                                        : null;
                                                     safeSetState(() {});
                                                     if (!(_model
                                                             .jsonSearchProyect !=
@@ -1688,6 +1614,221 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// Widget dropdown custom para proyectos Highbond — evita ANR con 15k+ items
+class _HighbondDropdown extends StatefulWidget {
+  final String? selectedId;
+  final String? selectedName;
+  final List<Map> projects;
+  final void Function(Map) onSelected;
+
+  const _HighbondDropdown({
+    required this.selectedId,
+    required this.selectedName,
+    required this.projects,
+    required this.onSelected,
+  });
+
+  @override
+  State<_HighbondDropdown> createState() => _HighbondDropdownState();
+}
+
+class _HighbondDropdownState extends State<_HighbondDropdown> {
+  final _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+  bool _isOpen = false;
+
+  void _open() {
+    if (_isOpen) return;
+    _isOpen = true;
+    _overlayEntry = _buildOverlay();
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _close() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    _isOpen = false;
+  }
+
+  OverlayEntry _buildOverlay() {
+    final renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
+
+    return OverlayEntry(
+      builder: (ctx) => GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: _close,
+        child: Stack(
+          children: [
+            CompositedTransformFollower(
+              link: _layerLink,
+              showWhenUnlinked: false,
+              offset: Offset(0, size.height + 2),
+              child: Material(
+                elevation: 4,
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: size.width,
+                  child: _HighbondDropdownMenu(
+                    projects: widget.projects,
+                    onSelected: (p) {
+                      _close();
+                      widget.onSelected(p);
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: GestureDetector(
+        onTap: _isOpen ? _close : _open,
+        child: Container(
+          height: 50.0,
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          decoration: BoxDecoration(
+            color: FlutterFlowTheme.of(context).secondaryBackground,
+            border: Border.all(
+              color: FlutterFlowTheme.of(context).customColor4bbbbb,
+              width: 2.0,
+            ),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  widget.selectedId != null
+                      ? '${widget.selectedId} - ${widget.selectedName ?? ''}'
+                      : 'Selecciona un proyecto',
+                  style: FlutterFlowTheme.of(context).bodyMedium.override(
+                    font: TextStyle(
+                      fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
+                      fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                    ),
+                    color: widget.selectedId != null
+                        ? FlutterFlowTheme.of(context).primaryText
+                        : FlutterFlowTheme.of(context).secondaryText,
+                    letterSpacing: 0.0,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Icon(
+                _isOpen ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                color: FlutterFlowTheme.of(context).secondaryText,
+                size: 24.0,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HighbondDropdownMenu extends StatefulWidget {
+  final List<Map> projects;
+  final void Function(Map) onSelected;
+
+  const _HighbondDropdownMenu({required this.projects, required this.onSelected});
+
+  @override
+  State<_HighbondDropdownMenu> createState() => _HighbondDropdownMenuState();
+}
+
+class _HighbondDropdownMenuState extends State<_HighbondDropdownMenu> {
+  late List<Map> _filtered;
+  final _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _filtered = widget.projects.take(50).toList();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 320),
+      decoration: BoxDecoration(
+        color: FlutterFlowTheme.of(context).secondaryBackground,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _controller,
+              autofocus: true,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: 'Buscar por ID...',
+                prefixIcon: const Icon(Icons.search, size: 18),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              ),
+              onChanged: (v) => setState(() {
+                _filtered = v.isEmpty
+                    ? widget.projects.take(50).toList()
+                    : widget.projects
+                        .where((p) => p['id']?.toString().contains(v) ?? false)
+                        .take(50)
+                        .toList();
+              }),
+            ),
+          ),
+          if (_filtered.isEmpty)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('Sin resultados', style: TextStyle(color: Colors.grey)),
+            )
+          else
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 250),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: _filtered.length,
+                itemBuilder: (_, i) {
+                  final p = _filtered[i];
+                  return ListTile(
+                    dense: true,
+                    title: Text('${p['id']} - ${p['name']}', overflow: TextOverflow.ellipsis),
+                    onTap: () => widget.onSelected(p),
+                  );
+                },
+              ),
+            ),
+        ],
       ),
     );
   }

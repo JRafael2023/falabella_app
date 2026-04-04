@@ -129,13 +129,6 @@ Future<String> combineAndSyncControls(
         // Supabase puede tener datos desactualizados si el usuario modificó offline sin sincronizar
         final localData = await DBControles.obtenerControlCompleto(controlId);
 
-        // Helper: prefiere valor local si existe, sino usa Supabase como fallback
-        String? _localFirst(String? localVal, dynamic supabaseVal) {
-          if (localVal != null && localVal.isNotEmpty) return localVal;
-          final s = supabaseVal?.toString();
-          return (s != null && s.isNotEmpty) ? s : null;
-        }
-
         // Crear Control con TODOS los datos de SQLite, actualizando solo campos de API
         final existingCompleted = existing['completed'] == true || existing['completed'] == 1;
 
@@ -298,6 +291,14 @@ Future<String> combineAndSyncControls(
     print('📋 Stack: $stackTrace');
     return 'Error: $e';
   }
+}
+
+/// Prefiere valor local si existe, sino usa Supabase como fallback.
+/// Declarada a nivel de archivo para evitar problemas con AOT (release builds).
+String? _localFirst(String? localVal, dynamic supabaseVal) {
+  if (localVal != null && localVal.isNotEmpty) return localVal;
+  final s = supabaseVal?.toString();
+  return (s != null && s.isNotEmpty) ? s : null;
 }
 
 /// Resuelve el valor final de un adjunto con prioridad a datos locales:

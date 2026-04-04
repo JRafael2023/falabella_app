@@ -149,16 +149,7 @@ class FFAppState extends ChangeNotifier {
           }).toList() ??
           _jsonMatrices;
     });
-    _safeInit(() {
-      _jsonHighbondProjects = prefs.getStringList('ff_jsonHighbondProjects')?.map((x) {
-            try {
-              return jsonDecode(x);
-            } catch (e) {
-              return {};
-            }
-          }).toList() ??
-          _jsonHighbondProjects;
-    });
+    // jsonHighbondProjects no se persiste (son 15k+ registros, se recarga desde Supabase al iniciar)
     _safeInit(() {
       if (prefs.containsKey('ff_currentUser')) {
         try {
@@ -638,9 +629,8 @@ class FFAppState extends ChangeNotifier {
   List<dynamic> _jsonHighbondProjects = [];
   List<dynamic> get jsonHighbondProjects => _jsonHighbondProjects;
   set jsonHighbondProjects(List<dynamic> value) {
+    // Solo en memoria — son 15k+ registros, persistir en SharedPreferences bloquea la UI
     _jsonHighbondProjects = value;
-    prefs.setStringList(
-        'ff_jsonHighbondProjects', value.map((x) => jsonEncode(x)).toList());
   }
 
   UserStruct _currentUser = UserStruct();

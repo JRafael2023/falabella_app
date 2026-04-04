@@ -1,4 +1,5 @@
 import '/backend/api_requests/api_calls.dart';
+import '/backend/supabase/supabase.dart';
 import '/components/exit_component_widget.dart';
 import '/components/no_internet_dialog_widget_widget.dart';
 import '/components/wifi_component_widget.dart';
@@ -113,41 +114,48 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
     super.dispose();
   }
 
-  /// Carga y cachea los proyectos de Highbond en segundo plano.
-  /// No bloquea el UI — si falla, se mantiene la lista anterior.
+  /// Lee los proyectos desde la tabla cache de Supabase con paginación.
+  /// El sync con Highbond lo hace el cron job en background cada 2 horas.
   void _cargarProyectosHighbondEnParalelo() {
-    SupabaseFunctionsGroup.getProjectsHighbondCall.call().then((resp) {
+    _fetchAllHighbondProjects().then((projects) {
       if (!mounted) return;
-      if (!resp.succeeded) return;
-      final body = resp.jsonBody;
-      List<dynamic> raw = [];
-      if (body is Map) {
-        final d1 = body['data'];
-        if (d1 is Map) {
-          final d2 = d1['data'];
-          if (d2 is List) raw = d2;
-        } else if (d1 is List) {
-          raw = d1;
-        }
-      } else if (body is List) {
-        raw = body;
-      }
-      final projects = raw
-          .whereType<Map>()
-          .map((p) => {
-                'id': p['id']?.toString() ?? '',
-                'name': (p['attributes']?['name'] ?? p['id'] ?? '').toString(),
-              })
-          .where((p) => (p['id'] as String).isNotEmpty)
-          .toList()
-          .cast<dynamic>();
       if (projects.isNotEmpty) {
-        FFAppState().jsonHighbondProjects = projects;
-        print('✅ Highbond projects cacheados: ${projects.length}');
+        FFAppState().jsonHighbondProjects = projects.cast<dynamic>();
+        print('✅ Proyectos cargados desde Supabase: ${projects.length}');
       }
     }).catchError((e) {
-      print('⚠️ No se pudo cargar proyectos Highbond: $e');
+      print('⚠️ Error cargando proyectos desde cache: $e');
     });
+  }
+
+  Future<List<Map<String, String>>> _fetchAllHighbondProjects() async {
+    const pageSize = 1000;
+    const batchSize = 5; // 5 requests en paralelo a la vez
+    const maxPages = 25; // soporta hasta 25.000 proyectos
+
+    final List<Map<String, String>> all = [];
+    for (int batch = 0; batch < maxPages; batch += batchSize) {
+      final end = (batch + batchSize).clamp(0, maxPages);
+      final futures = List.generate(end - batch, (i) => SupaFlow.client
+          .from('highbond_projects_cache')
+          .select('id_highbond, name')
+          .range((batch + i) * pageSize, (batch + i + 1) * pageSize - 1));
+
+      final results = await Future.wait(futures);
+      bool anyResults = false;
+      for (final rows in results) {
+        for (final r in (rows as List)) {
+          final id = r['id_highbond']?.toString() ?? '';
+          if (id.isNotEmpty) {
+            all.add({'id': id, 'name': r['name']?.toString() ?? ''});
+            anyResults = true;
+          }
+        }
+      }
+      // Si ningún resultado en este batch, terminamos
+      if (!anyResults) break;
+    }
+    return all;
   }
 
   @override
@@ -197,7 +205,7 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                           model: _model.wifiComponentModel,
                           updateCallback: () => safeSetState(() {}),
                           child: WifiComponentWidget(
-                            conexion: _model.estaconectado!,
+                            conexion: _model.estaconectado ?? true,
                           ),
                         ),
                       ),

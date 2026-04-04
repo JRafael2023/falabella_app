@@ -163,13 +163,21 @@ Future actualizarControlSqLite(
 
           if (controlIndex != -1) {
             // Crear mapa actualizado del control
+            // ⚠️ NUNCA poner bytes de foto/video/archivo en AppState.
+            // controles_widget hace jsonEncode(photos) lo que corrompe el base64 GZIP
+            // con comillas extra → convertBase64StringToUploadFiles genera imágenes en blanco
+            // → widget.listImages queda con archivos corruptos → se mezclan con los reales.
+            // Usar null + contadores; actualizarControlEnAppState confirma los conteos desde SQLite.
             final controlActualizado = {
               'id_control': control.idControl,
               'title': control.title,
               'description': control.description,
-              'photos': control.photos,
-              'video': control.video,
-              'archives': control.archives,
+              'photos': null,
+              'video': null,
+              'archives': null,
+              'photos_count': photos?.length ?? 0,
+              'archives_count': archives?.length ?? 0,
+              'has_video': (videos != null && videos.isNotEmpty) ? 1 : 0,
               'finding_status': control.findingStatus,
               'objective_id': control.objectiveId,
               'walkthrough_id': control.walkthroughId,
