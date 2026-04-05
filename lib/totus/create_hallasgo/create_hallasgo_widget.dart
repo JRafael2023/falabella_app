@@ -376,6 +376,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
           children: [
             Expanded(
               child: FlutterFlowDropDown<String>(
+                key: ValueKey('${label}_${options.length}'),
                 controller: controller ?? FormFieldController<String>(currentValue),
                 options: options,
                 optionLabels: optionLabels,
