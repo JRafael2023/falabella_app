@@ -14,54 +14,37 @@ import 'package:flutter/material.dart';
 import 'index.dart'; // Imports other custom actions
 
 import '/custom_code/DBObjetivos.dart';
+import '/custom_code/DBControles.dart';
 
 Future<double> actualizarProgressProyectoSupabase(String idProject) async {
   try {
-    print('🔄 Calculando progress del proyecto en Supabase: $idProject');
+    print('🔄 Calculando progress del proyecto: $idProject');
 
-    // PASO 1: Obtener todos los objetivos de este proyecto desde SQLite
+    // PASO 1: Obtener objetivos desde SQLite (rápido, local)
     final objetivosResponse =
         await DBObjetivos.listarObjetivosPorProyecto(idProject);
 
     if (objetivosResponse.isEmpty) {
-      print('⚠️ No hay objetivos para el proyecto $idProject en SQLite');
+      print('⚠️ No hay objetivos para $idProject');
       return 0.0;
     }
 
-    print('📊 Proyecto tiene ${objetivosResponse.length} objetivos (SQLite)');
+    // PASO 2: Contar controles desde SQLite (sin tocar Supabase)
+    int totalControles = 0;
+    int controlesCompletados = 0;
 
-    // PASO 2: Extraer IDs de objetivos
-    final idsObjetivos =
-        objetivosResponse.map((obj) => obj.idObjetivo).toList();
-
-    if (idsObjetivos.isEmpty) {
-      print('⚠️ No hay IDs de objetivos válidos');
-      return 0.0;
+    for (final obj in objetivosResponse) {
+      final controles = await DBControles.listarControlesJson(obj.idObjetivo);
+      totalControles += controles.length;
+      controlesCompletados += controles
+          .where((c) => c['completed'] == 1 || c['completed'] == true)
+          .length;
     }
 
-    // PASO 3: Obtener todos los controles de esos objetivos desde Supabase
-    final controlesResponse = await ControlsTable().queryRows(
-      queryFn: (q) {
-        // Construir filtro OR para múltiples objetivos
-        if (idsObjetivos.length == 1) {
-          return q!.eq('id_objective', idsObjetivos[0]);
-        } else {
-          String orFilter =
-              idsObjetivos.map((id) => 'id_objective.eq.$id').join(',');
-          return q!.or(orFilter);
-        }
-      },
-    );
-
-    if (controlesResponse.isEmpty) {
-      print('⚠️ No hay controles en el proyecto (Supabase)');
+    if (totalControles == 0) {
+      print('⚠️ No hay controles para $idProject');
       return 0.0;
     }
-
-    // PASO 4: Contar total y completados
-    final totalControles = controlesResponse.length;
-    final controlesCompletados =
-        controlesResponse.where((control) => control.completed == true).length;
 
     print('📊 Total controles: $totalControles');
     print('📊 Controles completados: $controlesCompletados');

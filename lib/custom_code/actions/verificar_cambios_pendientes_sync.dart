@@ -74,19 +74,13 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
         .toList();
 
     // 5. Obtener CONTROLES de esos objetivos desde SUPABASE
-    final controlesSupabase = await ControlsTable().queryRows(
-      queryFn: (q) {
-        // Construimos el filtro manualmente para id_objective
-        if (idsObjetivos.length == 1) {
-          return q!.eq('id_objective', idsObjetivos[0]);
-        } else {
-          // Para múltiples IDs, usamos OR
-          String orFilter =
-              idsObjetivos.map((id) => 'id_objective.eq.$id').join(',');
-          return q!.or(orFilter);
-        }
-      },
+    // ⚡ Una query simple por objetivo en paralelo — evita el OR complejo que causa timeout/connection drop
+    final _resultadosPorObjetivo = await Future.wait(
+      idsObjetivos.map((id) => ControlsTable().queryRows(
+        queryFn: (q) => q!.eq('id_objective', id),
+      )),
     );
+    final controlesSupabase = _resultadosPorObjetivo.expand((r) => r).toList();
 
     if (controlesSupabase.isEmpty) {
       print('⚠️ No hay controles en Supabase');

@@ -31,9 +31,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Deshabilitar descarga de fuentes en runtime: evita crash/exception cuando offline.
-  // Las fuentes se usan desde el cache local después del primer uso online.
-  GoogleFonts.config.allowRuntimeFetching = false;
+  // Permitir descarga de fuentes en runtime: descarga Inter la primera vez y usa caché offline.
+  // Con false + sin archivos bundled → excepción no manejada en cada widget con Inter.
+  GoogleFonts.config.allowRuntimeFetching = true;
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();

@@ -68,18 +68,21 @@ Future<List<ControlsRow>> obtenerControlesPorUsuario(String userId) async {
         .toList();
 
     // 5. Obtener CONTROLES de esos objetivos desde SUPABASE
-    final controlesSupabase = await ControlsTable().queryRows(
-      queryFn: (q) {
-        if (idsObjetivos.length == 1) {
-          return q!.eq('id_objective', idsObjetivos[0]);
-        } else {
-          // Para múltiples IDs, usamos OR
-          String orFilter =
-              idsObjetivos.map((id) => 'id_objective.eq.$id').join(',');
-          return q!.or(orFilter);
+    // ⚡ Una query simple por objetivo en paralelo — cada error se maneja por separado
+    // para que un timeout en un objetivo no cancele los demás
+    final resultadosPorObjetivo = await Future.wait(
+      idsObjetivos.map((id) async {
+        try {
+          return await ControlsTable().queryRows(
+            queryFn: (q) => q!.eq('id_objective', id),
+          );
+        } catch (e) {
+          print('⚠️ Error/timeout descargando controles del objetivo $id: $e');
+          return <ControlsRow>[];
         }
-      },
+      }),
     );
+    final controlesSupabase = resultadosPorObjetivo.expand((r) => r).toList();
 
     print('📊 Controles encontrados: ${controlesSupabase.length}');
     return controlesSupabase;

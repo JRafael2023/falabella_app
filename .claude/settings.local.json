@@ -45,7 +45,8 @@
       "mcp__scheduled-tasks__list_scheduled_tasks",
       "Read(//c/Users/USER/AppData/Local/Temp/claude/C--Users-USER-Downloads-falabella/3b2292f3-00da-49fc-8edf-09fe2e5b5bb6/tasks/**)",
       "Bash(Get-Content \"C:\\\\Users\\\\USER\\\\Downloads\\\\falabella\\\\lib\\\\totus\\\\page_admin\\\\create_proyectos\\\\create_proyectos_widget.dart\")",
-      "Bash(Measure-Object -Line)"
+      "Bash(Measure-Object -Line)",
+      "Bash(grep -E \"\\\\.dart$\")"
     ]
   }
 }

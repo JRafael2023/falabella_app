@@ -32,6 +32,17 @@ Future sync(
   List<dynamic>? qSQLiteUsersOFF;
 
   // ========================================
+  // ⏱️ CRONÓMETRO DE SINCRONIZACIÓN
+  // ========================================
+  final _stopwatch = Stopwatch()..start();
+
+  void _logTiempo(String etapa) {
+    final ms = _stopwatch.elapsedMilliseconds;
+    final seg = (ms / 1000).toStringAsFixed(1);
+    print('⏱️ [$seg s] $etapa');
+  }
+
+  // ========================================
   // 📝 CREAR SYNC LOG AL INICIO
   // ========================================
   final syncId = 'sync-${DateTime.now().millisecondsSinceEpoch}';
@@ -73,6 +84,8 @@ Future sync(
 
   try {
     if (connect!) {
+      _logTiempo('INICIO sync online');
+
       // ⚡ Descargar Projects + Matrices + Users en paralelo (antes eran 3 llamadas secuenciales)
       final dlResults = await Future.wait([
         ProjectsTable().queryRows(queryFn: (q) => q),
@@ -82,6 +95,7 @@ Future sync(
       queryONProjects = dlResults[0] as List<ProjectsRow>;
       listONMatrices = dlResults[1] as List<MatricesRow>;
       qONUsersList = dlResults[2] as List<UsersRow>;
+      _logTiempo('Descarga Projects/Matrices/Users OK');
 
       // ⚡ Guardar en SQLite en paralelo (tablas distintas, sin conflicto)
       await Future.wait([
@@ -103,49 +117,44 @@ Future sync(
       FFAppState().jsonMatrices = qOnMatrices!.toList().cast<dynamic>();
       FFAppState().jsonUsers = qJSONROwsSupabase!.toList().cast<dynamic>();
       FFAppState().update(() {});
-      returnValidateSync = await actions.verificarCambiosPendientesSync(
+      _logTiempo('Guardado SQLite OK');
+
+      // ⚡ NUEVO: Solo leer SQLite local (pendiente_sync=1) — sin descarga masiva de Supabase.
+      // El flag pendiente_sync se activa solo cuando el usuario modifica un control.
+      jsonSQListControlSync = await actions.obtenerControlesSQLitePorUsuario(
         FFAppState().currentUser.uidUsuario,
       );
-      if (returnValidateSync!) {
-        rowsSupabaseControlSync = await actions.obtenerControlesPorUsuario(
-          FFAppState().currentUser.uidUsuario,
+      _logTiempo('Controles pendientes SQLite (${jsonSQListControlSync?.length ?? 0})');
+
+      if (jsonSQListControlSync != null && jsonSQListControlSync!.isNotEmpty) {
+        // ⚡ Descargar SOLO los controles pendientes de Supabase (3-6 ids, no los 50)
+        final _idsPendientes = jsonSQListControlSync!
+            .map((c) => (c as Map<String, dynamic>)['id_control'] as String? ?? '')
+            .where((id) => id.isNotEmpty)
+            .toList();
+        rowsSupabaseControlSync = await ControlsTable().queryRows(
+          queryFn: (q) => q!.inFilter('id_control', _idsPendientes),
         );
-        jsonSQListControlSync = await actions.obtenerControlesSQLitePorUsuario(
-          FFAppState().currentUser.uidUsuario,
+        _logTiempo('Descarga Supabase solo pendientes OK (${rowsSupabaseControlSync?.length ?? 0})');
+
+        final syncResult = await actions.syncControlesToSupabase(
+          jsonSQListControlSync!.toList(),
+          rowsSupabaseControlSync!.toList(),
         );
-        if ((rowsSupabaseControlSync!.length > 0) &&
-            (jsonSQListControlSync!.length > 0)) {
-          final syncResult = await actions.syncControlesToSupabase(
-            jsonSQListControlSync!.toList(),
-            rowsSupabaseControlSync!.toList(),
+        _logTiempo('syncControlesToSupabase OK (resultado=$syncResult)');
+        if (syncResult == 'exito_highbond_fallo') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Sincronización completada, pero algunos archivos no se cargaron correctamente a HighBond. Por favor, intente nuevamente.',
+                style: TextStyle(
+                  color: FlutterFlowTheme.of(context).primaryBackground,
+                ),
+              ),
+              duration: Duration(milliseconds: 6000),
+              backgroundColor: FlutterFlowTheme.of(context).warning,
+            ),
           );
-          if (syncResult == 'exito_highbond_fallo') {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Sincronización completada, pero algunos archivos no se cargaron correctamente a HighBond. Por favor, intente nuevamente.',
-                  style: TextStyle(
-                    color: FlutterFlowTheme.of(context).primaryBackground,
-                  ),
-                ),
-                duration: Duration(milliseconds: 6000),
-                backgroundColor: FlutterFlowTheme.of(context).warning,
-              ),
-            );
-          } else if (syncResult != 'exito') {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Fallo Sincronizacion',
-                  style: TextStyle(
-                    color: FlutterFlowTheme.of(context).primaryBackground,
-                  ),
-                ),
-                duration: Duration(milliseconds: 4000),
-                backgroundColor: FlutterFlowTheme.of(context).error,
-              ),
-            );
-          }
         }
       }
 
@@ -178,14 +187,21 @@ Future sync(
         FFAppState().ultimaSincronizacion = syncEnd;
       });
 
-      // Siempre recargar desde HighBond al sincronizar manualmente.
-      // Garantiza que proyectos nuevos o con datos faltantes se actualicen,
-      // incluso si no había cambios pendientes locales.
+      // Recargar desde cache/SQLite (sin forzar HighBond).
+      // forceFullSync: false → si el cache es reciente usa SQLite (rápido).
+      // Solo llama HighBond si el cache expiró (> 8 horas), no en cada sync.
       print('🚀 Recargando datos con cache inteligente...');
       await actions.cargarDatosConCacheInteligente(
         FFAppState().currentUser!.id,
-        forceFullSync: true,
+        forceFullSync: false,
       );
+      _logTiempo('Recarga cache inteligente OK');
+
+      _stopwatch.stop();
+      final _totalSeg = (_stopwatch.elapsedMilliseconds / 1000).toStringAsFixed(1);
+      print('🏁 ================================');
+      print('🏁 SYNC TOTAL: $_totalSeg segundos');
+      print('🏁 ================================');
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

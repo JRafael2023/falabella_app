@@ -128,8 +128,25 @@ class DBControles {
         return null;
       }
 
+      // Excluir photos/video/archives de la tabla Controles: vienen de DBControlAttachments.
+      // Esto evita el "Row too big for CursorWindow" en registros con datos base64 legacy.
+      const _cols = [
+        'id', 'id_control', 'title', 'description', 'finding_status',
+        'walkthrough_id', 'objective_id', 'completed', 'status',
+        'titulo', 'nivel_riesgo', 'observacion', 'gerencia', 'ecosistema',
+        'fecha', 'descripcion_hallazgo', 'recomendacion', 'proceso_propuesto',
+        'control_text', 'titulo_observacion', 'risk_level_id', 'publication_status_id',
+        'estado_publicacion', 'impact_type_id', 'tipo_impacto', 'ecosystem_support_id',
+        'soporte_ecosistema', 'risk_type_id', 'tipo_riesgo', 'risk_typology_id',
+        'tipologia_riesgo', 'gerente_responsable', 'auditor_responsable',
+        'descripcion_riesgo', 'observation_scope_id', 'alcance_observacion',
+        'risk_actual_level_id', 'riesgo_actual', 'causa_raiz',
+        'created_at', 'updated_at',
+      ];
+
       final List<Map<String, dynamic>> maps = await database.query(
         'Controles',
+        columns: _cols,
         where: 'id_control = ?',
         whereArgs: [idControl],
         limit: 1,
@@ -138,15 +155,35 @@ class DBControles {
       if (maps.isNotEmpty) {
         final control = maps.first;
 
-        // Obtener attachments desde tabla separada
-        final attachments = await DBControlAttachments.obtenerTodosAttachments(idControl);
+        // Obtener attachments por tipo — si uno falla por CursorWindow, los otros siguen
+        String photos = '';
+        String video = '';
+        String archives = '';
+        try {
+          final p = await DBControlAttachments.obtenerPhotos(idControl);
+          photos = p.isEmpty ? '' : p.join('|||');
+        } catch (e) {
+          print("⚠️ CursorWindow photos $idControl: $e");
+        }
+        try {
+          final v = await DBControlAttachments.obtenerVideos(idControl);
+          video = v.isEmpty ? '' : v.join('|||');
+        } catch (e) {
+          print("⚠️ CursorWindow video $idControl: $e");
+        }
+        try {
+          final a = await DBControlAttachments.obtenerArchives(idControl);
+          archives = a.isEmpty ? '' : a.join('|||');
+        } catch (e) {
+          print("⚠️ CursorWindow archives $idControl: $e");
+        }
 
         return {
           ...control,
-          'id_objective': control['objective_id'], // Agregar alias
-          'photos': attachments['photos'],
-          'video': attachments['video'],
-          'archives': attachments['archives'],
+          'id_objective': control['objective_id'],
+          'photos': photos,
+          'video': video,
+          'archives': archives,
         };
       }
 
@@ -330,6 +367,8 @@ class DBControles {
         // Actualizar attachments en tabla separada
         if (photos.isNotEmpty) {
           await DBControlAttachments.guardarPhotos(control.idControl, photos);
+        } else {
+          await DBControlAttachments.eliminarAttachmentsPorTipo(control.idControl, 'photo');
         }
         if (videos.isNotEmpty) {
           await DBControlAttachments.guardarVideos(control.idControl, videos);
@@ -338,7 +377,14 @@ class DBControles {
         }
         if (archives.isNotEmpty) {
           await DBControlAttachments.guardarArchives(control.idControl, archives);
+        } else {
+          await DBControlAttachments.eliminarAttachmentsPorTipo(control.idControl, 'archive');
         }
+
+        await database.rawUpdate(
+          'UPDATE Controles SET pendiente_sync = 1 WHERE id_control = ?',
+          [control.idControl],
+        );
 
         return "Control actualizado correctamente en SQLite";
       } else {
@@ -347,6 +393,44 @@ class DBControles {
     } catch (e) {
       print('Error al actualizar control: $e');
       return "Error al actualizar control: $e";
+    }
+  }
+
+  static Future<void> resetPendienteSync(String idControl) async {
+    final database = await DBHelper.db;
+    if (database == null) return;
+    await database.rawUpdate(
+      'UPDATE Controles SET pendiente_sync = 0 WHERE id_control = ?',
+      [idControl],
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> listarControlesPendientesSync(String idObjetivo) async {
+    final database = await DBHelper.db;
+    if (database == null) return [];
+    try {
+      const _cols = [
+        'id', 'id_control', 'title', 'description', 'finding_status',
+        'walkthrough_id', 'objective_id', 'completed', 'status',
+        'titulo', 'nivel_riesgo', 'observacion', 'gerencia', 'ecosistema',
+        'fecha', 'descripcion_hallazgo', 'recomendacion', 'proceso_propuesto',
+        'control_text', 'titulo_observacion', 'risk_level_id', 'publication_status_id',
+        'estado_publicacion', 'impact_type_id', 'tipo_impacto', 'ecosystem_support_id',
+        'soporte_ecosistema', 'risk_type_id', 'tipo_riesgo', 'risk_typology_id',
+        'tipologia_riesgo', 'gerente_responsable', 'auditor_responsable',
+        'descripcion_riesgo', 'observation_scope_id', 'alcance_observacion',
+        'risk_actual_level_id', 'riesgo_actual', 'causa_raiz',
+        'created_at', 'updated_at', 'pendiente_sync',
+      ];
+      return await database.query(
+        'Controles',
+        columns: _cols,
+        where: 'objective_id = ? AND pendiente_sync = 1',
+        whereArgs: [idObjetivo],
+      );
+    } catch (e) {
+      print('❌ Error listarControlesPendientesSync: $e');
+      return [];
     }
   }
 

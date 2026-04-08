@@ -29,7 +29,7 @@ class DBHelper {
 
     return await openDatabase(
       path,
-      version: 20,
+      version: 21,
       onCreate: (db, version) async {
         await db.execute('PRAGMA foreign_keys = OFF;');
 
@@ -103,6 +103,7 @@ class DBHelper {
     completed INTEGER DEFAULT 0,
     sincronizadoNube INTEGER DEFAULT 1,
     sincronizadoLocal INTEGER DEFAULT 0,
+    pendiente_sync INTEGER DEFAULT 0,
     created_at TEXT,
     updated_at TEXT,
     status INTEGER DEFAULT 1,
@@ -993,6 +994,17 @@ class DBHelper {
           await _recrearSinOrden('ObservationScopes',   'observation_scope_id',  '', '');
 
           print('✅ Migración v20 completada');
+        }
+
+        // ⭐ MIGRACIÓN v21: Agregar columna pendiente_sync a Controles
+        if (oldVersion < 21) {
+          print('📦 Migrando v21: agregando pendiente_sync a Controles...');
+          try {
+            await db.execute('ALTER TABLE Controles ADD COLUMN pendiente_sync INTEGER DEFAULT 0');
+            print('✅ Columna pendiente_sync agregada a Controles');
+          } catch (e) {
+            print('⚠️ Error al agregar pendiente_sync: $e');
+          }
         }
 
         // ⭐ MIGRACIÓN v15: Crear tabla ControlAttachments y migrar datos
