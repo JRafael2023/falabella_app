@@ -155,25 +155,28 @@ Future actualizarControlSqLite(
         String resultado = await DBControles.updateControl(control);
         print('✅ $resultado');
 
-        // 8b️⃣ AUTO-SYNC ONLINE: si hay conexión, subir directo sin esperar sync manual
-        try {
-          final bool? esOnline = await checkInternetConecction();
-          if (esOnline == true) {
-            final controlCompleto = await DBControles.obtenerControlCompleto(idControl);
-            if (controlCompleto != null) {
-              final supabaseControls = await ControlsTable().queryRows(
-                queryFn: (q) => q!.eq('id_control', idControl),
-              );
-              if (supabaseControls.isNotEmpty) {
-                await syncControlesToSupabase([controlCompleto], supabaseControls);
-                print('✅ Auto-sync online completado para $idControl');
+        // 8b️⃣ AUTO-SYNC ONLINE: lanzar en background sin bloquear la UI
+        // No hacemos await → el usuario ve el resultado inmediatamente,
+        // la subida a Highbond/Supabase ocurre en paralelo.
+        () async {
+          try {
+            final bool? esOnline = await checkInternetConecction();
+            if (esOnline == true) {
+              final controlCompleto = await DBControles.obtenerControlCompleto(idControl);
+              if (controlCompleto != null) {
+                final supabaseControls = await ControlsTable().queryRows(
+                  queryFn: (q) => q!.eq('id_control', idControl),
+                );
+                if (supabaseControls.isNotEmpty) {
+                  await syncControlesToSupabase([controlCompleto], supabaseControls);
+                  print('✅ Auto-sync background completado para $idControl');
+                }
               }
             }
+          } catch (e) {
+            print('⚠️ Auto-sync background falló (quedará pendiente): $e');
           }
-        } catch (e) {
-          print('⚠️ Auto-sync online falló (quedará pendiente): $e');
-          // No crítico: pendiente_sync=1 ya está, el próximo sync manual lo sube
-        }
+        }();
 
         // 🔄 ACTUALIZAR TAMBIÉN EN FFAppState
         try {

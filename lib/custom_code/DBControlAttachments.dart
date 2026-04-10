@@ -28,58 +28,49 @@ class DBControlAttachments {
     print('✅ Attachment guardado: $attachmentType[$attachmentIndex] para control $idControl');
   }
 
-  /// Guardar múltiples photos
+  /// Guardar múltiples photos (en paralelo)
   static Future<void> guardarPhotos(String idControl, List<String> photos) async {
-    // Primero eliminar photos existentes
     await eliminarAttachmentsPorTipo(idControl, 'photo');
-
-    // Guardar nuevas photos
-    for (int i = 0; i < photos.length; i++) {
-      if (photos[i].isNotEmpty) {
-        await guardarAttachment(
-          idControl: idControl,
-          attachmentType: 'photo',
-          attachmentData: photos[i],
-          attachmentIndex: i,
-        );
-      }
-    }
+    await Future.wait([
+      for (int i = 0; i < photos.length; i++)
+        if (photos[i].isNotEmpty)
+          guardarAttachment(
+            idControl: idControl,
+            attachmentType: 'photo',
+            attachmentData: photos[i],
+            attachmentIndex: i,
+          ),
+    ]);
   }
 
-  /// Guardar múltiples videos (igual que guardarPhotos)
+  /// Guardar múltiples videos (en paralelo)
   static Future<void> guardarVideos(String idControl, List<String> videos) async {
-    // Primero eliminar videos existentes
     await eliminarAttachmentsPorTipo(idControl, 'video');
-
-    // Guardar nuevos videos con su índice
-    for (int i = 0; i < videos.length; i++) {
-      if (videos[i].isNotEmpty) {
-        await guardarAttachment(
-          idControl: idControl,
-          attachmentType: 'video',
-          attachmentData: videos[i],
-          attachmentIndex: i,
-        );
-      }
-    }
+    await Future.wait([
+      for (int i = 0; i < videos.length; i++)
+        if (videos[i].isNotEmpty)
+          guardarAttachment(
+            idControl: idControl,
+            attachmentType: 'video',
+            attachmentData: videos[i],
+            attachmentIndex: i,
+          ),
+    ]);
   }
 
-  /// Guardar múltiples archives
+  /// Guardar múltiples archives (en paralelo)
   static Future<void> guardarArchives(String idControl, List<String> archives) async {
-    // Primero eliminar archives existentes
     await eliminarAttachmentsPorTipo(idControl, 'archive');
-
-    // Guardar nuevos archives
-    for (int i = 0; i < archives.length; i++) {
-      if (archives[i].isNotEmpty) {
-        await guardarAttachment(
-          idControl: idControl,
-          attachmentType: 'archive',
-          attachmentData: archives[i],
-          attachmentIndex: i,
-        );
-      }
-    }
+    await Future.wait([
+      for (int i = 0; i < archives.length; i++)
+        if (archives[i].isNotEmpty)
+          guardarAttachment(
+            idControl: idControl,
+            attachmentType: 'archive',
+            attachmentData: archives[i],
+            attachmentIndex: i,
+          ),
+    ]);
   }
 
   /// Obtener photos de un control
@@ -201,11 +192,16 @@ class DBControlAttachments {
     );
   }
 
-  /// Obtener todos los attachments de un control (para sincronización)
+  /// Obtener todos los attachments de un control (para sincronización, en paralelo)
   static Future<Map<String, dynamic>> obtenerTodosAttachments(String idControl) async {
-    final photos = await obtenerPhotos(idControl);
-    final videos = await obtenerVideos(idControl);
-    final archives = await obtenerArchives(idControl);
+    final results = await Future.wait([
+      obtenerPhotos(idControl),
+      obtenerVideos(idControl),
+      obtenerArchives(idControl),
+    ]);
+    final photos = results[0];
+    final videos = results[1];
+    final archives = results[2];
 
     // 🔥 USAR FORMATO SIMPLE: base64|||base64|||base64
     // El formato JSON manual está causando problemas con strings muy largos
