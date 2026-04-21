@@ -156,6 +156,8 @@ class SupabaseFunctionsGroup {
       updateControlHighbondInefectivoCall =
       UpdateControlHighbondInefectivoCall();
   static GetTaksHighbondCall getTaksHighbondCall = GetTaksHighbondCall();
+  static CreateIssueHighbondCall createIssueHighbondCall =
+      CreateIssueHighbondCall();
 }
 
 class GetObjetivesHighbondCall {
@@ -420,6 +422,83 @@ class GetTaksHighbondCall {
       callType: ApiCallType.GET,
       headers: {},
       params: {},
+      returnBody: true,
+      encodeBodyUtf8: false,
+      decodeUtf8: false,
+      cache: false,
+      isStreamingApi: false,
+      alwaysAllowBody: false,
+    );
+  }
+}
+
+class CreateIssueHighbondCall {
+  Future<ApiCallResponse> call({
+    String? projectId = '',
+    String? title = '',
+    String? description = '',
+    String? owner = '',
+    String? recommendation = '',
+    String? deficiencyType = '',
+    String? severity = '',
+    bool published = false,
+    String? identifiedAt = '',
+    String? risk = '',
+    String? scope = '',
+    String? escalation = '',
+    String? cause = '',
+    String? executiveOwner = '',
+    String? projectOwner = '',
+    // custom attributes
+    String? tipoImpacto = '',
+    String? soporteEcosistema = '',
+    String? tipoRiesgo = '',
+    String? tipologiaRiesgo = '',
+  }) async {
+    final baseUrl = SupabaseFunctionsGroup.getBaseUrl();
+
+    final customAttributes = <Map<String, dynamic>>[];
+    if (tipoImpacto != null && tipoImpacto.isNotEmpty) {
+      customAttributes.add({'id': '27576', 'value': [tipoImpacto]});
+    }
+    if (soporteEcosistema != null && soporteEcosistema.isNotEmpty) {
+      customAttributes.add({'id': '27577', 'value': [soporteEcosistema]});
+    }
+    if (tipoRiesgo != null && tipoRiesgo.isNotEmpty) {
+      customAttributes.add({'id': '27578', 'value': [tipoRiesgo]});
+    }
+    if (tipologiaRiesgo != null && tipologiaRiesgo.isNotEmpty) {
+      customAttributes.add({'id': '27579', 'value': [tipologiaRiesgo]});
+    }
+
+    final ffApiRequestBody = json.encode({
+      'project_id': int.tryParse(projectId ?? '') ?? 0,
+      'title': title,
+      'description': description,
+      'owner': owner,
+      'recommendation': recommendation,
+      'deficiency_type': deficiencyType,
+      'severity': severity,
+      'published': published,
+      if (identifiedAt != null && identifiedAt.isNotEmpty)
+        'identified_at': identifiedAt,
+      'risk': risk,
+      'scope': scope,
+      'escalation': escalation,
+      'cause': cause,
+      'executive_owner': executiveOwner,
+      'project_owner': projectOwner,
+      if (customAttributes.isNotEmpty) 'custom_attributes': customAttributes,
+    });
+
+    return ApiManager.instance.makeApiCall(
+      callName: 'Create Issue Highbond',
+      apiUrl: '${baseUrl}/update-control-inefectivo',
+      callType: ApiCallType.POST,
+      headers: {},
+      params: {},
+      body: ffApiRequestBody,
+      bodyType: BodyType.JSON,
       returnBody: true,
       encodeBodyUtf8: false,
       decodeUtf8: false,

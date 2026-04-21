@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import '/custom_code/DBObjetivos.dart';
-import '/custom_code/DBControles.dart';
 import '/backend/api_requests/api_calls.dart' as api_calls;
 
 /// Carga inteligente de datos con caché:
@@ -100,7 +99,34 @@ Future cargarDatosConCacheInteligente(
       print('⏰ Caché expirado (${horasDesdeUltimaSync.toStringAsFixed(1)}h) → sync completa');
     }
 
-    final necesitaSyncCompleta = !tieneDatos || cacheExpirado || forceFullSync;
+    // Detectar proyectos nuevos asignados después del último full sync
+    // (objetivos vacíos en SQLite = proyecto que nunca fue sincronizado)
+    bool hayProyectosNuevos = false;
+    if (tieneDatos && !cacheExpirado && !forceFullSync) {
+      try {
+        final userUid = FFAppState().currentUser.uidUsuario ?? '';
+        if (userUid.isNotEmpty && userUid != 'null') {
+          final proyectosSupabase = await ProjectsTable().queryRows(
+            queryFn: (q) => q!.eq('assign_user', userUid),
+          );
+          for (final proyecto in proyectosSupabase) {
+            final idProyecto = proyecto.idProject ?? '';
+            if (idProyecto.isEmpty) continue;
+            final objetivosSQLite =
+                await DBObjetivos.listarObjetivosPorProyecto(idProyecto);
+            if (objetivosSQLite.isEmpty) {
+              hayProyectosNuevos = true;
+              print('🆕 Proyecto nuevo detectado: $idProyecto → forzando full sync');
+              break;
+            }
+          }
+        }
+      } catch (e) {
+        print('⚠️ Error verificando proyectos nuevos: $e');
+      }
+    }
+
+    final necesitaSyncCompleta = !tieneDatos || cacheExpirado || forceFullSync || hayProyectosNuevos;
 
     if (necesitaSyncCompleta) {
       print('🔄 Sincronización completa iniciada');
@@ -124,78 +150,14 @@ Future cargarDatosConCacheInteligente(
   }
 }
 
-/// Carga rápida desde SQLite + validación con Supabase
+/// Carga rápida desde SQLite + notifica UI.
+/// Solo llega aquí si el usuario ya tiene TODOS sus proyectos en SQLite
+/// (proyectos nuevos son detectados antes y disparan un full sync).
 Future _cargarRapidoDesdeCache(String userId) async {
   try {
-    // Obtener user_uid desde FFAppState (evita query con userId potencialmente nulo)
-    String userUid = FFAppState().currentUser.uidUsuario ?? '';
-    if (userUid.isEmpty || userUid == 'null') {
-      if (userId.isNotEmpty && userId != 'null') {
-        try {
-          final usuarioSupabase = await UsersTable().queryRows(
-            queryFn: (q) => q!.eq('id', userId),
-          );
-          if (usuarioSupabase.isNotEmpty) {
-            userUid = usuarioSupabase.first.userUid ?? '';
-          }
-        } catch (e) {
-          print('⚠️ Error obteniendo user_uid en carga rápida: $e');
-        }
-      }
-    }
-
-    if (userUid.isEmpty || userUid == 'null') {
-      return;
-    }
-
-    // Obtener proyectos
-    final proyectosSupabase = await ProjectsTable().queryRows(
-      queryFn: (q) => q!.eq('assign_user', userUid),
-    );
-
-    if (proyectosSupabase.isEmpty) {
-      return;
-    }
-
-    // Extraer IDs de proyectos
-    final idsProyectos = proyectosSupabase
-        .map((p) => p.idProject ?? '')
-        .where((id) => id.isNotEmpty)
-        .toList();
-
-    // Para cada proyecto, sincronizar solo con Supabase (SOLO SI HAY CAMBIOS)
-    print('🔄 Sincronizando ${idsProyectos.length} proyectos...');
-
-    for (var idProyecto in idsProyectos) {
-      try {
-        // Obtener objetivos del proyecto desde SQLite
-        final objetivosSQLite = await DBObjetivos.listarObjetivosPorProyecto(idProyecto);
-
-        for (var objetivo in objetivosSQLite) {
-          final idObjetivo = objetivo.idObjetivo;
-
-          // 2️⃣ SOLO SQLite → Supabase (subir cambios locales si hay)
-          // No descargar de Supabase porque ya está actualizado
-          await combineAndSyncControls(
-            [], // apiResponseDescription - vacío porque no llamamos API
-            [], // apiResponseWalkthrough - vacío porque no llamamos API
-            idObjetivo, // objectiveId
-          );
-        }
-      } catch (e) {
-        print('❌ Error sincronizando proyecto $idProyecto: $e');
-      }
-    }
-
-    // ⚠️ NO RECARGAR controles aquí - ya están actualizados en FFAppState
-    // Si recargamos desde SQLite, sobrescribimos los cambios recientes
-    // Los controles se cargan UNA VEZ en cargarTodosLosDatosUsuario (primera vez)
-    // Y se actualizan individualmente en actualizar_control_sq_lite
-    print('✅ Controles ya cargados en FFAppState - no recargando');
-
-    // Actualizar AppState con datos frescos
+    // Actualizar AppState con los datos que ya están en SQLite/FFAppState
     FFAppState().update(() {});
-
+    print('✅ Carga rápida: datos ya en FFAppState');
   } catch (e) {
     print('❌ Error en carga rápida: $e');
   }

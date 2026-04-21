@@ -14,6 +14,8 @@ import '/custom_code/EcosystemSupport.dart';
 import '/custom_code/RiskType.dart';
 import '/custom_code/RiskTypology.dart';
 import '/custom_code/ObservationScope.dart';
+import '/custom_code/ResponsibleManager.dart';
+import '/custom_code/ResponsibleAuditor.dart';
 import 'create_hallasgo_widget.dart' show CreateHallasgoWidget;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +36,8 @@ class CreateHallasgoModel extends FlutterFlowModel<CreateHallasgoWidget> {
   List<RiskTypology> riskTypologies = [];
   List<RiskTypology> filteredRiskTypologies = [];
   List<ObservationScope> observationScopes = [];
+  List<ResponsibleManager> responsibleManagers = [];
+  List<ResponsibleAuditor> responsibleAuditors = [];
 
   ///  State fields for stateful widgets in this component.
 

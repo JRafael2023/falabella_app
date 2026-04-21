@@ -1617,7 +1617,7 @@ class _ComponentControlladorWidgetState
                                   },
                                 );
                               },
-                              text: 'Hallazgo',
+                              text: 'Observación',
                               icon: Icon(
                                 Icons.fact_check,
                                 size: 24.0,

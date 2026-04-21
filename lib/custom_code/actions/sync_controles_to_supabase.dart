@@ -336,8 +336,42 @@ Future<String> syncControlesToSupabase(
                 (videosList != null && videosList.isNotEmpty) ||
                 (archivosList != null && archivosList.isNotEmpty);
 
-            if (controlLocal.findingStatus == 0 || tieneAdjuntos) {
-              print('🔄 API evidencias para $idControl (findingStatus=${controlLocal.findingStatus}, adjuntos=$tieneAdjuntos)');
+            // ⭐ NUEVA API: crear observación en Highbond solo para inefectivo
+            if (controlLocal.findingStatus == 0) {
+              print('🔄 Creando issue Highbond para $idControl');
+              final createIssueResponse = await SupabaseFunctionsGroup
+                  .createIssueHighbondCall
+                  .call(
+                projectId: FFAppState().idproyect,
+                title: controlLocal.observacion?.isNotEmpty == true
+                    ? controlLocal.observacion
+                    : controlLocal.tituloObservacion,
+                description: controlLocal.descripcionHallazgo,
+                owner: controlLocal.gerencia,
+                recommendation: controlLocal.recomendacion,
+                deficiencyType: controlLocal.ecosistema,
+                severity: controlLocal.nivelRiesgo,
+                published: false,
+                identifiedAt: controlLocal.fecha,
+                risk: controlLocal.descripcionRiesgo,
+                scope: controlLocal.alcanceObservacion,
+                escalation: controlLocal.riesgoActual,
+                cause: controlLocal.causaRaiz,
+                executiveOwner: controlLocal.gerenteResponsable,
+                projectOwner: controlLocal.auditorResponsable,
+                tipoImpacto: controlLocal.tipoImpacto,
+                soporteEcosistema: controlLocal.soporteEcosistema,
+                tipoRiesgo: controlLocal.tipoRiesgo,
+                tipologiaRiesgo: controlLocal.tipologiaRiesgo,
+              );
+              if (!createIssueResponse.succeeded) {
+                print('⚠️ Create Issue Highbond falló para $idControl, continuando...');
+                highbondFallo = true;
+              }
+            }
+
+            if (tieneAdjuntos) {
+              print('🔄 API evidencias para $idControl (adjuntos=$tieneAdjuntos)');
               final apiInefectivoResponse = await SupabaseFunctionsGroup
                   .updateControlHighbondInefectivoCall
                   .call(

@@ -146,7 +146,7 @@ Future sync(
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Sincronización completada, pero algunos archivos no se cargaron correctamente a HighBond. Por favor, intente nuevamente.',
+                'Sincronización completada, pero algunos datos no se enviaron correctamente a HighBond. Por favor, intente nuevamente.',
                 style: TextStyle(
                   color: FlutterFlowTheme.of(context).primaryBackground,
                 ),

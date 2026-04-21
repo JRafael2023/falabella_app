@@ -20,8 +20,11 @@ import '/custom_code/DBEcosystemSupport.dart';
 import '/custom_code/DBRiskType.dart';
 import '/custom_code/DBRiskTypology.dart';
 import '/custom_code/DBObservationScope.dart';
+import '/custom_code/DBResponsibleManager.dart';
+import '/custom_code/DBResponsibleAuditor.dart';
 import '/custom_code/RiskLevel.dart';
 import '/custom_code/RiskTypology.dart';
+import '/custom_code/ResponsibleAuditor.dart';
 import '/backend/supabase/supabase.dart';
 
 class CreateHallasgoWidget extends StatefulWidget {
@@ -229,6 +232,8 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
     _model.riskTypologies = await DBRiskTypology.getAllRiskTypologies();
     _model.filteredRiskTypologies = _model.riskTypologies;
     _model.observationScopes = await DBObservationScope.getAllObservationScopes();
+    _model.responsibleManagers = await DBResponsibleManager.getAllResponsibleManagers();
+    _model.responsibleAuditors = await DBResponsibleAuditor.getAllResponsibleAuditors();
 
     // Si SQLite está vacío, sincronizar desde Supabase y recargar
     final necesitaSync = _model.riskLevels.isEmpty ||
@@ -236,7 +241,9 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         _model.impactTypes.isEmpty ||
         _model.ecosystemSupports.isEmpty ||
         _model.riskTypes.isEmpty ||
-        _model.observationScopes.isEmpty;
+        _model.observationScopes.isEmpty ||
+        _model.responsibleManagers.isEmpty ||
+        _model.responsibleAuditors.isEmpty;
 
     if (necesitaSync) {
       print('⚠️ Maestros v19 vacíos en SQLite — sincronizando desde Supabase...');
@@ -256,6 +263,10 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
               (data) => DBRiskTypology.insertBatchFromSupabase(data)),
           _syncMaestroFromSupabase('ObservationScopes', 'observation_scope_id',
               (data) => DBObservationScope.insertBatchFromSupabase(data)),
+          _syncMaestroFromSupabase('ResponsibleManagers', 'responsible_manager_id',
+              (data) => DBResponsibleManager.insertBatchFromSupabase(data)),
+          _syncMaestroFromSupabase('ResponsibleAuditors', 'responsible_auditor_id',
+              (data) => DBResponsibleAuditor.insertBatchFromSupabase(data)),
         ]);
         // Recargar desde SQLite tras sync
         _model.riskLevels = await DBRiskLevel.getAllRiskLevels();
@@ -266,6 +277,8 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         _model.riskTypologies = await DBRiskTypology.getAllRiskTypologies();
         _model.filteredRiskTypologies = _model.riskTypologies;
         _model.observationScopes = await DBObservationScope.getAllObservationScopes();
+        _model.responsibleManagers = await DBResponsibleManager.getAllResponsibleManagers();
+        _model.responsibleAuditors = await DBResponsibleAuditor.getAllResponsibleAuditors();
         print('✅ Maestros v19 sincronizados: '
             'riskLevels=${_model.riskLevels.length}, '
             'pubStatuses=${_model.publicationStatuses.length}');
@@ -713,7 +726,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Hallazgo',
+                              'Observación',
                               style: FlutterFlowTheme.of(context).bodyMedium.override(
                                     font: TextStyle(
                                       fontWeight: FlutterFlowTheme.of(context).bodyMedium.fontWeight,
@@ -1237,7 +1250,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                               // Si no hay tipologías con ese riskTypeId, mostrar todas
                               _model.filteredRiskTypologies = filtered.isNotEmpty ? filtered : _model.riskTypologies;
                               _model.cmdRiskTypologyValue = null;
-                              _model.cmdRiskTypologyController = FormFieldController<String>(null);
+                              _model.cmdRiskTypologyController?.value = null;
                             });
                           },
                         ),
@@ -1251,42 +1264,20 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdRiskTypologyController,
                           onChanged: (val) => safeSetState(() => _model.cmdRiskTypologyValue = val),
                         ),
-                        // 13. Gerente Responsable (dropdown de usuarios)
+                        // 13. Gerente Responsable
                         _buildDropdownField(
                           context: context,
                           label: 'Gerente Responsable',
-                          options: FFAppState().jsonUsers
-                              .where((e) {
-                                final uid = getJsonField(e, r'''$.user_uid''');
-                                return uid != null && uid.toString() != 'null' && uid.toString().isNotEmpty;
-                              })
-                              .map((e) {
-                                final name = getJsonField(e, r'''$.display_name''');
-                                return (name != null && name.toString() != 'null' && name.toString().isNotEmpty)
-                                    ? name.toString()
-                                    : getJsonField(e, r'''$.email''').toString();
-                              })
-                              .toList(),
+                          options: _model.responsibleManagers.map((m) => m.name ?? '').toList(),
                           currentValue: _model.cmdGerenteValue,
                           controller: _model.cmdGerenteController,
                           onChanged: (val) => safeSetState(() => _model.cmdGerenteValue = val),
                         ),
-                        // 14. Auditor Responsable (dropdown de usuarios)
+                        // 14. Auditor Responsable
                         _buildDropdownField(
                           context: context,
                           label: 'Auditor Responsable',
-                          options: FFAppState().jsonUsers
-                              .where((e) {
-                                final uid = getJsonField(e, r'''$.user_uid''');
-                                return uid != null && uid.toString() != 'null' && uid.toString().isNotEmpty;
-                              })
-                              .map((e) {
-                                final name = getJsonField(e, r'''$.display_name''');
-                                return (name != null && name.toString() != 'null' && name.toString().isNotEmpty)
-                                    ? name.toString()
-                                    : getJsonField(e, r'''$.email''').toString();
-                              })
-                              .toList(),
+                          options: _model.responsibleAuditors.map((a) => a.name ?? '').toList(),
                           currentValue: _model.cmdAuditorValue,
                           controller: _model.cmdAuditorController,
                           onChanged: (val) => safeSetState(() => _model.cmdAuditorValue = val),

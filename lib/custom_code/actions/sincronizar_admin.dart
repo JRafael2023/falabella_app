@@ -26,6 +26,8 @@ import '/custom_code/DBEcosystemSupport.dart';
 import '/custom_code/DBRiskType.dart';
 import '/custom_code/DBRiskTypology.dart';
 import '/custom_code/DBObservationScope.dart';
+import '/custom_code/DBResponsibleAuditor.dart';
+import '/custom_code/DBResponsibleManager.dart';
 import '/custom_code/Usuario.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -44,6 +46,8 @@ class SyncAdminResult {
   final int usuariosEliminados;    // eliminados offline → sincronizados en Supabase
   final int matricesSincronizadas;
   final int maestrosV19Sincronizados;
+  final int responsibleAuditorsSincronizados;
+  final int responsibleManagersSincronizados;
   final bool huboCambiosPendientes;
 
   SyncAdminResult({
@@ -60,6 +64,8 @@ class SyncAdminResult {
     this.usuariosEliminados = 0,
     this.matricesSincronizadas = 0,
     this.maestrosV19Sincronizados = 0,
+    this.responsibleAuditorsSincronizados = 0,
+    this.responsibleManagersSincronizados = 0,
     this.huboCambiosPendientes = false,
   });
 }
@@ -83,6 +89,8 @@ Future<SyncAdminResult> sincronizarAdmin() async {
   int usuariosEliminados = 0;   // eliminados offline → sincronizados
   int matricesSinc = 0;
   int maestrosV19Sinc = 0;
+  int responsibleAuditorsSinc = 0;
+  int responsibleManagersSinc = 0;
   bool huboCambios = false;
 
   try {
@@ -93,12 +101,14 @@ Future<SyncAdminResult> sincronizarAdmin() async {
     // Registros eliminados offline que aún no se han borrado en Supabase
     // ══════════════════════════════════════════════════════════════════════════
     final eliminacionesPendientes = {
-      'Gerencias':    {'tabla': 'Managements', 'campoId': 'idGerencia',   'campoSupabase': 'management_id'},
-      'Ecosistemas':  {'tabla': 'Ecosystems',  'campoId': 'idEcosistema', 'campoSupabase': 'ecosystem_id'},
-      'Procesos':     {'tabla': 'Processes',   'campoId': 'idProceso',    'campoSupabase': 'process_id'},
-      'Titulos':      {'tabla': 'Titles',      'campoId': 'idTitulo',     'campoSupabase': 'titles_id'},
-      'Proyectos':    {'tabla': 'Projects',    'campoId': 'idProyecto',   'campoSupabase': 'id_project'},
-      'Users':        {'tabla': 'Users',       'campoId': 'user_uid',     'campoSupabase': 'user_uid'},
+      'Gerencias':            {'tabla': 'Managements',         'campoId': 'idGerencia',               'campoSupabase': 'management_id'},
+      'Ecosistemas':          {'tabla': 'Ecosystems',           'campoId': 'idEcosistema',             'campoSupabase': 'ecosystem_id'},
+      'Procesos':             {'tabla': 'Processes',            'campoId': 'idProceso',                'campoSupabase': 'process_id'},
+      'Titulos':              {'tabla': 'Titles',               'campoId': 'idTitulo',                 'campoSupabase': 'titles_id'},
+      'Proyectos':            {'tabla': 'Projects',             'campoId': 'idProyecto',               'campoSupabase': 'id_project'},
+      'Users':                {'tabla': 'Users',                'campoId': 'user_uid',                 'campoSupabase': 'user_uid'},
+      'ResponsibleAuditors':  {'tabla': 'ResponsibleAuditors',  'campoId': 'responsible_auditor_id',   'campoSupabase': 'responsible_auditor_id'},
+      'ResponsibleManagers':  {'tabla': 'ResponsibleManagers',  'campoId': 'responsible_manager_id',   'campoSupabase': 'responsible_manager_id'},
     };
 
     for (final entry in eliminacionesPendientes.entries) {
@@ -640,6 +650,138 @@ Future<SyncAdminResult> sincronizarAdmin() async {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
+    // RESPONSIBLE AUDITORS & MANAGERS (offline→nube + descarga)
+    // ══════════════════════════════════════════════════════════════════════════
+    final _responsiblesConfig = [
+      {
+        'supaTable': 'ResponsibleAuditors',
+        'sqliteTable': 'ResponsibleAuditors',
+        'idSupaField': 'responsible_auditor_id',
+        'idSqliteField': 'responsible_auditor_id',
+      },
+      {
+        'supaTable': 'ResponsibleManagers',
+        'sqliteTable': 'ResponsibleManagers',
+        'idSupaField': 'responsible_manager_id',
+        'idSqliteField': 'responsible_manager_id',
+      },
+    ];
+
+    for (final cfg in _responsiblesConfig) {
+      final supaTable = cfg['supaTable']!;
+      final sqliteTable = cfg['sqliteTable']!;
+      final idSupaField = cfg['idSupaField']!;
+      final idSqliteField = cfg['idSqliteField']!;
+
+      try {
+        // ── PASO 1: Subir registros creados offline (sincronizadoNube = 0) ──
+        final offlineRows = await db.query(
+          sqliteTable,
+          where: 'sincronizadoNube = 0 AND (pendienteEliminar = 0 OR pendienteEliminar IS NULL)',
+        );
+        for (final row in offlineRows) {
+          final id = row[idSqliteField] as String? ?? '';
+          if (id.isEmpty) continue;
+          try {
+            await SupaFlow.client.from(supaTable).insert({
+              idSupaField: id,
+              'name': row['name'] ?? '',
+              'status': true,
+              'created_at': row['created_at'] ?? DateTime.now().toIso8601String(),
+              'updated_at': DateTime.now().toIso8601String(),
+            });
+            await db.update(sqliteTable, {'sincronizadoNube': 1},
+                where: '$idSqliteField = ?', whereArgs: [id]);
+            huboCambios = true;
+            if (supaTable == 'ResponsibleAuditors') responsibleAuditorsSinc++;
+            else responsibleManagersSinc++;
+            print('☁️ $supaTable subido offline→nube: $id');
+          } catch (e) {
+            print('⚠️ Error subiendo $supaTable offline $id: $e');
+          }
+        }
+
+        // ── PASO 2: Eliminar en Supabase los pendienteEliminar=1 ──
+        final pendientesEliminar = await db.query(
+          sqliteTable,
+          where: 'pendienteEliminar = 1',
+        );
+        for (final row in pendientesEliminar) {
+          final id = row[idSqliteField] as String? ?? '';
+          if (id.isEmpty) continue;
+          try {
+            await SupaFlow.client
+                .from(supaTable)
+                .update({'status': false})
+                .eq(idSupaField, id);
+            await db.delete(sqliteTable,
+                where: '$idSqliteField = ?', whereArgs: [id]);
+            huboCambios = true;
+            print('🗑️ $supaTable eliminado en Supabase y SQLite: $id');
+          } catch (e) {
+            print('⚠️ Error eliminando $supaTable $id en Supabase: $e');
+          }
+        }
+
+        // ── PASO 3: Supabase es fuente de verdad → sync descarga ──
+        final supaResponse = await SupaFlow.client
+            .from(supaTable)
+            .select('$idSupaField, name, status, created_at, updated_at')
+            .eq('status', true);
+
+        final idsSupabase = (supaResponse as List)
+            .map((r) => r[idSupaField] as String? ?? '')
+            .where((id) => id.isNotEmpty)
+            .toSet();
+
+        final sqliteRows = await db.query(sqliteTable,
+            where: 'pendienteEliminar = 0 OR pendienteEliminar IS NULL');
+        final idsSQLite = sqliteRows
+            .map((r) => r[idSqliteField] as String? ?? '')
+            .where((id) => id.isNotEmpty)
+            .toSet();
+
+        // En SQLite pero NO en Supabase → eliminar (solo si ya estaba sincronizado)
+        final eliminar = idsSQLite.difference(idsSupabase);
+        for (final id in eliminar) {
+          final rowsCheck = await db.query(sqliteTable,
+              columns: ['sincronizadoNube'],
+              where: '$idSqliteField = ?', whereArgs: [id]);
+          final sinc = rowsCheck.isNotEmpty ? (rowsCheck.first['sincronizadoNube'] as int? ?? 1) : 1;
+          if (sinc == 0) continue; // pendiente de subir, no eliminar
+          await db.delete(sqliteTable, where: '$idSqliteField = ?', whereArgs: [id]);
+          huboCambios = true;
+          print('🗑️ $supaTable eliminado de SQLite: $id');
+        }
+
+        // En Supabase pero NO en SQLite → insertar
+        final insertar = idsSupabase.difference(idsSQLite);
+        for (final row in (supaResponse as List)) {
+          final id = row[idSupaField] as String? ?? '';
+          if (!insertar.contains(id)) continue;
+          await db.insert(sqliteTable, {
+            idSqliteField: id,
+            'name': row['name'] ?? '',
+            'status': (row['status'] as bool? ?? true) ? 1 : 0,
+            'sincronizadoNube': 1,
+            'sincronizadoLocal': 1,
+            'pendienteEliminar': 0,
+            'created_at': row['created_at'] ?? DateTime.now().toIso8601String(),
+            'updated_at': row['updated_at'] ?? DateTime.now().toIso8601String(),
+          }, conflictAlgorithm: ConflictAlgorithm.replace);
+          if (supaTable == 'ResponsibleAuditors') responsibleAuditorsSinc++;
+          else responsibleManagersSinc++;
+          huboCambios = true;
+          print('📥 $supaTable insertado: ${row['name']}');
+        }
+
+        print('✅ $supaTable: ${eliminar.length} eliminados, ${insertar.length} insertados, ${offlineRows.length} subidos offline');
+      } catch (e) {
+        print('⚠️ Error sincronizando $supaTable: $e');
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
     // USUARIOS
     // ══════════════════════════════════════════════════════════════════════════
     try {
@@ -833,6 +975,8 @@ Future<SyncAdminResult> sincronizarAdmin() async {
       if (proyectosSinc > 0) mensaje += '\n  • Proyectos: $proyectosSinc';
       if (matricesSinc > 0) mensaje += '\n  • Matrices: $matricesSinc';
       if (maestrosV19Sinc > 0) mensaje += '\n  • Maestros v19: $maestrosV19Sinc';
+      if (responsibleAuditorsSinc > 0) mensaje += '\n  • Auditores responsables: $responsibleAuditorsSinc';
+      if (responsibleManagersSinc > 0) mensaje += '\n  • Gerentes responsables: $responsibleManagersSinc';
       // ✅ Separados: subidos (offline→nube) vs descargados (nube→local)
       if (usuariosSubidos > 0) mensaje += '\n  • Usuarios subidos a nube: $usuariosSubidos';
       if (usuariosDescargados > 0) mensaje += '\n  • Usuarios descargados: $usuariosDescargados';
@@ -855,6 +999,8 @@ Future<SyncAdminResult> sincronizarAdmin() async {
       usuariosEliminados: usuariosEliminados,
       matricesSincronizadas: matricesSinc,
       maestrosV19Sincronizados: maestrosV19Sinc,
+      responsibleAuditorsSincronizados: responsibleAuditorsSinc,
+      responsibleManagersSincronizados: responsibleManagersSinc,
       huboCambiosPendientes: huboCambios,
     );
   } catch (e, stack) {

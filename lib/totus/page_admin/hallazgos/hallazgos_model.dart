@@ -55,6 +55,10 @@ class HallazgosModel extends FlutterFlowModel<HallazgosWidget> {
   late ContainerAdminModel containerAdminModel10;
   // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel11;
+  // Model for ContainerAdmin component.
+  late ContainerAdminModel containerAdminModel12;
+  // Model for ContainerAdmin component.
+  late ContainerAdminModel containerAdminModel13;
 
   @override
   void initState(BuildContext context) {
@@ -71,6 +75,8 @@ class HallazgosModel extends FlutterFlowModel<HallazgosWidget> {
     containerAdminModel9 = createModel(context, () => ContainerAdminModel());
     containerAdminModel10 = createModel(context, () => ContainerAdminModel());
     containerAdminModel11 = createModel(context, () => ContainerAdminModel());
+    containerAdminModel12 = createModel(context, () => ContainerAdminModel());
+    containerAdminModel13 = createModel(context, () => ContainerAdminModel());
   }
 
   @override
@@ -89,5 +95,7 @@ class HallazgosModel extends FlutterFlowModel<HallazgosWidget> {
     containerAdminModel9.dispose();
     containerAdminModel10.dispose();
     containerAdminModel11.dispose();
+    containerAdminModel12.dispose();
+    containerAdminModel13.dispose();
   }
 }

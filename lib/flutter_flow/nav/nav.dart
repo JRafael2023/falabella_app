@@ -226,6 +226,16 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: MatricesWidget.routeName,
           path: MatricesWidget.routePath,
           builder: (context, params) => MatricesWidget(),
+        ),
+        FFRoute(
+          name: ResponsibleAuditorsWidget.routeName,
+          path: ResponsibleAuditorsWidget.routePath,
+          builder: (context, params) => ResponsibleAuditorsWidget(),
+        ),
+        FFRoute(
+          name: ResponsibleManagersWidget.routeName,
+          path: ResponsibleManagersWidget.routePath,
+          builder: (context, params) => ResponsibleManagersWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

@@ -919,8 +919,8 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                               updateCallback: () => safeSetState(() {}),
                               child: ContainerAdminWidget(
                                 icontext: '🔍',
-                                name: 'Hallazgos',
-                                description: 'Gestión de hallazgos',
+                                name: 'Observaciones',
+                                description: 'Gestión de observaciones',
                               ),
                             ),
                           ),

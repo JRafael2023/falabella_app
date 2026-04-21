@@ -322,7 +322,7 @@ class _HallazgosWidgetState extends State<HallazgosWidget> with TickerProviderSt
                                   Align(
                                     alignment: AlignmentDirectional(0.0, 0.0),
                                     child: Text(
-                                      'Detalles  Hallazgo',
+                                      'Detalles Observación',
                                       style: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .override(
@@ -532,6 +532,42 @@ class _HallazgosWidgetState extends State<HallazgosWidget> with TickerProviderSt
                                   icontext: '🔍',
                                   name: 'Alcance de Observación',
                                   description: 'Crear Alcances de Observación',
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                context.pushNamed(ResponsibleAuditorsWidget.routeName);
+                              },
+                              child: wrapWithModel(
+                                model: _model.containerAdminModel12,
+                                updateCallback: () => safeSetState(() {}),
+                                child: ContainerAdminWidget(
+                                  icontext: '👤',
+                                  name: 'Auditor Responsable',
+                                  description: 'Crear Auditores Responsables',
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              splashColor: Colors.transparent,
+                              focusColor: Colors.transparent,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                              onTap: () async {
+                                context.pushNamed(ResponsibleManagersWidget.routeName);
+                              },
+                              child: wrapWithModel(
+                                model: _model.containerAdminModel13,
+                                updateCallback: () => safeSetState(() {}),
+                                child: ContainerAdminWidget(
+                                  icontext: '👔',
+                                  name: 'Gerente Responsable',
+                                  description: 'Crear Gerentes Responsables',
                                 ),
                               ),
                             ),

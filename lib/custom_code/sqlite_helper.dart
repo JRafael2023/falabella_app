@@ -29,7 +29,7 @@ class DBHelper {
 
     return await openDatabase(
       path,
-      version: 21,
+      version: 22,
       onCreate: (db, version) async {
         await db.execute('PRAGMA foreign_keys = OFF;');
 
@@ -395,6 +395,40 @@ class DBHelper {
           CREATE TABLE ObservationScopes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             observation_scope_id TEXT UNIQUE NOT NULL,
+            name TEXT,
+            sincronizadoNube INTEGER DEFAULT 1,
+            sincronizadoLocal INTEGER DEFAULT 0,
+            pendienteEliminar INTEGER DEFAULT 0,
+            created_at TEXT,
+            updated_at TEXT,
+            status INTEGER DEFAULT 1
+          )
+        ''');
+
+        // =========================
+        // RESPONSIBLE AUDITORS
+        // =========================
+        await db.execute('''
+          CREATE TABLE ResponsibleAuditors (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            responsible_auditor_id TEXT UNIQUE NOT NULL,
+            name TEXT,
+            sincronizadoNube INTEGER DEFAULT 1,
+            sincronizadoLocal INTEGER DEFAULT 0,
+            pendienteEliminar INTEGER DEFAULT 0,
+            created_at TEXT,
+            updated_at TEXT,
+            status INTEGER DEFAULT 1
+          )
+        ''');
+
+        // =========================
+        // RESPONSIBLE MANAGERS
+        // =========================
+        await db.execute('''
+          CREATE TABLE ResponsibleManagers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            responsible_manager_id TEXT UNIQUE NOT NULL,
             name TEXT,
             sincronizadoNube INTEGER DEFAULT 1,
             sincronizadoLocal INTEGER DEFAULT 0,
@@ -1005,6 +1039,44 @@ class DBHelper {
           } catch (e) {
             print('⚠️ Error al agregar pendiente_sync: $e');
           }
+        }
+
+        // ⭐ MIGRACIÓN v22: Crear tablas ResponsibleAuditors y ResponsibleManagers
+        if (oldVersion < 22) {
+          print('📦 Migrando v22: creando tablas ResponsibleAuditors y ResponsibleManagers...');
+          try {
+            await db.execute('''
+              CREATE TABLE IF NOT EXISTS ResponsibleAuditors (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                responsible_auditor_id TEXT UNIQUE NOT NULL,
+                name TEXT,
+                sincronizadoNube INTEGER DEFAULT 1,
+                sincronizadoLocal INTEGER DEFAULT 0,
+                pendienteEliminar INTEGER DEFAULT 0,
+                created_at TEXT,
+                updated_at TEXT,
+                status INTEGER DEFAULT 1
+              )
+            ''');
+            print('✅ Tabla ResponsibleAuditors creada');
+          } catch (e) { print('⚠️ ResponsibleAuditors: $e'); }
+          try {
+            await db.execute('''
+              CREATE TABLE IF NOT EXISTS ResponsibleManagers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                responsible_manager_id TEXT UNIQUE NOT NULL,
+                name TEXT,
+                sincronizadoNube INTEGER DEFAULT 1,
+                sincronizadoLocal INTEGER DEFAULT 0,
+                pendienteEliminar INTEGER DEFAULT 0,
+                created_at TEXT,
+                updated_at TEXT,
+                status INTEGER DEFAULT 1
+              )
+            ''');
+            print('✅ Tabla ResponsibleManagers creada');
+          } catch (e) { print('⚠️ ResponsibleManagers: $e'); }
+          print('✅ Migración v22 completada');
         }
 
         // ⭐ MIGRACIÓN v15: Crear tabla ControlAttachments y migrar datos

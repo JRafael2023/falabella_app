@@ -34,3 +34,7 @@ export '/totus/hallazgos/risk_typology/risk_typology_widget.dart'
 export '/totus/hallazgos/observation_scope/observation_scope_widget.dart'
     show ObservationScopeWidget;
 export '/totus/page_admin/matrices/matrices_widget.dart' show MatricesWidget;
+export '/totus/hallazgos/responsible_auditors/responsible_auditors_widget.dart'
+    show ResponsibleAuditorsWidget;
+export '/totus/hallazgos/responsible_managers/responsible_managers_widget.dart'
+    show ResponsibleManagersWidget;

@@ -15,3 +15,5 @@ export 'tables/projects.dart';
 export 'tables/objectives.dart';
 export 'tables/processes.dart';
 export 'tables/users.dart';
+export 'tables/responsible_auditors.dart';
+export 'tables/responsible_managers.dart';
