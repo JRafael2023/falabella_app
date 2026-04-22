@@ -215,60 +215,77 @@ Future cargarTodosLosDatosUsuario(String userId) async {
       return;
     }
 
-    // ⚡ Procesar controles en PARALELO (lotes de 10)
-    // Si están en cache del paso 3, usarlos directamente (sin consulta SQLite)
-    // Solo llama API si es primera vez (SQLite vacío y no en cache)
-    final batchSizeControles = 10;
+    // Procesar controles en lotes de 2 para evitar timeout de Supabase
+    // (corrían 10 en paralelo → 4 queries simultáneas → statement timeout en Supabase)
+    // Con batch=2 se reduce la carga y se agrega retry automático en timeout.
+    final batchSizeControles = 2;
     for (var i = 0; i < idsObjetivos.length; i += batchSizeControles) {
       final batch = idsObjetivos.skip(i).take(batchSizeControles).toList();
 
       final resultados = await Future.wait(batch.map((idObjetivo) async {
-        try {
-          // ⚡ Usar cache del paso 3 si está disponible (evita segunda consulta SQLite)
-          final controlesCached = controlesCache[idObjetivo];
-          if (controlesCached != null && controlesCached.isNotEmpty) {
-            return controlesCached;
-          }
-
-          // 1️⃣ Verificar si ya existen controles en SQLite
-          final controlesSQLite =
-              await DBControles.listarControlesJson(idObjetivo);
-
-          if (controlesSQLite.isNotEmpty) {
-            // ✅ YA HAY DATOS EN SQLITE - Usarlos directamente (NO llamar API)
-            return controlesSQLite;
-          } else {
-            // ⚠️ SQLite VACÍO - Primera vez, llamar API
-            final results = await Future.wait([
-              api_calls.SupabaseFunctionsGroup.getControlsDescriptionHighbondCall
-                  .call(idObjective: idObjetivo),
-              api_calls.SupabaseFunctionsGroup.getControlsWalkthroughHighbondCall
-                  .call(idObjective: idObjetivo),
-            ]);
-
-            final apiControls = results[0];
-            final apiControlWalk = results[1];
-
-            if (apiControls?.succeeded ?? false) {
-              // Combinar y sincronizar controles (primera vez)
-              await combineAndSyncControls(
-                getJsonField(apiControls?.jsonBody ?? '', r'''$.data.data''', true)!,
-                getJsonField(
-                    apiControlWalk?.jsonBody ?? '', r'''$.data.data''', true)!,
-                idObjetivo,
-              );
-
-              // Leer controles guardados desde SQLite
-              final controlesNuevos =
-                  await DBControles.listarControlesJson(idObjetivo);
-
-              return controlesNuevos;
+        // Helper interno con retry (máx 2 intentos)
+        Future<List<dynamic>> cargarControlesConRetry(int intento) async {
+          try {
+            // ⚡ Usar cache del paso 3 si está disponible (evita segunda consulta SQLite)
+            final controlesCached = controlesCache[idObjetivo];
+            if (controlesCached != null && controlesCached.isNotEmpty) {
+              return controlesCached;
             }
+
+            // 1️⃣ Verificar si ya existen controles en SQLite
+            final controlesSQLite =
+                await DBControles.listarControlesJson(idObjetivo);
+
+            if (controlesSQLite.isNotEmpty) {
+              // ✅ YA HAY DATOS EN SQLITE - Usarlos directamente (NO llamar API)
+              return controlesSQLite;
+            } else {
+              // ⚠️ SQLite VACÍO - Primera vez, llamar API
+              final results = await Future.wait([
+                api_calls.SupabaseFunctionsGroup.getControlsDescriptionHighbondCall
+                    .call(idObjective: idObjetivo),
+                api_calls.SupabaseFunctionsGroup.getControlsWalkthroughHighbondCall
+                    .call(idObjective: idObjetivo),
+              ]);
+
+              final apiControls = results[0];
+              final apiControlWalk = results[1];
+
+              if (apiControls?.succeeded ?? false) {
+                // Combinar y sincronizar controles (primera vez)
+                await combineAndSyncControls(
+                  getJsonField(apiControls?.jsonBody ?? '', r'''$.data.data''', true)!,
+                  getJsonField(
+                      apiControlWalk?.jsonBody ?? '', r'''$.data.data''', true)!,
+                  idObjetivo,
+                );
+
+                // Leer controles guardados desde SQLite
+                final controlesNuevos =
+                    await DBControles.listarControlesJson(idObjetivo);
+
+                return controlesNuevos;
+              }
+            }
+          } catch (e) {
+            final esRetriable = e.toString().contains('57014') ||
+                e.toString().contains('statement timeout') ||
+                e.toString().contains('canceling statement') ||
+                e.toString().contains('Connection closed') ||
+                e.toString().contains('ClientException') ||
+                e.toString().contains('SocketException') ||
+                e.toString().contains('Connection reset');
+            if (esRetriable && intento < 2) {
+              print('  ⏱️ Error de red en $idObjetivo (intento $intento) → reintentando en 2s...');
+              await Future.delayed(const Duration(seconds: 2));
+              return cargarControlesConRetry(intento + 1);
+            }
+            print('  ❌ Error en $idObjetivo (intento $intento): $e');
           }
-        } catch (e) {
-          print('  ❌ Error en $idObjetivo: $e');
+          return <dynamic>[];
         }
-        return <dynamic>[];
+
+        return cargarControlesConRetry(1);
       }));
 
       // Agregar todos los resultados del batch

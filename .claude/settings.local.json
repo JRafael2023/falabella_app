@@ -49,7 +49,9 @@
       "Bash(grep -E \"\\\\.dart$\")",
       "Bash(grep -E \"\\\\.\\(js|ts|jsx|tsx|dart\\)$\")",
       "Bash(grep -rn \"obtenerPhotos\\\\|obtenerVideos\\\\|obtenerArchives\" /c/Users/USER/Downloads/falabella/lib/custom_code/actions/*.dart)",
-      "Bash(find \"/c/Users/USER/Downloads/falabella\" -name \"*.dart\" -type f -exec grep -l \"component_controllador\\\\|ComponentControllador\" {} \\\\;)"
+      "Bash(find \"/c/Users/USER/Downloads/falabella\" -name \"*.dart\" -type f -exec grep -l \"component_controllador\\\\|ComponentControllador\" {} \\\\;)",
+      "Bash(python \"C:\\\\Users\\\\USER\\\\AppData\\\\Roaming\\\\Claude\\\\local-agent-mode-sessions\\\\skills-plugin\\\\91f6c8fb-c5ee-4c5a-b249-23dea71d05a2\\\\204dca80-260d-44b4-afc4-8687d01c3808\\\\skills\\\\xlsx\\\\scripts\\\\create_hallazgos_template.py\")",
+      "Bash(python create_template.py)"
     ]
   }
 }

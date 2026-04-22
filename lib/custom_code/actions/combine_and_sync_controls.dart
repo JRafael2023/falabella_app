@@ -54,50 +54,82 @@ Future<String> combineAndSyncControls(
               )),
     );
 
-    // 🔹 PASO 2: OBTENER controles existentes CON TODOS LOS CAMPOS ✅
-    final existingControlsFuture = supabase.from('Controls').select('''
-          id,
-          id_control,
-          completed,
-          finding_status,
-          photos,
-          video,
-          archives,
-          status,
-          observacion,
-          gerencia,
-          ecosistema,
-          fecha,
-          descripcion_hallazgo,
-          recomendacion,
-          proceso_propuesto,
-          titulo,
-          nivel_riesgo,
-          control_text,
-          titulo_observacion,
-          publication_status_id,
-          estado_publicacion,
-          impact_type_id,
-          tipo_impacto,
-          ecosystem_support_id,
-          soporte_ecosistema,
-          risk_type_id,
-          tipo_riesgo,
-          risk_typology_id,
-          tipologia_riesgo,
-          risk_level_id,
-          gerente_responsable,
-          auditor_responsable,
-          descripcion_riesgo,
-          observation_scope_id,
-          alcance_observacion,
-          risk_actual_level_id,
-          riesgo_actual,
-          causa_raiz
-        ''').eq('id_objective', objectiveId!);
+    // 🔹 PASO 2: OBTENER controles existentes en PÁGINAS de 50 (evita respuestas enormes)
+    // ⚡ Cada página tiene retry automático ante errores de red
+    const _pageSize = 50;
+    List<dynamic> existingControls = [];
+    int _pageFrom = 0;
+    bool _hasMore = true;
 
-    // 🔹 PASO 3: ESPERAR resultado de Supabase
-    final existingControls = await existingControlsFuture as List<dynamic>;
+    while (_hasMore) {
+      List<dynamic> page = [];
+      for (int _attempt = 1; _attempt <= 3; _attempt++) {
+        try {
+          page = await supabase.from('Controls').select('''
+            id,
+            id_control,
+            completed,
+            finding_status,
+            photos,
+            video,
+            archives,
+            status,
+            observacion,
+            gerencia,
+            ecosistema,
+            fecha,
+            descripcion_hallazgo,
+            recomendacion,
+            proceso_propuesto,
+            titulo,
+            nivel_riesgo,
+            control_text,
+            titulo_observacion,
+            publication_status_id,
+            estado_publicacion,
+            impact_type_id,
+            tipo_impacto,
+            ecosystem_support_id,
+            soporte_ecosistema,
+            risk_type_id,
+            tipo_riesgo,
+            risk_typology_id,
+            tipologia_riesgo,
+            risk_level_id,
+            gerente_responsable,
+            auditor_responsable,
+            descripcion_riesgo,
+            observation_scope_id,
+            alcance_observacion,
+            risk_actual_level_id,
+            riesgo_actual,
+            causa_raiz
+          ''').eq('id_objective', objectiveId!).range(_pageFrom, _pageFrom + _pageSize - 1);
+          break; // ✅ página exitosa
+        } catch (e) {
+          final isRetriable = e.toString().contains('57014') ||
+              e.toString().contains('statement timeout') ||
+              e.toString().contains('canceling statement') ||
+              e.toString().contains('Connection closed') ||
+              e.toString().contains('ClientException') ||
+              e.toString().contains('SocketException') ||
+              e.toString().contains('Connection reset');
+          if (!isRetriable || _attempt == 3) rethrow;
+          print('⏱️ Error de red en página $_pageFrom (intento $_attempt) → reintentando en ${_attempt}s...');
+          await Future.delayed(Duration(seconds: _attempt));
+        }
+      }
+
+      existingControls.addAll(page);
+      if (page.length < _pageSize) {
+        _hasMore = false; // última página
+      } else {
+        _pageFrom += _pageSize;
+        print('📄 Página cargada: ${existingControls.length} controles hasta ahora...');
+      }
+    }
+
+    // 🔹 PASO 3: resultado ya en existingControls
 
     // Crear mapa de existentes CON TODOS LOS DATOS ✅
     final existingMap = Map<String, Map<String, dynamic>>.fromEntries(
@@ -289,6 +321,15 @@ Future<String> combineAndSyncControls(
   } catch (e, stackTrace) {
     print('❌ Error: $e');
     print('📋 Stack: $stackTrace');
+    // Rethrow errores de red/timeout para que el caller pueda reintentar
+    final isRetriable = e.toString().contains('57014') ||
+        e.toString().contains('statement timeout') ||
+        e.toString().contains('canceling statement') ||
+        e.toString().contains('Connection closed') ||
+        e.toString().contains('ClientException') ||
+        e.toString().contains('SocketException') ||
+        e.toString().contains('Connection reset');
+    if (isRetriable) rethrow;
     return 'Error: $e';
   }
 }

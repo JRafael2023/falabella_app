@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'package:shared_preferences/shared_preferences.dart';
-import '/custom_code/DBObjetivos.dart';
 import '/backend/api_requests/api_calls.dart' as api_calls;
 
 /// Carga inteligente de datos con caché:
@@ -99,34 +98,49 @@ Future cargarDatosConCacheInteligente(
       print('⏰ Caché expirado (${horasDesdeUltimaSync.toStringAsFixed(1)}h) → sync completa');
     }
 
-    // Detectar proyectos nuevos asignados después del último full sync
-    // (objetivos vacíos en SQLite = proyecto que nunca fue sincronizado)
+    // Detectar proyectos asignados que no tienen objetivos en FFAppState.
+    // jsonProyectos ya está cargado y fresco desde Supabase/SQLite (home_widget).
+    // Si hay algún proyecto sin objetivos → forzar full sync.
     bool hayProyectosNuevos = false;
     if (tieneDatos && !cacheExpirado && !forceFullSync) {
-      try {
-        final userUid = FFAppState().currentUser.uidUsuario ?? '';
-        if (userUid.isNotEmpty && userUid != 'null') {
-          final proyectosSupabase = await ProjectsTable().queryRows(
-            queryFn: (q) => q!.eq('assign_user', userUid),
-          );
-          for (final proyecto in proyectosSupabase) {
-            final idProyecto = proyecto.idProject ?? '';
-            if (idProyecto.isEmpty) continue;
-            final objetivosSQLite =
-                await DBObjetivos.listarObjetivosPorProyecto(idProyecto);
-            if (objetivosSQLite.isEmpty) {
-              hayProyectosNuevos = true;
-              print('🆕 Proyecto nuevo detectado: $idProyecto → forzando full sync');
-              break;
-            }
-          }
+      final idsConObjetivos = FFAppState()
+          .jsonObjetivos
+          .map((o) => o['id_project']?.toString() ?? '')
+          .where((id) => id.isNotEmpty)
+          .toSet();
+
+      for (final proyecto in FFAppState().jsonProyectos) {
+        final idProyecto = proyecto['id_project']?.toString() ?? '';
+        if (idProyecto.isEmpty) continue;
+        if (!idsConObjetivos.contains(idProyecto)) {
+          hayProyectosNuevos = true;
+          print('🆕 Proyecto sin objetivos detectado: $idProyecto → forzando full sync');
+          break;
         }
-      } catch (e) {
-        print('⚠️ Error verificando proyectos nuevos: $e');
       }
     }
 
-    final necesitaSyncCompleta = !tieneDatos || cacheExpirado || forceFullSync || hayProyectosNuevos;
+    // Detectar objetivos que no tienen controles en cache (carga incompleta previa)
+    bool hayObjetivosSinControles = false;
+    if (tieneDatos && !cacheExpirado && !forceFullSync && !hayProyectosNuevos) {
+      final idsConControles = FFAppState()
+          .jsonControles
+          .map((c) => c['id_objective']?.toString() ?? '')
+          .where((id) => id.isNotEmpty)
+          .toSet();
+
+      for (final obj in FFAppState().jsonObjetivos) {
+        final idObj = obj['id_objective']?.toString() ?? '';
+        if (idObj.isEmpty) continue;
+        if (!idsConControles.contains(idObj)) {
+          hayObjetivosSinControles = true;
+          print('⚠️ Objetivo sin controles: ${obj['title']} ($idObj) → forzando full sync');
+          break;
+        }
+      }
+    }
+
+    final necesitaSyncCompleta = !tieneDatos || cacheExpirado || forceFullSync || hayProyectosNuevos || hayObjetivosSinControles;
 
     if (necesitaSyncCompleta) {
       print('🔄 Sincronización completa iniciada');

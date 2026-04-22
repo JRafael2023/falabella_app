@@ -20,7 +20,6 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import '/custom_code/DBGerencia.dart';
 import '/custom_code/DBEcosistema.dart';
-import '/custom_code/DBProceso.dart';
 import '/custom_code/DBTitulo.dart';
 import '/custom_code/DBRiskLevel.dart';
 import '/custom_code/DBPublicationStatus.dart';
@@ -29,6 +28,8 @@ import '/custom_code/DBEcosystemSupport.dart';
 import '/custom_code/DBRiskType.dart';
 import '/custom_code/DBRiskTypology.dart';
 import '/custom_code/DBObservationScope.dart';
+import '/custom_code/DBResponsibleManager.dart';
+import '/custom_code/DBResponsibleAuditor.dart';
 import '/custom_code/RiskLevel.dart';
 import '/custom_code/PublicationStatus.dart';
 import '/custom_code/ImpactType.dart';
@@ -36,6 +37,8 @@ import '/custom_code/EcosystemSupport.dart';
 import '/custom_code/RiskType.dart';
 import '/custom_code/RiskTypology.dart';
 import '/custom_code/ObservationScope.dart';
+import '/custom_code/ResponsibleManager.dart';
+import '/custom_code/ResponsibleAuditor.dart';
 import '/flutter_flow/random_data_util.dart' as random_data;
 
 // ── Resultado de la importación ───────────────────────────────────────────────
@@ -46,7 +49,6 @@ class ImportResult {
   // IDs insertados en Supabase para rollback
   final List<String> gerenciasSupabaseIds;
   final List<String> ecosistemasSupabaseIds;
-  final List<String> procesosSupabaseIds;
   final List<String> titulosSupabaseIds;
   final List<String> riskLevelsSupabaseIds;
   final List<String> publicationStatusesSupabaseIds;
@@ -55,11 +57,12 @@ class ImportResult {
   final List<String> riskTypesSupabaseIds;
   final List<String> riskTypologiesSupabaseIds;
   final List<String> observationScopesSupabaseIds;
+  final List<String> responsibleManagersSupabaseIds;
+  final List<String> responsibleAuditorsSupabaseIds;
 
   // IDs insertados en SQLite para rollback
   final List<String> gerenciasLocalIds;
   final List<String> ecosistemasLocalIds;
-  final List<String> procesosLocalIds;
   final List<String> titulosLocalIds;
   final List<String> riskLevelsLocalIds;
   final List<String> publicationStatusesLocalIds;
@@ -68,13 +71,14 @@ class ImportResult {
   final List<String> riskTypesLocalIds;
   final List<String> riskTypologiesLocalIds;
   final List<String> observationScopesLocalIds;
+  final List<String> responsibleManagersLocalIds;
+  final List<String> responsibleAuditorsLocalIds;
 
   ImportResult({
     required this.success,
     required this.message,
     this.gerenciasSupabaseIds = const [],
     this.ecosistemasSupabaseIds = const [],
-    this.procesosSupabaseIds = const [],
     this.titulosSupabaseIds = const [],
     this.riskLevelsSupabaseIds = const [],
     this.publicationStatusesSupabaseIds = const [],
@@ -83,9 +87,10 @@ class ImportResult {
     this.riskTypesSupabaseIds = const [],
     this.riskTypologiesSupabaseIds = const [],
     this.observationScopesSupabaseIds = const [],
+    this.responsibleManagersSupabaseIds = const [],
+    this.responsibleAuditorsSupabaseIds = const [],
     this.gerenciasLocalIds = const [],
     this.ecosistemasLocalIds = const [],
-    this.procesosLocalIds = const [],
     this.titulosLocalIds = const [],
     this.riskLevelsLocalIds = const [],
     this.publicationStatusesLocalIds = const [],
@@ -94,12 +99,13 @@ class ImportResult {
     this.riskTypesLocalIds = const [],
     this.riskTypologiesLocalIds = const [],
     this.observationScopesLocalIds = const [],
+    this.responsibleManagersLocalIds = const [],
+    this.responsibleAuditorsLocalIds = const [],
   });
 
   bool get tieneRollback =>
       gerenciasSupabaseIds.isNotEmpty ||
       ecosistemasSupabaseIds.isNotEmpty ||
-      procesosSupabaseIds.isNotEmpty ||
       titulosSupabaseIds.isNotEmpty ||
       riskLevelsSupabaseIds.isNotEmpty ||
       publicationStatusesSupabaseIds.isNotEmpty ||
@@ -108,9 +114,10 @@ class ImportResult {
       riskTypesSupabaseIds.isNotEmpty ||
       riskTypologiesSupabaseIds.isNotEmpty ||
       observationScopesSupabaseIds.isNotEmpty ||
+      responsibleManagersSupabaseIds.isNotEmpty ||
+      responsibleAuditorsSupabaseIds.isNotEmpty ||
       gerenciasLocalIds.isNotEmpty ||
       ecosistemasLocalIds.isNotEmpty ||
-      procesosLocalIds.isNotEmpty ||
       titulosLocalIds.isNotEmpty ||
       riskLevelsLocalIds.isNotEmpty ||
       publicationStatusesLocalIds.isNotEmpty ||
@@ -118,7 +125,9 @@ class ImportResult {
       ecosystemSupportsLocalIds.isNotEmpty ||
       riskTypesLocalIds.isNotEmpty ||
       riskTypologiesLocalIds.isNotEmpty ||
-      observationScopesLocalIds.isNotEmpty;
+      observationScopesLocalIds.isNotEmpty ||
+      responsibleManagersLocalIds.isNotEmpty ||
+      responsibleAuditorsLocalIds.isNotEmpty;
 }
 
 String _generarId() => random_data.randomString(1, 5, true, false, true);
@@ -130,11 +139,9 @@ Future<ImportResult> importarHallazgos({
   // IDs para rollback — maestros existentes
   final List<String> gerenciasSupabaseIds = [];
   final List<String> ecosistemasSupabaseIds = [];
-  final List<String> procesosSupabaseIds = [];
   final List<String> titulosSupabaseIds = [];
   final List<String> gerenciasLocalIds = [];
   final List<String> ecosistemasLocalIds = [];
-  final List<String> procesosLocalIds = [];
   final List<String> titulosLocalIds = [];
 
   // IDs para rollback — maestros v19
@@ -152,6 +159,12 @@ Future<ImportResult> importarHallazgos({
   final List<String> riskTypesLocalIds = [];
   final List<String> riskTypologiesLocalIds = [];
   final List<String> observationScopesLocalIds = [];
+
+  // IDs para rollback — gerente y auditor
+  final List<String> responsibleManagersSupabaseIds = [];
+  final List<String> responsibleAuditorsSupabaseIds = [];
+  final List<String> responsibleManagersLocalIds = [];
+  final List<String> responsibleAuditorsLocalIds = [];
 
   try {
     print('📥 Iniciando importación de hallazgos...');
@@ -189,7 +202,7 @@ Future<ImportResult> importarHallazgos({
     print('📋 Encabezados: $headers');
 
     // Columnas obligatorias
-    final requiredColumns = ['proceso_propuesto', 'titulo', 'gerencia', 'ecosistema'];
+    final requiredColumns = ['titulo', 'gerencia', 'ecosistema'];
     for (var col in requiredColumns) {
       if (!headers.contains(col)) {
         return ImportResult(
@@ -199,7 +212,7 @@ Future<ImportResult> importarHallazgos({
       }
     }
 
-    // Columnas v19 opcionales — se procesan solo si existen en el Excel
+    // Columnas opcionales — se procesan solo si existen en el Excel
     final bool tieneNivelRiesgo        = headers.contains('nivel_riesgo');
     final bool tieneEstadoPublicacion  = headers.contains('estado_publicacion');
     final bool tieneTipoImpacto        = headers.contains('tipo_impacto');
@@ -207,11 +220,12 @@ Future<ImportResult> importarHallazgos({
     final bool tieneTipoRiesgo         = headers.contains('tipo_riesgo');
     final bool tieneTipologiaRiesgo    = headers.contains('tipologia_riesgo');
     final bool tieneAlcanceObservacion = headers.contains('alcance_observacion');
+    final bool tieneGerente            = headers.contains('gerente');
+    final bool tieneAuditor            = headers.contains('auditor');
 
     // ── PASO 4: INICIALIZAR CONTADORES ────────────────────────────────────────
     int gerenciasInsertadas = 0;
     int ecosistemasInsertados = 0;
-    int procesosInsertados = 0;
     int titulosInsertados = 0;
     int riskLevelsInsertados = 0;
     int publicationStatusesInsertados = 0;
@@ -220,13 +234,14 @@ Future<ImportResult> importarHallazgos({
     int riskTypesInsertados = 0;
     int riskTypologiesInsertados = 0;
     int observationScopesInsertados = 0;
+    int responsibleManagersInsertados = 0;
+    int responsibleAuditorsInsertados = 0;
     int rowsProcessed = 0;
     int rowsSkipped = 0;
 
     // Sets para deduplicar dentro del mismo archivo
     Set<String> gerenciasSet = {};
     Set<String> ecosistemasSet = {};
-    Set<String> procesosSet = {};
     Set<String> titulosSet = {};
     Set<String> riskLevelsSet = {};
     Set<String> publicationStatusesSet = {};
@@ -235,6 +250,8 @@ Future<ImportResult> importarHallazgos({
     Set<String> riskTypesSet = {};
     Set<String> riskTypologiesSet = {};
     Set<String> observationScopesSet = {};
+    Set<String> responsibleManagersSet = {};
+    Set<String> responsibleAuditorsSet = {};
 
     // Mapa nombre → ID para RiskTypes (necesario para RiskTypologies)
     final Map<String, String> riskTypeNameToId = {};
@@ -249,12 +266,11 @@ Future<ImportResult> importarHallazgos({
         var row = table.rows[i];
 
         // Columnas obligatorias
-        String? procesoPropuesto = _getCellValue(row, headers, 'proceso_propuesto');
-        String? titulo           = _getCellValue(row, headers, 'titulo');
-        String? gerencia         = _getCellValue(row, headers, 'gerencia');
-        String? ecosistema       = _getCellValue(row, headers, 'ecosistema');
+        String? titulo     = _getCellValue(row, headers, 'titulo');
+        String? gerencia   = _getCellValue(row, headers, 'gerencia');
+        String? ecosistema = _getCellValue(row, headers, 'ecosistema');
 
-        // Columnas v19 opcionales
+        // Columnas opcionales
         String? nivelRiesgo        = tieneNivelRiesgo        ? _getCellValue(row, headers, 'nivel_riesgo')        : null;
         String? estadoPublicacion  = tieneEstadoPublicacion  ? _getCellValue(row, headers, 'estado_publicacion')  : null;
         String? tipoImpacto        = tieneTipoImpacto        ? _getCellValue(row, headers, 'tipo_impacto')        : null;
@@ -262,6 +278,8 @@ Future<ImportResult> importarHallazgos({
         String? tipoRiesgo         = tieneTipoRiesgo         ? _getCellValue(row, headers, 'tipo_riesgo')         : null;
         String? tipologiaRiesgo    = tieneTipologiaRiesgo    ? _getCellValue(row, headers, 'tipologia_riesgo')    : null;
         String? alcanceObservacion = tieneAlcanceObservacion ? _getCellValue(row, headers, 'alcance_observacion') : null;
+        String? gerente            = tieneGerente            ? _getCellValue(row, headers, 'gerente')            : null;
+        String? auditor            = tieneAuditor            ? _getCellValue(row, headers, 'auditor')            : null;
 
         if (titulo == null || titulo.isEmpty) {
           print('⚠️ Fila $i: Sin título, se omite');
@@ -319,32 +337,6 @@ Future<ImportResult> importarHallazgos({
               print('✅ Ecosistema "$ecosistema" → $insertedId');
             }
           } catch (e) { print('⚠️ Ecosistema "$ecosistema": $e'); }
-        }
-
-        // ── PROCESO ───────────────────────────────────────────────────────────
-        if (procesoPropuesto != null && procesoPropuesto.isNotEmpty && !procesosSet.contains(procesoPropuesto)) {
-          final customId = _generarId();
-          try {
-            final response = await SupaFlow.client.from('Processes').insert({
-              'process_id': customId,
-              'name': procesoPropuesto,
-              'status': true,
-              'created_at': DateTime.now().toIso8601String(),
-              'updated_at': DateTime.now().toIso8601String(),
-            }).select();
-            if (response != null && response.isNotEmpty) {
-              final insertedId = (response[0]['process_id'] as String?) ?? customId;
-              procesosSupabaseIds.add(insertedId);
-              await DBProceso.insertProceso(ProcesoStruct(
-                idProceso: insertedId, nombre: procesoPropuesto,
-                createdAt: DateTime.now(), updateAt: DateTime.now(), estado: true,
-              ));
-              procesosLocalIds.add(insertedId);
-              procesosSet.add(procesoPropuesto);
-              procesosInsertados++;
-              print('✅ Proceso "$procesoPropuesto" → $insertedId');
-            }
-          } catch (e) { print('⚠️ Proceso "$procesoPropuesto": $e'); }
         }
 
         // ── TÍTULO ────────────────────────────────────────────────────────────
@@ -540,7 +532,7 @@ Future<ImportResult> importarHallazgos({
           } catch (e) { print('⚠️ Tipología Riesgo "$tipologiaRiesgo": $e'); }
         }
 
-        // ── ALCANCE DE OBSERVACIÓN (v19 opcional) ─────────────────────────────
+        // ── ALCANCE DE OBSERVACIÓN (opcional) ────────────────────────────────
         if (alcanceObservacion != null && alcanceObservacion.isNotEmpty && !observationScopesSet.contains(alcanceObservacion)) {
           final customId = _generarId();
           try {
@@ -567,6 +559,60 @@ Future<ImportResult> importarHallazgos({
           } catch (e) { print('⚠️ Alcance Observación "$alcanceObservacion": $e'); }
         }
 
+        // ── GERENTE (opcional) ────────────────────────────────────────────────
+        if (gerente != null && gerente.isNotEmpty && !responsibleManagersSet.contains(gerente)) {
+          final customId = _generarId();
+          try {
+            final response = await SupaFlow.client.from('ResponsibleManagers').insert({
+              'responsible_manager_id': customId,
+              'name': gerente,
+              'status': true,
+              'created_at': DateTime.now().toIso8601String(),
+              'updated_at': DateTime.now().toIso8601String(),
+            }).select();
+            if (response != null && response.isNotEmpty) {
+              final insertedId = (response[0]['responsible_manager_id'] as String?) ?? customId;
+              responsibleManagersSupabaseIds.add(insertedId);
+              await DBResponsibleManager.insertResponsibleManager(ResponsibleManager(
+                responsibleManagerId: insertedId, name: gerente,
+                createdAt: DateTime.now().toIso8601String(),
+                updatedAt: DateTime.now().toIso8601String(), status: true,
+              ), fromSupabase: true);
+              responsibleManagersLocalIds.add(insertedId);
+              responsibleManagersSet.add(gerente);
+              responsibleManagersInsertados++;
+              print('✅ Gerente "$gerente" → $insertedId');
+            }
+          } catch (e) { print('⚠️ Gerente "$gerente": $e'); }
+        }
+
+        // ── AUDITOR (opcional) ────────────────────────────────────────────────
+        if (auditor != null && auditor.isNotEmpty && !responsibleAuditorsSet.contains(auditor)) {
+          final customId = _generarId();
+          try {
+            final response = await SupaFlow.client.from('ResponsibleAuditors').insert({
+              'responsible_auditor_id': customId,
+              'name': auditor,
+              'status': true,
+              'created_at': DateTime.now().toIso8601String(),
+              'updated_at': DateTime.now().toIso8601String(),
+            }).select();
+            if (response != null && response.isNotEmpty) {
+              final insertedId = (response[0]['responsible_auditor_id'] as String?) ?? customId;
+              responsibleAuditorsSupabaseIds.add(insertedId);
+              await DBResponsibleAuditor.insertResponsibleAuditor(ResponsibleAuditor(
+                responsibleAuditorId: insertedId, name: auditor,
+                createdAt: DateTime.now().toIso8601String(),
+                updatedAt: DateTime.now().toIso8601String(), status: true,
+              ), fromSupabase: true);
+              responsibleAuditorsLocalIds.add(insertedId);
+              responsibleAuditorsSet.add(auditor);
+              responsibleAuditorsInsertados++;
+              print('✅ Auditor "$auditor" → $insertedId');
+            }
+          } catch (e) { print('⚠️ Auditor "$auditor": $e'); }
+        }
+
         rowsProcessed++;
       } catch (e) {
         print('⚠️ Error fila $i: $e');
@@ -582,15 +628,16 @@ Future<ImportResult> importarHallazgos({
     msg.writeln('Datos insertados:');
     msg.writeln('  • Gerencias: $gerenciasInsertadas');
     msg.writeln('  • Ecosistemas: $ecosistemasInsertados');
-    msg.writeln('  • Procesos: $procesosInsertados');
     msg.writeln('  • Títulos: $titulosInsertados');
-    if (riskLevelsInsertados > 0)        msg.writeln('  • Niveles de Riesgo: $riskLevelsInsertados');
-    if (publicationStatusesInsertados > 0) msg.writeln('  • Estados de Publicación: $publicationStatusesInsertados');
-    if (impactTypesInsertados > 0)       msg.writeln('  • Tipos de Impacto: $impactTypesInsertados');
-    if (ecosystemSupportsInsertados > 0) msg.writeln('  • Soportes de Ecosistema: $ecosystemSupportsInsertados');
-    if (riskTypesInsertados > 0)         msg.writeln('  • Tipos de Riesgo: $riskTypesInsertados');
-    if (riskTypologiesInsertados > 0)    msg.writeln('  • Tipologías de Riesgo: $riskTypologiesInsertados');
-    if (observationScopesInsertados > 0) msg.writeln('  • Alcances de Observación: $observationScopesInsertados');
+    if (riskLevelsInsertados > 0)           msg.writeln('  • Niveles de Riesgo: $riskLevelsInsertados');
+    if (publicationStatusesInsertados > 0)  msg.writeln('  • Estados de Publicación: $publicationStatusesInsertados');
+    if (impactTypesInsertados > 0)          msg.writeln('  • Tipos de Impacto: $impactTypesInsertados');
+    if (ecosystemSupportsInsertados > 0)    msg.writeln('  • Soportes de Ecosistema: $ecosystemSupportsInsertados');
+    if (riskTypesInsertados > 0)            msg.writeln('  • Tipos de Riesgo: $riskTypesInsertados');
+    if (riskTypologiesInsertados > 0)       msg.writeln('  • Tipologías de Riesgo: $riskTypologiesInsertados');
+    if (observationScopesInsertados > 0)    msg.writeln('  • Alcances de Observación: $observationScopesInsertados');
+    if (responsibleManagersInsertados > 0)  msg.writeln('  • Gerentes: $responsibleManagersInsertados');
+    if (responsibleAuditorsInsertados > 0)  msg.writeln('  • Auditores: $responsibleAuditorsInsertados');
     msg.write('\nArchivo: ${result.files.single.name}');
 
     return ImportResult(
@@ -598,7 +645,6 @@ Future<ImportResult> importarHallazgos({
       message: msg.toString(),
       gerenciasSupabaseIds: List.from(gerenciasSupabaseIds),
       ecosistemasSupabaseIds: List.from(ecosistemasSupabaseIds),
-      procesosSupabaseIds: List.from(procesosSupabaseIds),
       titulosSupabaseIds: List.from(titulosSupabaseIds),
       riskLevelsSupabaseIds: List.from(riskLevelsSupabaseIds),
       publicationStatusesSupabaseIds: List.from(publicationStatusesSupabaseIds),
@@ -607,9 +653,10 @@ Future<ImportResult> importarHallazgos({
       riskTypesSupabaseIds: List.from(riskTypesSupabaseIds),
       riskTypologiesSupabaseIds: List.from(riskTypologiesSupabaseIds),
       observationScopesSupabaseIds: List.from(observationScopesSupabaseIds),
+      responsibleManagersSupabaseIds: List.from(responsibleManagersSupabaseIds),
+      responsibleAuditorsSupabaseIds: List.from(responsibleAuditorsSupabaseIds),
       gerenciasLocalIds: List.from(gerenciasLocalIds),
       ecosistemasLocalIds: List.from(ecosistemasLocalIds),
-      procesosLocalIds: List.from(procesosLocalIds),
       titulosLocalIds: List.from(titulosLocalIds),
       riskLevelsLocalIds: List.from(riskLevelsLocalIds),
       publicationStatusesLocalIds: List.from(publicationStatusesLocalIds),
@@ -618,17 +665,19 @@ Future<ImportResult> importarHallazgos({
       riskTypesLocalIds: List.from(riskTypesLocalIds),
       riskTypologiesLocalIds: List.from(riskTypologiesLocalIds),
       observationScopesLocalIds: List.from(observationScopesLocalIds),
+      responsibleManagersLocalIds: List.from(responsibleManagersLocalIds),
+      responsibleAuditorsLocalIds: List.from(responsibleAuditorsLocalIds),
     );
   } catch (e, stackTrace) {
     print('❌ Error general: $e\n$stackTrace');
     if (gerenciasSupabaseIds.isNotEmpty || titulosSupabaseIds.isNotEmpty ||
-        riskLevelsSupabaseIds.isNotEmpty || riskTypesSupabaseIds.isNotEmpty) {
+        riskLevelsSupabaseIds.isNotEmpty || riskTypesSupabaseIds.isNotEmpty ||
+        responsibleManagersSupabaseIds.isNotEmpty || responsibleAuditorsSupabaseIds.isNotEmpty) {
       try {
         onProgress('Deshaciendo cambios parciales...', 0, 0);
         await _ejecutarRollback(
           gerenciasSupabaseIds: gerenciasSupabaseIds,
           ecosistemasSupabaseIds: ecosistemasSupabaseIds,
-          procesosSupabaseIds: procesosSupabaseIds,
           titulosSupabaseIds: titulosSupabaseIds,
           riskLevelsSupabaseIds: riskLevelsSupabaseIds,
           publicationStatusesSupabaseIds: publicationStatusesSupabaseIds,
@@ -637,9 +686,10 @@ Future<ImportResult> importarHallazgos({
           riskTypesSupabaseIds: riskTypesSupabaseIds,
           riskTypologiesSupabaseIds: riskTypologiesSupabaseIds,
           observationScopesSupabaseIds: observationScopesSupabaseIds,
+          responsibleManagersSupabaseIds: responsibleManagersSupabaseIds,
+          responsibleAuditorsSupabaseIds: responsibleAuditorsSupabaseIds,
           gerenciasLocalIds: gerenciasLocalIds,
           ecosistemasLocalIds: ecosistemasLocalIds,
-          procesosLocalIds: procesosLocalIds,
           titulosLocalIds: titulosLocalIds,
           riskLevelsLocalIds: riskLevelsLocalIds,
           publicationStatusesLocalIds: publicationStatusesLocalIds,
@@ -648,6 +698,8 @@ Future<ImportResult> importarHallazgos({
           riskTypesLocalIds: riskTypesLocalIds,
           riskTypologiesLocalIds: riskTypologiesLocalIds,
           observationScopesLocalIds: observationScopesLocalIds,
+          responsibleManagersLocalIds: responsibleManagersLocalIds,
+          responsibleAuditorsLocalIds: responsibleAuditorsLocalIds,
           onProgress: onProgress,
         );
       } catch (_) {}
@@ -668,7 +720,6 @@ Future<void> deshacerImportacion({
   await _ejecutarRollback(
     gerenciasSupabaseIds: result.gerenciasSupabaseIds,
     ecosistemasSupabaseIds: result.ecosistemasSupabaseIds,
-    procesosSupabaseIds: result.procesosSupabaseIds,
     titulosSupabaseIds: result.titulosSupabaseIds,
     riskLevelsSupabaseIds: result.riskLevelsSupabaseIds,
     publicationStatusesSupabaseIds: result.publicationStatusesSupabaseIds,
@@ -677,9 +728,10 @@ Future<void> deshacerImportacion({
     riskTypesSupabaseIds: result.riskTypesSupabaseIds,
     riskTypologiesSupabaseIds: result.riskTypologiesSupabaseIds,
     observationScopesSupabaseIds: result.observationScopesSupabaseIds,
+    responsibleManagersSupabaseIds: result.responsibleManagersSupabaseIds,
+    responsibleAuditorsSupabaseIds: result.responsibleAuditorsSupabaseIds,
     gerenciasLocalIds: result.gerenciasLocalIds,
     ecosistemasLocalIds: result.ecosistemasLocalIds,
-    procesosLocalIds: result.procesosLocalIds,
     titulosLocalIds: result.titulosLocalIds,
     riskLevelsLocalIds: result.riskLevelsLocalIds,
     publicationStatusesLocalIds: result.publicationStatusesLocalIds,
@@ -688,6 +740,8 @@ Future<void> deshacerImportacion({
     riskTypesLocalIds: result.riskTypesLocalIds,
     riskTypologiesLocalIds: result.riskTypologiesLocalIds,
     observationScopesLocalIds: result.observationScopesLocalIds,
+    responsibleManagersLocalIds: result.responsibleManagersLocalIds,
+    responsibleAuditorsLocalIds: result.responsibleAuditorsLocalIds,
     onProgress: onProgress,
   );
 }
@@ -696,7 +750,6 @@ Future<void> deshacerImportacion({
 Future<void> _ejecutarRollback({
   required List<String> gerenciasSupabaseIds,
   required List<String> ecosistemasSupabaseIds,
-  required List<String> procesosSupabaseIds,
   required List<String> titulosSupabaseIds,
   required List<String> riskLevelsSupabaseIds,
   required List<String> publicationStatusesSupabaseIds,
@@ -705,9 +758,10 @@ Future<void> _ejecutarRollback({
   required List<String> riskTypesSupabaseIds,
   required List<String> riskTypologiesSupabaseIds,
   required List<String> observationScopesSupabaseIds,
+  required List<String> responsibleManagersSupabaseIds,
+  required List<String> responsibleAuditorsSupabaseIds,
   required List<String> gerenciasLocalIds,
   required List<String> ecosistemasLocalIds,
-  required List<String> procesosLocalIds,
   required List<String> titulosLocalIds,
   required List<String> riskLevelsLocalIds,
   required List<String> publicationStatusesLocalIds,
@@ -716,6 +770,8 @@ Future<void> _ejecutarRollback({
   required List<String> riskTypesLocalIds,
   required List<String> riskTypologiesLocalIds,
   required List<String> observationScopesLocalIds,
+  required List<String> responsibleManagersLocalIds,
+  required List<String> responsibleAuditorsLocalIds,
   required void Function(String paso, int actual, int total) onProgress,
 }) async {
   print('🔄 Iniciando rollback...');
@@ -750,16 +806,6 @@ Future<void> _ejecutarRollback({
   for (final id in titulosLocalIds) {
     try { await DBTitulo.deleteTitulo(id); }
     catch (e) { print('⚠️ Rollback Título local $id: $e'); }
-  }
-
-  // Procesos
-  for (final id in procesosSupabaseIds) {
-    try { await SupaFlow.client.from('Processes').delete().eq('process_id', id); }
-    catch (e) { print('⚠️ Rollback Proceso $id: $e'); }
-  }
-  for (final id in procesosLocalIds) {
-    try { await DBProceso.deleteProceso(id); }
-    catch (e) { print('⚠️ Rollback Proceso local $id: $e'); }
   }
 
   // Ecosistemas
@@ -830,6 +876,26 @@ Future<void> _ejecutarRollback({
   for (final id in observationScopesLocalIds) {
     try { await DBObservationScope.deleteObservationScope(id); }
     catch (e) { print('⚠️ Rollback ObservationScope local $id: $e'); }
+  }
+
+  // Gerentes
+  for (final id in responsibleManagersSupabaseIds) {
+    try { await SupaFlow.client.from('ResponsibleManagers').delete().eq('responsible_manager_id', id); }
+    catch (e) { print('⚠️ Rollback ResponsibleManager $id: $e'); }
+  }
+  for (final id in responsibleManagersLocalIds) {
+    try { await DBResponsibleManager.deleteResponsibleManager(id); }
+    catch (e) { print('⚠️ Rollback ResponsibleManager local $id: $e'); }
+  }
+
+  // Auditores
+  for (final id in responsibleAuditorsSupabaseIds) {
+    try { await SupaFlow.client.from('ResponsibleAuditors').delete().eq('responsible_auditor_id', id); }
+    catch (e) { print('⚠️ Rollback ResponsibleAuditor $id: $e'); }
+  }
+  for (final id in responsibleAuditorsLocalIds) {
+    try { await DBResponsibleAuditor.deleteResponsibleAuditor(id); }
+    catch (e) { print('⚠️ Rollback ResponsibleAuditor local $id: $e'); }
   }
 
   print('✅ Rollback completado.');
