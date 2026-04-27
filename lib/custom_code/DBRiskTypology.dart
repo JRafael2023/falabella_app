@@ -21,7 +21,6 @@ class DBRiskTypology {
           ? "RiskTypology agregado correctamente"
           : "Error: No se pudo agregar el RiskTypology";
     } catch (e) {
-      print('Error al insertar RiskTypology: $e');
       return "Error al insertar RiskTypology: $e";
     }
   }
@@ -46,7 +45,6 @@ class DBRiskTypology {
           ? "RiskTypology actualizado correctamente"
           : "Error: No se pudo actualizar el RiskTypology";
     } catch (e) {
-      print('Error al actualizar RiskTypology: $e');
       return "Error al actualizar RiskTypology: $e";
     }
   }
@@ -66,7 +64,6 @@ class DBRiskTypology {
           ? "RiskTypology eliminado correctamente"
           : "Error: No se pudo eliminar el RiskTypology";
     } catch (e) {
-      print('Error al eliminar RiskTypology: $e');
       return "Error al eliminar RiskTypology: $e";
     }
   }
@@ -81,7 +78,6 @@ class DBRiskTypology {
           orderBy: 'name ASC');
       return result.map((row) => RiskTypology.fromMap(row)).toList();
     } catch (e) {
-      print('Error al obtener RiskTypologies: $e');
       return [];
     }
   }
@@ -97,7 +93,6 @@ class DBRiskTypology {
           orderBy: 'name ASC');
       return result.map((row) => RiskTypology.fromMap(row)).toList();
     } catch (e) {
-      print('Error al obtener RiskTypologies por tipo: $e');
       return [];
     }
   }
@@ -115,7 +110,6 @@ class DBRiskTypology {
       }
       return "Se insertaron $count de ${supabaseData.length} RiskTypologies";
     } catch (e) {
-      print('Error insertBatchFromSupabase RiskTypology: $e');
       return "Error: $e";
     }
   }

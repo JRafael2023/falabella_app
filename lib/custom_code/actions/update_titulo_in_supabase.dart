@@ -27,10 +27,8 @@ Future<bool> updateTituloInSupabase(TituloStruct titulo) async {
         .update(data)
         .eq('id', titulo.idTitulo!);
 
-    print('✅ Título actualizado en Supabase');
     return true;
   } catch (e) {
-    print('❌ Error al actualizar título en Supabase: $e');
     return false;
   }
 }

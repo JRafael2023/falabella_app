@@ -182,7 +182,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  // ── Fila título + botón Crear ──────────────────────────
                   Row(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -231,7 +230,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                     ],
                   ),
                   const SizedBox(height: 12.0),
-                  // ── Lista de proyectos ─────────────────────────────────
                   Expanded(
                     child: Builder(
                       builder: (context) {
@@ -310,7 +308,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                             },
                           );
                         } else {
-                          // ── Modo offline ───────────────────────────────
                           final arrayOFFProjects = FFAppState().jsonProyectos.toList();
                           return ListView.separated(
                             padding: EdgeInsets.zero,
@@ -446,7 +443,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      // ── Toggle: Escribir ID / Seleccionar de Highbond ──────────────
                                       if (_model.estaconectado ?? false)
                                         Row(
                                           children: [
@@ -475,7 +471,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                             ),
                                           ],
                                         ),
-                                      // ── Modo manual: campo de texto + lupa ─────────────────────────
                                       if (!_model.usarDropdownHighbond)
                                       Row(
                                         mainAxisSize: MainAxisSize.max,
@@ -727,7 +722,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                             ),
                                         ].divide(SizedBox(width: 8.0)),
                                       ),
-                                      // ── Modo dropdown: cargar proyectos de Highbond ─────────────
                                       if (_model.usarDropdownHighbond)
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1238,7 +1232,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                           ),
                                         ].divide(SizedBox(height: 5.0)),
                                       ),
-                                      // ── Mensaje de error inline ─────────────────────────
                                       if (errorMsg != null)
                                         Container(
                                           width: double.infinity,
@@ -1408,7 +1401,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                             .cast<dynamic>();
                                                     FFAppState().update(() {});
                                                     } catch (e) {
-                                                      print('❌ Error guardando proyecto online: $e');
                                                       ScaffoldMessenger.of(context).showSnackBar(
                                                         SnackBar(
                                                           content: Text('Error al guardar: $e'),
@@ -1445,7 +1437,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                               .cast<dynamic>();
                                                       FFAppState().update(() {});
                                                     } catch (e) {
-                                                      print('❌ Error guardando proyecto offline: $e');
                                                       ScaffoldMessenger.of(context).showSnackBar(
                                                         SnackBar(
                                                           content: Text('Error al guardar: $e'),

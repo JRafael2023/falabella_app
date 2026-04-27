@@ -47,7 +47,6 @@ Future<List<FFUploadedFile>> pickMultipleVideosFromGallery() async {
 
     return uploadedFiles;
   } catch (e) {
-    print('❌ Error al seleccionar videos: $e');
     return [];
   }
 }

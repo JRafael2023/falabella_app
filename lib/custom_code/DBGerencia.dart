@@ -37,7 +37,6 @@ class DBGerencia {
         return "Error: No se pudo agregar la Gerencia";
       }
     } catch (e) {
-      print('Error al insertar gerencia: $e');
       return "Error al insertar gerencia: $e";
     }
   }
@@ -72,7 +71,6 @@ class DBGerencia {
         return "Error: No se pudo actualizar la Gerencia";
       }
     } catch (e) {
-      print('Error al actualizar gerencia: $e');
       return "Error al actualizar gerencia: $e";
     }
   }
@@ -98,7 +96,6 @@ class DBGerencia {
         return "Error: No se pudo eliminar la Gerencia";
       }
     } catch (e) {
-      print('Error al eliminar gerencia: $e');
       return "Error al eliminar gerencia: $e";
     }
   }
@@ -124,7 +121,6 @@ class DBGerencia {
 
       return null;
     } catch (e) {
-      print('Error al obtener gerencia por ID: $e');
       return null;
     }
   }
@@ -140,7 +136,6 @@ class DBGerencia {
 
       return result.map((row) => metodoconvertidorGerencia(row)).toList();
     } catch (e) {
-      print('Error al obtener todas las gerencias: $e');
       return [];
     }
   }
@@ -202,7 +197,6 @@ class DBGerencia {
 
       return "Se insertaron $insertedCount gerencias de ${gerencias.length} correctamente";
     } catch (e) {
-      print('Error al insertar batch desde Supabase: $e');
       return "Error al insertar batch: $e";
     }
   }

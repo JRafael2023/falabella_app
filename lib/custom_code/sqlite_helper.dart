@@ -439,10 +439,8 @@ class DBHelper {
           )
         ''');
 
-        print('✅ Base de datos creada correctamente');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        print('🔄 Migrando DB de versión $oldVersion a $newVersion');
 
         if (oldVersion < 6) {
           // Migrar tabla Users: renombrar columnas
@@ -479,7 +477,6 @@ class DBHelper {
           await db.execute('DROP TABLE Users');
           await db.execute('ALTER TABLE Users_new RENAME TO Users');
 
-          print('✅ Tabla Users migrada correctamente');
         }
 
         if (oldVersion < 7) {
@@ -488,9 +485,7 @@ class DBHelper {
             await db.execute('''
               ALTER TABLE Controles ADD COLUMN archives TEXT DEFAULT ''
             ''');
-            print('✅ Columna archives agregada a tabla Controles');
           } catch (e) {
-            print('⚠️ Error al agregar columna archives: $e');
           }
         }
 
@@ -524,9 +519,7 @@ class DBHelper {
             await db.execute('''
               ALTER TABLE Controles ADD COLUMN nivel_riesgo TEXT
             ''');
-            print('✅ 9 columnas nuevas agregadas a tabla Controles');
           } catch (e) {
-            print('⚠️ Error al agregar nuevas columnas: $e');
           }
         }
 
@@ -536,9 +529,7 @@ class DBHelper {
             await db.execute('''
               ALTER TABLE Controles ADD COLUMN control_text TEXT
             ''');
-            print('✅ Columna control_text agregada a tabla Controles');
           } catch (e) {
-            print('⚠️ Error al agregar columna control_text: $e');
           }
         }
 
@@ -559,9 +550,7 @@ class DBHelper {
                 status INTEGER DEFAULT 1
               )
             ''');
-            print('✅ Tabla Titulos creada correctamente');
           } catch (e) {
-            print('⚠️ Error al crear tabla Titulos: $e');
           }
         }
 
@@ -588,7 +577,6 @@ class DBHelper {
                   status INTEGER DEFAULT 1
                 )
               ''');
-              print('✅ Tabla Procesos creada correctamente');
             } else {
               // Migrar datos si la tabla ya existe con estructura antigua
               await db
@@ -604,16 +592,13 @@ class DBHelper {
                   .execute('ALTER TABLE Procesos RENAME COLUMN nombre TO name');
               await db.execute(
                   'ALTER TABLE Procesos RENAME COLUMN abreviacion TO abbreviation');
-              print('✅ Tabla Procesos migrada correctamente');
             }
           } catch (e) {
-            print('⚠️ Error en migración de Procesos: $e');
           }
         }
 
         // ⭐ MIGRACIÓN v12: Crear/actualizar tabla Gerencias para Supabase
         if (oldVersion < 12) {
-          print('📦 Migrando tabla Gerencias...');
           try {
             final tables = await db.rawQuery(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name='Gerencias'");
@@ -632,7 +617,6 @@ class DBHelper {
                   status INTEGER DEFAULT 1
                 )
               ''');
-              print('✅ Tabla Gerencias creada correctamente');
             } else {
               // Migrar datos si la tabla ya existe con estructura antigua
               await db.execute(
@@ -644,16 +628,13 @@ class DBHelper {
               // Renombrar columna si es necesario
               await db.execute(
                   'ALTER TABLE Gerencias RENAME COLUMN nombre TO name');
-              print('✅ Tabla Gerencias migrada correctamente');
             }
           } catch (e) {
-            print('⚠️ Error en migración de Gerencias: $e');
           }
         }
 
         // ⭐ MIGRACIÓN v13: Crear/actualizar tabla Ecosistemas para Supabase
         if (oldVersion < 13) {
-          print('📦 Migrando tabla Ecosistemas...');
           try {
             final tables = await db.rawQuery(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name='Ecosistemas'");
@@ -672,7 +653,6 @@ class DBHelper {
                   status INTEGER DEFAULT 1
                 )
               ''');
-              print('✅ Tabla Ecosistemas creada correctamente');
             } else {
               // Migrar datos si la tabla ya existe con estructura antigua
               await db.execute(
@@ -684,16 +664,13 @@ class DBHelper {
               // Renombrar columna si es necesario
               await db.execute(
                   'ALTER TABLE Ecosistemas RENAME COLUMN nombre TO name');
-              print('✅ Tabla Ecosistemas migrada correctamente');
             }
           } catch (e) {
-            print('⚠️ Error en migración de Ecosistemas: $e');
           }
         }
 
         // ⭐ MIGRACIÓN v14: Crear tabla SyncLogs
         if (oldVersion < 14) {
-          print('📦 Creando tabla SyncLogs...');
           try {
             await db.execute('''
               CREATE TABLE IF NOT EXISTS SyncLogs (
@@ -714,15 +691,12 @@ class DBHelper {
                 created_at TEXT
               )
             ''');
-            print('✅ Tabla SyncLogs creada correctamente');
           } catch (e) {
-            print('⚠️ Error al crear tabla SyncLogs: $e');
           }
         }
 
         // ⭐ MIGRACIÓN v16: Agregar columna pendienteEliminar a las 6 tablas
         if (oldVersion < 16) {
-          print('📦 Migrando v16: agregando pendienteEliminar...');
           final tablas = {
             'Gerencias': 'idGerencia',
             'Ecosistemas': 'idEcosistema',
@@ -735,9 +709,7 @@ class DBHelper {
             try {
               await db.execute(
                   'ALTER TABLE $tabla ADD COLUMN pendienteEliminar INTEGER DEFAULT 0');
-              print('✅ pendienteEliminar agregado a $tabla');
             } catch (e) {
-              print('⚠️ $tabla: $e');
             }
           }
         }
@@ -745,19 +717,15 @@ class DBHelper {
         // ⭐ MIGRACIÓN v17: Agregar columna password_temp a Users
         // Permite guardar contraseña temporal de usuarios creados offline para sincronizarlos luego
         if (oldVersion < 17) {
-          print('📦 Migrando v17: agregando password_temp a Users...');
           try {
             await db.execute(
                 'ALTER TABLE Users ADD COLUMN password_temp TEXT');
-            print('✅ Columna password_temp agregada a Users');
           } catch (e) {
-            print('⚠️ Error al agregar password_temp: $e');
           }
         }
 
         // ⭐ MIGRACIÓN v18: Eliminar process_id de Titulos y abbreviation de Procesos
         if (oldVersion < 18) {
-          print('📦 Migrando v18: eliminando process_id de Titulos y abbreviation de Procesos...');
 
           // Recrear tabla Titulos sin process_id
           try {
@@ -784,9 +752,7 @@ class DBHelper {
             ''');
             await db.execute('DROP TABLE Titulos');
             await db.execute('ALTER TABLE Titulos_new RENAME TO Titulos');
-            print('✅ Tabla Titulos migrada: process_id eliminado');
           } catch (e) {
-            print('⚠️ Error migrando Titulos v18: $e');
           }
 
           // Recrear tabla Procesos sin abbreviation
@@ -814,15 +780,12 @@ class DBHelper {
             ''');
             await db.execute('DROP TABLE Procesos');
             await db.execute('ALTER TABLE Procesos_new RENAME TO Procesos');
-            print('✅ Tabla Procesos migrada: abbreviation eliminado');
           } catch (e) {
-            print('⚠️ Error migrando Procesos v18: $e');
           }
         }
 
         // ⭐ MIGRACIÓN v19: Nuevas tablas maestros hallazgo + columnas en Controles
         if (oldVersion < 19) {
-          print('📦 Migrando v19: nuevos maestros hallazgo...');
 
           // Nuevas columnas en Controles
           final nuevasColumnasControles = [
@@ -851,10 +814,8 @@ class DBHelper {
             try {
               await db.execute('ALTER TABLE Controles ADD COLUMN $col');
             } catch (e) {
-              print('⚠️ Controles $col: $e');
             }
           }
-          print('✅ Columnas hallazgo agregadas a Controles');
 
           // Crear tabla RiskLevels
           try {
@@ -871,7 +832,6 @@ class DBHelper {
                 status INTEGER DEFAULT 1
               )
             ''');
-            print('✅ Tabla RiskLevels creada');
           } catch (e) { print('⚠️ RiskLevels: $e'); }
 
           // Crear tabla PublicationStatuses
@@ -889,7 +849,6 @@ class DBHelper {
                 status INTEGER DEFAULT 1
               )
             ''');
-            print('✅ Tabla PublicationStatuses creada');
           } catch (e) { print('⚠️ PublicationStatuses: $e'); }
 
           // Crear tabla ImpactTypes
@@ -907,7 +866,6 @@ class DBHelper {
                 status INTEGER DEFAULT 1
               )
             ''');
-            print('✅ Tabla ImpactTypes creada');
           } catch (e) { print('⚠️ ImpactTypes: $e'); }
 
           // Crear tabla EcosystemSupports
@@ -925,7 +883,6 @@ class DBHelper {
                 status INTEGER DEFAULT 1
               )
             ''');
-            print('✅ Tabla EcosystemSupports creada');
           } catch (e) { print('⚠️ EcosystemSupports: $e'); }
 
           // Crear tabla RiskTypes
@@ -943,7 +900,6 @@ class DBHelper {
                 status INTEGER DEFAULT 1
               )
             ''');
-            print('✅ Tabla RiskTypes creada');
           } catch (e) { print('⚠️ RiskTypes: $e'); }
 
           // Crear tabla RiskTypologies
@@ -963,7 +919,6 @@ class DBHelper {
                 status INTEGER DEFAULT 1
               )
             ''');
-            print('✅ Tabla RiskTypologies creada');
           } catch (e) { print('⚠️ RiskTypologies: $e'); }
 
           // Crear tabla ObservationScopes
@@ -981,15 +936,12 @@ class DBHelper {
                 status INTEGER DEFAULT 1
               )
             ''');
-            print('✅ Tabla ObservationScopes creada');
           } catch (e) { print('⚠️ ObservationScopes: $e'); }
 
-          print('✅ Migración v19 completada');
         }
 
         // ⭐ MIGRACIÓN v20: Quitar columna 'orden' de las 7 tablas maestro v19
         if (oldVersion < 20) {
-          print('📦 Migrando v20: eliminando columna orden de maestros v19...');
 
           // Helper: recrea tabla sin columna orden copiando datos
           Future<void> _recrearSinOrden(String tabla, String idCol, String extraCols, String extraColsInsert) async {
@@ -1015,7 +967,6 @@ class DBHelper {
                 FROM ${tabla}_old
               ''');
               await db.execute('DROP TABLE ${tabla}_old');
-              print('✅ $tabla: columna orden eliminada');
             } catch (e) { print('⚠️ $tabla v20: \$e'); }
           }
 
@@ -1027,23 +978,18 @@ class DBHelper {
           await _recrearSinOrden('RiskTypologies',      'risk_typology_id',      'codigo TEXT, risk_type_id TEXT,', 'codigo, risk_type_id, ');
           await _recrearSinOrden('ObservationScopes',   'observation_scope_id',  '', '');
 
-          print('✅ Migración v20 completada');
         }
 
         // ⭐ MIGRACIÓN v21: Agregar columna pendiente_sync a Controles
         if (oldVersion < 21) {
-          print('📦 Migrando v21: agregando pendiente_sync a Controles...');
           try {
             await db.execute('ALTER TABLE Controles ADD COLUMN pendiente_sync INTEGER DEFAULT 0');
-            print('✅ Columna pendiente_sync agregada a Controles');
           } catch (e) {
-            print('⚠️ Error al agregar pendiente_sync: $e');
           }
         }
 
         // ⭐ MIGRACIÓN v22: Crear tablas ResponsibleAuditors y ResponsibleManagers
         if (oldVersion < 22) {
-          print('📦 Migrando v22: creando tablas ResponsibleAuditors y ResponsibleManagers...');
           try {
             await db.execute('''
               CREATE TABLE IF NOT EXISTS ResponsibleAuditors (
@@ -1058,7 +1004,6 @@ class DBHelper {
                 status INTEGER DEFAULT 1
               )
             ''');
-            print('✅ Tabla ResponsibleAuditors creada');
           } catch (e) { print('⚠️ ResponsibleAuditors: $e'); }
           try {
             await db.execute('''
@@ -1074,14 +1019,11 @@ class DBHelper {
                 status INTEGER DEFAULT 1
               )
             ''');
-            print('✅ Tabla ResponsibleManagers creada');
           } catch (e) { print('⚠️ ResponsibleManagers: $e'); }
-          print('✅ Migración v22 completada');
         }
 
         // ⭐ MIGRACIÓN v15: Crear tabla ControlAttachments y migrar datos
         if (oldVersion < 15) {
-          print('📦 Creando tabla ControlAttachments...');
           try {
             // Crear tabla de attachments
             await db.execute('''
@@ -1095,10 +1037,8 @@ class DBHelper {
                 UNIQUE(id_control, attachment_type, attachment_index)
               )
             ''');
-            print('✅ Tabla ControlAttachments creada');
 
             // Migrar datos existentes de la tabla Controles
-            print('🔄 Migrando attachments existentes...');
             final controles = await db.query('Controles');
             int totalMigrados = 0;
 
@@ -1124,7 +1064,6 @@ class DBHelper {
                     }
                   }
                 } catch (e) {
-                  print('⚠️ Error migrando photos de $idControl: $e');
                 }
               }
 
@@ -1141,7 +1080,6 @@ class DBHelper {
                   });
                   totalMigrados++;
                 } catch (e) {
-                  print('⚠️ Error migrando video de $idControl: $e');
                 }
               }
 
@@ -1163,22 +1101,17 @@ class DBHelper {
                     }
                   }
                 } catch (e) {
-                  print('⚠️ Error migrando archives de $idControl: $e');
                 }
               }
             }
 
-            print('✅ Migrados $totalMigrados attachments a la nueva tabla');
 
             // Limpiar campos de attachments en tabla Controles
-            print('🧹 Limpiando campos de attachments en tabla Controles...');
             await db.execute('''
               UPDATE Controles
               SET photos = '', video = '', archives = ''
             ''');
-            print('✅ Tabla ControlAttachments creada y datos migrados');
           } catch (e) {
-            print('⚠️ Error en migración v15: $e');
           }
         }
       },

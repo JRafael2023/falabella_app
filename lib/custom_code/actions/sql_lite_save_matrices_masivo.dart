@@ -25,14 +25,9 @@ Future<String> sqlLiteSaveMatricesMasivo(
 
     final countLocal = await DBMatrices.countMatrices();
 
-    print('📊 SQLite: $countLocal | Supabase: ${rowsSupabaseMatriz.length}');
 
     // Debug: Ver qué recibe desde Supabase
     if (rowsSupabaseMatriz.isNotEmpty) {
-      print('🔍 Primer elemento de Supabase:');
-      print('   id: ${rowsSupabaseMatriz.first.id}');
-      print('   matrixId: ${rowsSupabaseMatriz.first.matrixId}');
-      print('   name: ${rowsSupabaseMatriz.first.name}');
     }
 
     // Convertir MatricesRow a Matrices
@@ -42,15 +37,11 @@ Future<String> sqlLiteSaveMatricesMasivo(
 
     // Debug: Ver qué se convirtió
     if (matrices.isNotEmpty) {
-      print('🔍 Primer elemento convertido:');
-      print('   ${matrices.first.toString()}');
     }
 
     if (countLocal == 0) {
-      print('🔥 Sync completo');
       return await DBMatrices.insertMatricesMasivas(matrices);
     } else {
-      print('🔄 Sync incremental');
       return await DBMatrices.insertMatricesIncrementales(matrices);
     }
   } catch (e) {

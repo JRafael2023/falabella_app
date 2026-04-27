@@ -25,36 +25,25 @@ Future<String?> openimagenCopyStorageExternal() async {
   );
 
   if (result == null) {
-    print("❌ No se seleccionó ningún archivo");
     return null;
   }
 
   final file = result.files.first;
   final String? extension = file.extension?.toLowerCase();
   final filePath = file.path;
-  print("✅ Ruta completa del archivo: $filePath");
-  print("FF UPLOAD");
 
-  print("Nombre del archivo: ${file.name}");
-  print("Tamaño del archivo: ${file.size} bytes");
-  print("IDENTIFIE: ${file.identifier} ");
-  print("Extensión del archivo: ${file.extension}");
   if (file.bytes == null) {
-    print("⚠️ No se pudieron obtener los bytes del archivo.");
     return null;
   }
   String rutafinal = file.name.split(".")[0];
-  print("lA RUTA FINALES  : ${rutafinal}");
   // Copiar la imagen a la carpeta externa
   final String? copiedPath =
       await copyImageToExternalFolder(file.bytes!, extension, rutafinal);
 
   if (copiedPath == null) {
-    print("⚠️ No se pudo copiar la imagen.");
     return null;
   }
 
-  print("Imagen copiada a: $copiedPath");
 
   return copiedPath;
 }
@@ -81,7 +70,6 @@ Future<String?> copyImageToExternalFolder(
 
     return newImage.path; // Devolver la nueva ruta de la imagen copiada
   } catch (e) {
-    print("Error al copiar la imagen: $e");
     return null;
   }
 }

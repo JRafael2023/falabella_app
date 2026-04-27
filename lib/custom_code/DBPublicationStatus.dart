@@ -21,7 +21,6 @@ class DBPublicationStatus {
           ? "PublicationStatus agregado correctamente"
           : "Error: No se pudo agregar el PublicationStatus";
     } catch (e) {
-      print('Error al insertar PublicationStatus: $e');
       return "Error al insertar PublicationStatus: $e";
     }
   }
@@ -46,7 +45,6 @@ class DBPublicationStatus {
           ? "PublicationStatus actualizado correctamente"
           : "Error: No se pudo actualizar el PublicationStatus";
     } catch (e) {
-      print('Error al actualizar PublicationStatus: $e');
       return "Error al actualizar PublicationStatus: $e";
     }
   }
@@ -67,7 +65,6 @@ class DBPublicationStatus {
           ? "PublicationStatus eliminado correctamente"
           : "Error: No se pudo eliminar el PublicationStatus";
     } catch (e) {
-      print('Error al eliminar PublicationStatus: $e');
       return "Error al eliminar PublicationStatus: $e";
     }
   }
@@ -82,7 +79,6 @@ class DBPublicationStatus {
           orderBy: 'name ASC');
       return result.map((row) => PublicationStatus.fromMap(row)).toList();
     } catch (e) {
-      print('Error al obtener PublicationStatuses: $e');
       return [];
     }
   }
@@ -100,7 +96,6 @@ class DBPublicationStatus {
       }
       return "Se insertaron $count de ${supabaseData.length} PublicationStatuses";
     } catch (e) {
-      print('Error insertBatchFromSupabase PublicationStatus: $e');
       return "Error: $e";
     }
   }

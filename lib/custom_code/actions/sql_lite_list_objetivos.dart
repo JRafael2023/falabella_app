@@ -22,8 +22,6 @@ Future<List<dynamic>> sqlLiteListObjetivos(String idProyecto) async {
     final List<Objetivo> objetivos =
         await DBObjetivos.listarObjetivosPorProyecto(idProyecto);
 
-    print(
-        'Objetivos encontrados: ${objetivos.length} para proyecto: $idProyecto');
 
     // ✅ Convertir a JSON usando toJson() de la clase Objetivo
     final List<dynamic> objetivosJson =
@@ -31,12 +29,10 @@ Future<List<dynamic>> sqlLiteListObjetivos(String idProyecto) async {
 
     // ✅ Debug: imprimir el primer objetivo
     if (objetivosJson.isNotEmpty) {
-      print('Primer objetivo JSON: ${objetivosJson[0]}');
     }
 
     return objetivosJson;
   } catch (e) {
-    print('Error al listar objetivos: $e');
     return [];
   }
 }

@@ -36,7 +36,6 @@ Future<String> updateMatrizSQLite(
 
     return resultado;
   } catch (e) {
-    print('❌ Error updateMatrizSQLite: $e');
     return "❌ Error al actualizar matriz: $e";
   }
 }

@@ -27,10 +27,8 @@ Future<bool> updateGerenciaInSupabase(GerenciaStruct gerencia) async {
         .update(data)
         .eq('id', gerencia.idGerencia!);
 
-    print('✅ Gerencia actualizada en Supabase');
     return true;
   } catch (e) {
-    print('❌ Error al actualizar gerencia en Supabase: $e');
     return false;
   }
 }

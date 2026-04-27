@@ -42,8 +42,6 @@ Future<String> syncControlesToSupabase(
       return "ℹ️ No hay controles en Supabase";
     }
 
-    print('📦 SQLite: ${listSQLiteControles.length} controles');
-    print('📦 Supabase: ${listSupabaseControles.length} controles');
 
     // 3️⃣ CONVERTIR CONTROLES DE SQLITE (JSON) A OBJETOS CONTROL
     List<Control> controlesSQLite = [];
@@ -105,7 +103,6 @@ Future<String> syncControlesToSupabase(
       final proyecto = await DBProyectos.getProyectoByIdProject(FFAppState().idproyect);
       projectName = proyecto?.name ?? '';
       if (projectName.isNotEmpty) {
-        print('📦 projectName resuelto desde SQLite: $projectName');
       }
     }
 
@@ -118,7 +115,6 @@ Future<String> syncControlesToSupabase(
     final List<Future> supabasePendientes = [];
     bool highbondFallo = false;
 
-    // ── FASE A: comparar todos los controles y acumular tareas (sin I/O) ───
     // Cada tarea incluye: control + dataToUpdate + flag needsHighbond
     final List<Map<String, dynamic>> _tareas = [];
 
@@ -127,7 +123,6 @@ Future<String> syncControlesToSupabase(
         final idControl = controlLocal.idControl;
 
         if (!mapaSupabase.containsKey(idControl)) {
-          print('⚠️ Control $idControl existe en SQLite pero NO en Supabase');
           omitidos++;
           continue;
         }
@@ -214,7 +209,6 @@ Future<String> syncControlesToSupabase(
         bool necesitaSincronizacion = true;
 
         if (necesitaSincronizacion) {
-          print('🔄 Preparando $idControl para sincronizar...');
 
           final projectIdValido = FFAppState().idproyect.isNotEmpty && FFAppState().idproyect != '0';
           final needsHighbond = controlLocal.completed &&
@@ -290,17 +284,13 @@ Future<String> syncControlesToSupabase(
         errores++;
         String error = '${controlLocal.title}: ${e.toString()}';
         erroresDetalle.add(error);
-        print('❌ Error al procesar ${controlLocal.idControl}: $e');
       }
     }
 
-    // ── Separar tareas: solo-Supabase vs. necesitan HighBond ───────────────
     final _tareasHighbond  = _tareas.where((t) => t['needsHighbond'] == true).toList();
     final _tareasSoloSupa  = _tareas.where((t) => t['needsHighbond'] == false).toList();
 
-    print('📋 Tareas: ${_tareasHighbond.length} con HighBond, ${_tareasSoloSupa.length} solo-Supabase, $omitidos sin cambios');
 
-    // ── FASE B1: controles solo-Supabase → todos en paralelo de una vez ────
     for (final tarea in _tareasSoloSupa) {
       final ctrl = tarea['control'] as Control;
       final capturedData = Map<String, dynamic>.from(tarea['dataToUpdate'] as Map<String, dynamic>);
@@ -312,16 +302,13 @@ Future<String> syncControlesToSupabase(
       sincronizados++;
     }
     if (_tareasSoloSupa.isNotEmpty) {
-      print('⚡ ${_tareasSoloSupa.length} controles solo-Supabase encolados en paralelo');
     }
 
-    // ── FASE B2: controles con HighBond → lotes de 8 en paralelo ───────────
     // 8 simultáneos: ~3x más rápido que el batch de 3 anterior.
     // Límite para no saturar la API de HighBond ni causar timeouts con adjuntos grandes.
     const int _hbBatch = 8;
     for (int _bi = 0; _bi < _tareasHighbond.length; _bi += _hbBatch) {
       final _lote = _tareasHighbond.skip(_bi).take(_hbBatch).toList();
-      print('⚡ Lote HighBond ${(_bi ~/ _hbBatch) + 1}: ${_lote.length} controles en paralelo...');
       await Future.wait(_lote.map((tarea) async {
         final controlLocal = tarea['control'] as Control;
         final idControl = controlLocal.idControl;
@@ -338,7 +325,6 @@ Future<String> syncControlesToSupabase(
 
             // ⭐ NUEVA API: crear observación en Highbond solo para inefectivo
             if (controlLocal.findingStatus == 0) {
-              print('🔄 Creando issue Highbond para $idControl');
               final createIssueResponse = await SupabaseFunctionsGroup
                   .createIssueHighbondCall
                   .call(
@@ -351,7 +337,7 @@ Future<String> syncControlesToSupabase(
                 recommendation: controlLocal.recomendacion,
                 deficiencyType: controlLocal.ecosistema,
                 severity: controlLocal.nivelRiesgo,
-                published: false,
+                published: true,
                 identifiedAt: controlLocal.fecha,
                 risk: controlLocal.descripcionRiesgo,
                 scope: controlLocal.alcanceObservacion,
@@ -365,13 +351,11 @@ Future<String> syncControlesToSupabase(
                 tipologiaRiesgo: controlLocal.tipologiaRiesgo,
               );
               if (!createIssueResponse.succeeded) {
-                print('⚠️ Create Issue Highbond falló para $idControl, continuando...');
                 highbondFallo = true;
               }
             }
 
             if (tieneAdjuntos) {
-              print('🔄 API evidencias para $idControl (adjuntos=$tieneAdjuntos)');
               final apiInefectivoResponse = await SupabaseFunctionsGroup
                   .updateControlHighbondInefectivoCall
                   .call(
@@ -393,7 +377,6 @@ Future<String> syncControlesToSupabase(
                 controlText: controlLocal.title,
               );
               if (!apiInefectivoResponse.succeeded) {
-                print('⚠️ API evidencias HighBond falló para $idControl, continuando...');
                 highbondFallo = true;
               }
             }
@@ -408,11 +391,9 @@ Future<String> syncControlesToSupabase(
               controlDesign: controlLocal.findingStatus == 1,
             );
             if (!apiResponse.succeeded) {
-              print('⚠️ API HighBond falló para $idControl, continuando con Supabase...');
               highbondFallo = true;
             }
           } catch (apiError) {
-            print('⚠️ Error en API HighBond para $idControl: $apiError, continuando...');
             highbondFallo = true;
           }
         }
@@ -426,13 +407,11 @@ Future<String> syncControlesToSupabase(
         ));
         sincronizados++;
         await DBControles.resetPendienteSync(idControl);
-        print('✅ Control $idControl sincronizado');
       }));
     }
 
     // ⚡ Ejecutar todos los updates de Supabase en paralelo
     if (supabasePendientes.isNotEmpty) {
-      print('⚡ Ejecutando ${supabasePendientes.length} updates Supabase en paralelo...');
       await Future.wait(supabasePendientes);
     }
 
@@ -480,7 +459,6 @@ Future<String> syncControlesToSupabase(
       resultado = '❌ No se pudo sincronizar ningún control.\n' + resultado;
     }
 
-    print(resultado);
 
     // 7️⃣ ACTUALIZAR PROGRESS DEL PROYECTO EN SUPABASE
     try {
@@ -492,20 +470,16 @@ Future<String> syncControlesToSupabase(
           final objetivo = await DBObjetivos.getObjetivoByIdObjetivo(objectiveId);
 
           if (objetivo != null && objetivo.projectId.isNotEmpty) {
-            print('🔄 Actualizando progress del proyecto ${objetivo.projectId} en Supabase...');
             final progressActualizado = await actualizarProgressProyectoSupabase(objetivo.projectId);
-            print('✅ Progress actualizado en Supabase: $progressActualizado%');
           }
         }
       }
     } catch (e) {
-      print('⚠️ Error al actualizar progress del proyecto en Supabase: $e');
     }
 
     return highbondFallo ? 'exito_highbond_fallo' : 'exito';
   } catch (e) {
     String errorMsg = '❌ Error general en la sincronización: $e';
-    print(errorMsg);
     return errorMsg;
   }
 }

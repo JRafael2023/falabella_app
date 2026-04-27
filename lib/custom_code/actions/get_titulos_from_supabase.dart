@@ -26,7 +26,6 @@ Future<List<TituloStruct>> getTitulosFromSupabase() async {
         .order('created_at', ascending: false);
 
     if (response == null) {
-      print('⚠️ No hay títulos en Supabase');
       return [];
     }
 
@@ -45,10 +44,8 @@ Future<List<TituloStruct>> getTitulosFromSupabase() async {
       );
     }).toList();
 
-    print('✅ ${titulos.length} títulos obtenidos desde Supabase');
     return titulos;
   } catch (e) {
-    print('❌ Error al obtener títulos desde Supabase: $e');
     return [];
   }
 }

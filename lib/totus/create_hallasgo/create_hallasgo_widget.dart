@@ -246,7 +246,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         _model.responsibleAuditors.isEmpty;
 
     if (necesitaSync) {
-      print('⚠️ Maestros v19 vacíos en SQLite — sincronizando desde Supabase...');
       try {
         await Future.wait([
           _syncMaestroFromSupabase('RiskLevels', 'risk_level_id',
@@ -279,11 +278,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         _model.observationScopes = await DBObservationScope.getAllObservationScopes();
         _model.responsibleManagers = await DBResponsibleManager.getAllResponsibleManagers();
         _model.responsibleAuditors = await DBResponsibleAuditor.getAllResponsibleAuditors();
-        print('✅ Maestros v19 sincronizados: '
-            'riskLevels=${_model.riskLevels.length}, '
-            'pubStatuses=${_model.publicationStatuses.length}');
       } catch (e) {
-        print('⚠️ Error sincronizando maestros v19 desde Supabase: $e');
       }
     }
 
@@ -339,10 +334,8 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
           .eq('status', true);
       if ((response as List).isNotEmpty) {
         await insertBatch(response);
-        print('📥 $supaTable: ${response.length} registros sincronizados');
       }
     } catch (e) {
-      print('⚠️ Error fetch $supaTable: $e');
     }
   }
 

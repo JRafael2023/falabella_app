@@ -25,7 +25,6 @@ class DBControlAttachments {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
-    print('✅ Attachment guardado: $attachmentType[$attachmentIndex] para control $idControl');
   }
 
   /// Guardar múltiples photos (en paralelo)

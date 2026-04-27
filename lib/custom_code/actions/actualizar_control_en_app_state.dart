@@ -26,7 +26,6 @@ Future actualizarControlEnAppState(String idControl) async {
     final controlCompleto = await DBControles.obtenerControlCompleto(idControl);
 
     if (controlCompleto == null) {
-      print('⚠️ Control $idControl no encontrado en SQLite');
       return;
     }
 
@@ -68,12 +67,6 @@ Future actualizarControlEnAppState(String idControl) async {
       'has_video': hasVideo ? 1 : 0,
     };
 
-    print('✅ Control ligero creado');
-    print('   - Completed: ${controlLigero['completed']}');
-    print('   - Finding Status: ${controlLigero['finding_status']}');
-    print('   - Photos count: $photosCount');
-    print('   - Archives count: $archivesCount');
-    print('   - Has video: $hasVideo');
 
     // 4️⃣ Actualizar el control en FFAppState (reemplazar el existente)
     final indice = FFAppState().jsonControles.indexWhere(
@@ -81,15 +74,11 @@ Future actualizarControlEnAppState(String idControl) async {
 
     if (indice != -1) {
       FFAppState().jsonControles[indice] = controlLigero;
-      print('⚡ Control $idControl actualizado en FFAppState (índice: $indice)');
     } else {
       // Si no existe, agregarlo
       FFAppState().addToJsonControles(controlLigero);
-      print('⚡ Control $idControl agregado a FFAppState');
     }
 
-    print('✅ FFAppState actualizado correctamente (sin recargar todos)');
   } catch (e) {
-    print('❌ Error al actualizar control en FFAppState: $e');
   }
 }

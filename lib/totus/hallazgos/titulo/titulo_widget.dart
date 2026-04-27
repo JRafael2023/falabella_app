@@ -151,7 +151,6 @@ class _TituloWidgetState extends State<TituloWidget> with WidgetsBindingObserver
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // ── Nombre ────────────────────────────────────
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,7 +243,6 @@ class _TituloWidgetState extends State<TituloWidget> with WidgetsBindingObserver
                               ),
                             ].divide(SizedBox(height: 5.0)),
                           ),
-                          // ── Error inline ──────────────────────────────
                           if (errorMsg != null)
                             Container(
                               width: double.infinity,
@@ -271,7 +269,6 @@ class _TituloWidgetState extends State<TituloWidget> with WidgetsBindingObserver
                                 ],
                               ),
                             ),
-                          // ── Botón Guardar ─────────────────────────────
                           Row(
                             mainAxisSize: MainAxisSize.max,
                             children: [

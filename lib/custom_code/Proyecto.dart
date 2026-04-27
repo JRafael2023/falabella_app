@@ -122,8 +122,6 @@ class Proyecto {
   }
 
   static List<Proyecto> convercionListProyectos(String data) {
-    print(data.runtimeType);
-    print(data);
 
     final Map<String, dynamic> dataJon = json.decode(data);
     final List<dynamic> controls = dataJon['data'];
@@ -132,10 +130,8 @@ class Proyecto {
       return Proyecto.fromHighBondJson(item);
     }).toList();
 
-    print("nele ${proyectos.length}");
 
     for (var proyecto in proyectos) {
-      print(proyecto);
     }
 
     return proyectos;

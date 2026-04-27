@@ -281,7 +281,6 @@ class _ObjetivesWidgetState extends State<ObjetivesWidget>
                                     ),
                                     showLoadingIndicator: true,
                                     onPressed: () {
-                                      print('IconButton pressed ...');
                                     },
                                   ).animateOnPageLoad(animationsMap[
                                       'iconButtonOnPageLoadAnimation']!),

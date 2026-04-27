@@ -34,7 +34,6 @@ Future<String> insertMatrizSQLite(
 
     return resultado;
   } catch (e) {
-    print('❌ Error insertMatrizSQLite: $e');
     return "❌ Error al insertar matriz: $e";
   }
 }

@@ -64,7 +64,6 @@ Future actualizarControlSqLite(
     final todosControles = await DBControles.listarControlesJson(idObjetivo);
 
     if (todosControles.isEmpty) {
-      print('Error: No se encontraron controles');
       return;
     }
 
@@ -83,7 +82,6 @@ Future actualizarControlSqLite(
               convertListUploadFIletoBase64List(photos);
           if (photosBase64 != null) {
             control.setPhotosList(photosBase64);
-            print('✅ ${photosBase64.length} fotos agregadas');
           }
         } else {
           control.photos = null;
@@ -95,7 +93,6 @@ Future actualizarControlSqLite(
               convertListUploadFIletoBase64List(videos);
           if (videosBase64 != null) {
             control.setVideosList(videosBase64);
-            print('✅ ${videosBase64.length} videos agregados');
           }
         } else {
           control.video = null;
@@ -107,7 +104,6 @@ Future actualizarControlSqLite(
               convertListUploadFIletoBase64List(archives);
           if (archivesBase64 != null) {
             control.setArchivesList(archivesBase64);
-            print('✅ ${archivesBase64.length} archivos agregados');
           }
         } else {
           control.archives = null;
@@ -153,7 +149,6 @@ Future actualizarControlSqLite(
 
         // 8️⃣ ACTUALIZAR EN SQLITE
         String resultado = await DBControles.updateControl(control);
-        print('✅ $resultado');
 
         // 8b️⃣ AUTO-SYNC ONLINE: lanzar en background sin bloquear la UI
         // No hacemos await → el usuario ve el resultado inmediatamente,
@@ -169,12 +164,10 @@ Future actualizarControlSqLite(
                 );
                 if (supabaseControls.isNotEmpty) {
                   await syncControlesToSupabase([controlCompleto], supabaseControls);
-                  print('✅ Auto-sync background completado para $idControl');
                 }
               }
             }
           } catch (e) {
-            print('⚠️ Auto-sync background falló (quedará pendiente): $e');
           }
         }();
 
@@ -245,31 +238,18 @@ Future actualizarControlSqLite(
               FFAppState().jsonControles[controlIndex] = controlActualizado;
             });
 
-            print('✅ Control actualizado en FFAppState (índice: $controlIndex)');
           } else {
-            print('⚠️ Control no encontrado en FFAppState');
           }
         } catch (e) {
-          print('⚠️ Error actualizando FFAppState: $e');
         }
 
         // Ya no necesitamos releer desde SQLite porque actualizamos FFAppState directamente
-        print('📊 Control guardado exitosamente');
 
         // Contar attachments desde las listas recibidas
         final photosCount = photos?.length ?? 0;
         final videosCount = videos?.length ?? 0;
         final archivesCount = archives?.length ?? 0;
 
-        print('📊 Fotos agregadas: $photosCount');
-        print('📊 Videos agregados: $videosCount');
-        print('📊 Archivos agregados: $archivesCount');
-        print('📊 Observación: ${control.observacion ?? "N/A"}');
-        print('📊 Gerencia: ${control.gerencia ?? "N/A"}');
-        print('📊 Nivel de Riesgo: ${control.nivelRiesgo ?? "N/A"}');
-        print('📊 Status: ${control.status}');
-        print('📊 Completed: ${control.completed}');
-        print('📊 Finding Status: ${control.findingStatus}');
 
         // 9️⃣ ACTUALIZAR PROGRESS DEL PROYECTO (SOLO SQLite - optimizado)
         // El progress de Supabase se actualiza solo cuando hay conexión al guardar online
@@ -284,13 +264,9 @@ Future actualizarControlSqLite(
             final progressSQLite =
                 await DBProyectos.calcularYActualizarProgressProyecto(
                     projectId);
-            print(
-                '🎯 Progress actualizado: $progressSQLite% (proyecto $projectId)');
           } else {
-            print('⚠️ No se encontró el objetivo ${control.objectiveId}');
           }
         } catch (e) {
-          print('⚠️ Error al actualizar progress: $e');
           // No lanzar error, solo registrar
         }
 
@@ -298,8 +274,6 @@ Future actualizarControlSqLite(
       }
     }
 
-    print('⚠️ Control no encontrado');
   } catch (e) {
-    print('❌ Error al actualizar control: $e');
   }
 }

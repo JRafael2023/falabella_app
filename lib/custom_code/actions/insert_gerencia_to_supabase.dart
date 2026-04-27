@@ -23,7 +23,6 @@ Future<String> insertGerenciaToSupabase(GerenciaStruct gerencia) async {
       'updated_at': DateTime.now().toIso8601String(),
     };
 
-    print('📤 Insertando gerencia en Supabase: ${gerencia.nombre}');
 
     final response =
         await SupaFlow.client.from('Managements').insert(data).select();
@@ -32,7 +31,6 @@ Future<String> insertGerenciaToSupabase(GerenciaStruct gerencia) async {
       final insertedRow = response[0];
       final insertedId = insertedRow['id'] as String;
       final managementId = insertedRow['management_id'] as String? ?? '';
-      print('✅ Gerencia insertada en Supabase con ID: $insertedId, management_id: $managementId');
 
       // También insertar en SQLite con el management_id correcto
       if (managementId.isNotEmpty) {
@@ -44,16 +42,13 @@ Future<String> insertGerenciaToSupabase(GerenciaStruct gerencia) async {
           ),
           fromSupabase: true,
         );
-        print('✅ Gerencia también insertada en SQLite: $managementId');
       }
 
       return managementId.isNotEmpty ? managementId : insertedId;
     } else {
-      print('❌ Error al insertar gerencia en Supabase: response vacío');
       return '';
     }
   } catch (e) {
-    print('❌ Error al insertar gerencia en Supabase: $e');
     return '';
   }
 }

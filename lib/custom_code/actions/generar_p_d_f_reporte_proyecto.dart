@@ -28,7 +28,6 @@ import 'dart:io';
 
 Future<String> generarPDFReporteProyecto(String idProject) async {
   try {
-    print('📄 Generando REPORTE PRELIMINAR DE AUDITORÍA: $idProject');
 
     // ============================================
     // PASO 1: OBTENER DATOS DESDE SQLITE
@@ -98,8 +97,6 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
       }
     }
 
-    print('📊 Objetivos con controles: ${seccionesPorObjetivo.length}');
-    print('📊 Controles inefectivos: $totalInefectivos');
 
     // ============================================
     // PASO 2: CREAR DOCUMENTO PDF
@@ -318,8 +315,6 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
 
     return '✅ Reporte generado';
   } catch (e, stackTrace) {
-    print('❌ Error al generar reporte PDF: $e');
-    print('Stack trace: $stackTrace');
     return '❌ Error al generar reporte: $e';
   }
 }
@@ -402,12 +397,10 @@ Future<List<String>> _obtenerFotosSeguro(String idControl) async {
         final dato = buffer.toString();
         if (dato.isNotEmpty) fotos.add(dato);
       } catch (e) {
-        print('⚠️ Error cargando foto índice $i de $idControl: $e');
       }
     }
     return fotos;
   } catch (e) {
-    print('⚠️ Error obteniendo fotos de $idControl: $e');
     return [];
   }
 }
@@ -436,7 +429,6 @@ List<String> _extraerFotosDesdeControlPhotos(String photosField) {
       if (p.isNotEmpty) result.add(p);
     }
   } catch (e) {
-    print('⚠️ Error parseando photos del control: $e');
   }
   return result;
 }
@@ -466,7 +458,6 @@ Uint8List? _decodeBase64Foto(String b64) {
     }
     return bytes;
   } catch (e) {
-    print('⚠️ Error decodificando foto: $e');
     return null;
   }
 }

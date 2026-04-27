@@ -65,7 +65,6 @@ class _LogsWidgetState extends State<LogsWidget> with WidgetsBindingObserver, In
             todosProyectos.map((p) => p.toJson()).toList().cast<dynamic>();
         FFAppState().jsonUsers = usuarios?.toList().cast<dynamic>() ?? [];
       });
-      print('📊 Logs: ${todosProyectos.length} proyectos cargados para admin');
       safeSetState(() {});
     });
   }
@@ -492,7 +491,6 @@ class _LogsWidgetState extends State<LogsWidget> with WidgetsBindingObserver, In
                                   ),
                                 ],
                               ),
-                              // ── Botón limpiar filtros ─────────────────────
                               Align(
                                 alignment: AlignmentDirectional(-1.0, 0.0),
                                 child: TextButton.icon(

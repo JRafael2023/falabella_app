@@ -40,7 +40,6 @@ Future<String> registerUserSupabaseAuth(
       return 'La contraseña debe tener al menos 6 caracteres';
     }
 
-    print('Intentando registrar usuario con email: $email');
 
     // Registrar usuario en Supabase Auth
     final response = await SupaFlow.client.auth.signUp(
@@ -52,12 +51,9 @@ Future<String> registerUserSupabaseAuth(
       return 'Error al crear el usuario';
     }
 
-    print(
-        'Usuario registrado exitosamente en Supabase Auth. UID: ${response.user!.id}');
 
     return 'OK';
   } on AuthException catch (e) {
-    print('Error de autenticación al registrar: ${e.message}');
 
     if (e.message.contains('User already registered')) {
       return 'El correo ya está registrado';
@@ -69,7 +65,6 @@ Future<String> registerUserSupabaseAuth(
       return 'Error de registro: ${e.message}';
     }
   } catch (e) {
-    print('Error inesperado al registrar: $e');
     return 'Error al registrar usuario: $e';
   }
 }

@@ -54,7 +54,6 @@ Future<String> insertProyectoSQLite(
 
     return "✅ Proyecto insertado correctamente";
   } catch (e) {
-    print('❌ Error insertProyectoSQLite: $e');
     return "❌ Error al insertar proyecto: $e";
   }
 }

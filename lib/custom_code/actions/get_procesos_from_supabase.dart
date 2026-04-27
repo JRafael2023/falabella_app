@@ -20,7 +20,6 @@ import 'package:tottus/custom_code/sqlite_helper.dart';
 /// Obtener todos los procesos desde Supabase
 Future<List<ProcesoStruct>> getProcesosFromSupabase() async {
   try {
-    print('📥 Consultando procesos desde Supabase...');
     final response = await SupaFlow.client
         .from('Processes')
         .select()
@@ -28,17 +27,14 @@ Future<List<ProcesoStruct>> getProcesosFromSupabase() async {
         .order('created_at', ascending: false);
 
     if (response == null) {
-      print('⚠️ No hay procesos en Supabase');
       return [];
     }
 
-    print('📊 Respuesta de Supabase: ${response.length} registros');
 
     final List<ProcesoStruct> procesos = [];
 
     for (var item in (response as List)) {
       try {
-        print('🔄 Procesando: ${item['name']} - ID: ${item['id']}');
         final proceso = ProcesoStruct(
           id: item['id'] as String?,
           idProceso: (item['process_id'] as String?) ?? (item['id'] as String?),
@@ -53,15 +49,11 @@ Future<List<ProcesoStruct>> getProcesosFromSupabase() async {
         );
         procesos.add(proceso);
       } catch (e) {
-        print('❌ Error procesando item: ${item['name']} - Error: $e');
       }
     }
 
-    print(
-        '✅ ${procesos.length} procesos obtenidos exitosamente desde Supabase');
     return procesos;
   } catch (e) {
-    print('❌ Error al obtener procesos desde Supabase: $e');
     return [];
   }
 }

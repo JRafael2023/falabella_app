@@ -34,7 +34,6 @@ class EditEcosistemaWidget extends StatefulWidget {
 class _EditEcosistemaWidgetState extends State<EditEcosistemaWidget> {
   late EditEcosistemaModel _model;
 
-  // ── Error inline ──────────────────────────────────────────────────────────
   String? _errorMsg;
 
   void _mostrarError(String msg) {
@@ -204,7 +203,6 @@ class _EditEcosistemaWidgetState extends State<EditEcosistemaWidget> {
                           ),
                         ].divide(const SizedBox(height: 5.0)),
                       ),
-                      // ── Error inline ──────────────────────────────────────
                       if (_errorMsg != null)
                         Container(
                           width: double.infinity,

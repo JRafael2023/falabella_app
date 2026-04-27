@@ -30,17 +30,14 @@ Future<String> sincronizarTitulosFromSupabase() async {
         await DBTitulo.insertTitulo(titulo, fromSupabase: true);
         sincronizados++;
       } catch (e) {
-        print('❌ Error al sincronizar título a SQLite: $e');
         errores++;
       }
     }
 
     final mensaje =
         '✅ Descarga completada: $sincronizados títulos descargados, $errores errores';
-    print(mensaje);
     return mensaje;
   } catch (e) {
-    print('❌ Error al descargar títulos desde Supabase: $e');
     return 'Error al descargar: $e';
   }
 }

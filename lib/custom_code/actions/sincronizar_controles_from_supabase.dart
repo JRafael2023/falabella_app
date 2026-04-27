@@ -26,7 +26,6 @@ Future<String> sincronizarControlesFromSupabase(
       return 'No hay controles en Supabase';
     }
 
-    print('🔄 Sincronizando ${controlesSupabase.length} controles desde Supabase a SQLite...');
 
     int actualizados = 0;
     int sinCambios = 0;
@@ -167,11 +166,9 @@ Future<String> sincronizarControlesFromSupabase(
           }
         }
       } catch (e) {
-        print('⚠️ Error actualizando control ${controlSupabase.idControl}: $e');
       }
     }
 
-    print('✅ Sincronización completada: $actualizados actualizados, $sinCambios sin cambios');
 
     if (actualizados > 0) {
       return 'Actualizados: $actualizados controles';
@@ -179,7 +176,6 @@ Future<String> sincronizarControlesFromSupabase(
       return 'Sin cambios';
     }
   } catch (e) {
-    print('❌ Error en sincronización: $e');
     return 'Error: $e';
   }
 }

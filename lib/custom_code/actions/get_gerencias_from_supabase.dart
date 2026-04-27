@@ -20,7 +20,6 @@ import 'package:tottus/custom_code/sqlite_helper.dart';
 /// Obtener todas las gerencias desde Supabase
 Future<List<GerenciaStruct>> getGerenciasFromSupabase() async {
   try {
-    print('📥 Consultando gerencias desde Supabase...');
     final response = await SupaFlow.client
         .from('Managements')
         .select()
@@ -28,17 +27,14 @@ Future<List<GerenciaStruct>> getGerenciasFromSupabase() async {
         .order('created_at', ascending: false);
 
     if (response == null) {
-      print('⚠️ No hay gerencias en Supabase');
       return [];
     }
 
-    print('📊 Respuesta de Supabase: ${response.length} registros');
 
     final List<GerenciaStruct> gerencias = [];
 
     for (var item in (response as List)) {
       try {
-        print('🔄 Procesando: ${item['name']} - ID: ${item['id']}');
         final gerencia = GerenciaStruct(
           id: item['id'] as String?,
           idGerencia: (item['management_id'] as String?) ?? (item['id'] as String?),
@@ -53,15 +49,11 @@ Future<List<GerenciaStruct>> getGerenciasFromSupabase() async {
         );
         gerencias.add(gerencia);
       } catch (e) {
-        print('❌ Error procesando item: ${item['name']} - Error: $e');
       }
     }
 
-    print(
-        '✅ ${gerencias.length} gerencias obtenidas exitosamente desde Supabase');
     return gerencias;
   } catch (e) {
-    print('❌ Error al obtener gerencias desde Supabase: $e');
     return [];
   }
 }

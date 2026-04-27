@@ -501,31 +501,21 @@ List<dynamic> filterListReturnList(
   List<dynamic> listControles,
   int? currentIndex,
 ) {
-  print('🔎 filterListReturnList called');
-  print('📦 listControles length: ${listControles.length}');
-  print('📍 currentIndex: $currentIndex');
 
   if (currentIndex == null) {
-    print('⚠️ currentIndex is null → return []');
     return [];
   }
 
   if (currentIndex < 0) {
-    print('❌ currentIndex < 0 → return []');
     return [];
   }
 
   if (currentIndex >= listControles.length) {
-    print(
-      '❌ currentIndex out of range (${currentIndex} >= ${listControles.length}) → return []',
-    );
     return [];
   }
 
   final result = [listControles[currentIndex]];
 
-  print('✅ returning list with 1 element');
-  print('➡️ element: ${listControles[currentIndex]}');
 
   return result;
 }
@@ -545,13 +535,9 @@ dynamic filterAPI(
   String? id,
   dynamic jsonProyectsAPI,
 ) {
-  print('=== INICIO filterAPI ===');
-  print('ID buscado: $id');
-  print('Tipo recibido: ${jsonProyectsAPI.runtimeType}');
 
   // Validar que los parámetros no sean nulos
   if (id == null || jsonProyectsAPI == null) {
-    print('❌ Parámetros nulos');
     return null;
   }
 
@@ -565,37 +551,28 @@ dynamic filterAPI(
       // Estructura completa: {"success":…, "data": {"data": [...]}}
       final level2 = level1['data'];
       if (level2 is List<dynamic>) {
-        print('📦 Estructura completa detectada (data.data)');
         projectsList = level2;
       } else {
-        print('❌ data.data no es una lista');
         return null;
       }
     } else if (level1 is List<dynamic>) {
       // Estructura: {"data": [...]}
-      print('📦 Estructura {"data":[...]} detectada');
       projectsList = level1;
     } else {
-      print('❌ Estructura Map no reconocida: claves=${jsonProyectsAPI.keys}');
       return null;
     }
   } else if (jsonProyectsAPI is List<dynamic>) {
-    print('📋 Recibido como List directamente');
     projectsList = jsonProyectsAPI;
   } else {
-    print('❌ Tipo no válido: ${jsonProyectsAPI.runtimeType}');
     return null;
   }
 
   if (projectsList.isEmpty) {
-    print('❌ Lista de proyectos vacía');
     return null;
   }
 
-  print('Cantidad de proyectos en la lista: ${projectsList.length}');
 
   try {
-    print('🔍 Buscando proyecto con ID: $id');
 
     // Buscar el primer proyecto que coincida con el ID
     final project = projectsList.firstWhere(
@@ -604,22 +581,18 @@ dynamic filterAPI(
         String? projectId = isMap ? project['id'] : null;
         bool matches = projectId == id;
 
-        print('  - Proyecto ID: $projectId, coincide: $matches');
 
         return isMap && matches;
       },
       orElse: () => null,
     );
 
-    print('Proyecto encontrado: ${project != null}');
 
     // Si no se encuentra, retornar null
     if (project == null || project is! Map<String, dynamic>) {
-      print('❌ No se encontró el proyecto o no es un Map válido');
       return null;
     }
 
-    print('📦 Extrayendo campos del proyecto...');
 
     // Extraer solo los campos necesarios
     final result = {
@@ -629,15 +602,10 @@ dynamic filterAPI(
       'opinion': project['attributes']?['opinion'] ?? project['opinion'],
     };
 
-    print('✅ Resultado extraído:');
-    print('  - ID: ${result['id']}');
-    print('  - Name: ${result['name']}');
 
-    print('=== FIN filterAPI ===');
 
     return result; // 👈 Retorna el objeto directamente, NO en lista
   } catch (e) {
-    print('❌ ERROR en filterAPI: $e');
     return null;
   }
 }
@@ -646,11 +614,9 @@ String? getIdWalkthrough(
   String? idControler,
   dynamic jsonControls,
 ) {
-  print('🔍 Buscando walkthrough_id para control: $idControler');
 
   // Validar que los parámetros no sean nulos
   if (idControler == null || jsonControls == null) {
-    print('❌ Parámetros nulos');
     return null;
   }
 
@@ -663,16 +629,13 @@ String? getIdWalkthrough(
     } else if (jsonControls is List<dynamic>) {
       controls = jsonControls;
     } else {
-      print('❌ Formato de jsonControls no válido');
       return null;
     }
 
     if (controls.isEmpty) {
-      print('❌ Lista de controles vacía');
       return null;
     }
 
-    print('📋 Total de controles en la lista: ${controls.length}');
 
     // Buscar el control que coincida con el ID
     final control = controls.firstWhere(
@@ -683,7 +646,6 @@ String? getIdWalkthrough(
         bool matches = controlId == idControler;
 
         if (matches) {
-          print('✅ Control encontrado: $controlId');
         }
 
         return matches;
@@ -692,7 +654,6 @@ String? getIdWalkthrough(
     );
 
     if (control == null) {
-      print('❌ Control con ID $idControler no encontrado');
       return null;
     }
 
@@ -701,14 +662,11 @@ String? getIdWalkthrough(
         control['relationships']?['walkthrough']?['data']?['id']?.toString();
 
     if (walkthroughId == null || walkthroughId.isEmpty) {
-      print('❌ walkthrough_id no encontrado en el control');
       return null;
     }
 
-    print('✅ walkthrough_id encontrado: $walkthroughId');
     return walkthroughId;
   } catch (e) {
-    print('❌ Error en getIdWalkthrough: $e');
     return null;
   }
 }
@@ -731,7 +689,6 @@ int calcularPorcentaje(List<dynamic>? jsonControles) {
 
     return porcentaje.round();
   } catch (e) {
-    print('Error calculando porcentaje: $e');
     return 0;
   }
 }
@@ -818,8 +775,6 @@ List<ProyectoStruct>? convertJsontoDataProyecto(List<dynamic>? jsonProyectos) {
 
   // Verificar que sea una lista
   if (jsonProyectos is! List<dynamic>) {
-    print(
-        'Error: jsonProyectos no es una lista. Tipo recibido: ${jsonProyectos.runtimeType}');
     return [];
   }
 
@@ -843,7 +798,6 @@ List<ProyectoStruct>? convertJsontoDataProyecto(List<dynamic>? jsonProyectos) {
         status: json['status'] ?? true,
       ));
     } catch (e) {
-      print('Error converting proyecto: $e');
     }
   }
 
@@ -855,8 +809,6 @@ List<MatricesStruct>? convertJsontoDataMatriz(List<dynamic>? jsonMatriz) {
 
   // Verificar que sea una lista
   if (jsonMatriz is! List<dynamic>) {
-    print(
-        'Error: jsonMatriz no es una lista. Tipo recibido: ${jsonMatriz.runtimeType}');
     return [];
   }
 
@@ -873,7 +825,6 @@ List<MatricesStruct>? convertJsontoDataMatriz(List<dynamic>? jsonMatriz) {
         status: json['status'] ?? true,
       ));
     } catch (e) {
-      print('Error converting matriz: $e');
     }
   }
 
@@ -903,7 +854,6 @@ List<dynamic>? convertDocumentProjects(List<ProjectsRow>? supabaseProject) {
         'status': row.status ?? true,
       });
     } catch (e) {
-      print('Error converting project row: $e');
     }
   }
 
@@ -944,7 +894,6 @@ List<dynamic>? convetDocumentControls(List<ControlsRow>? rowsControls) {
         'control_text': row.controlText,
       });
     } catch (e) {
-      print('Error converting control row: $e');
     }
   }
 
@@ -1010,8 +959,6 @@ List<String>? convertListUploadFIletoBase64List(List<FFUploadedFile> uploads) {
           String base64String = base64Encode(upload.bytes!);
           double sizeMB = upload.bytes!.length / 1024 / 1024;
 
-          print('📹 Video (sin comprimir): ${upload.name}');
-          print('   Tamaño: ${sizeMB.toStringAsFixed(2)}MB');
 
           base64List.add(base64String);
         } else {
@@ -1025,14 +972,10 @@ List<String>? convertListUploadFIletoBase64List(List<FFUploadedFile> uploads) {
           double compressionRatio =
               (1 - (compressedBytes.length / upload.bytes!.length)) * 100;
 
-          print('✅ Comprimido: ${upload.name}');
-          print(
-              '   Original: ${originalSizeMB.toStringAsFixed(2)}MB → Comprimido: ${compressedSizeMB.toStringAsFixed(2)}MB (${compressionRatio.toStringAsFixed(1)}% reducción)');
 
           base64List.add(finalString);
         }
       } catch (e) {
-        print('❌ Error procesando ${upload.name}: $e');
         // Si falla, guardar sin comprimir
         String base64String = base64Encode(upload.bytes!);
         base64List.add(base64String);
@@ -1075,17 +1018,12 @@ List<String>? decompressGzipBase64List(List<String>? compressedList) {
         String decompressedBase64 = base64Encode(decompressedBytes);
 
         decompressedList.add(decompressedBase64);
-        print(
-            '✅ Archivo descomprimido para HighBond (${(decompressedBytes.length / 1024 / 1024).toStringAsFixed(2)}MB)');
       } else {
         // Ya está en base64 puro (videos, etc.), agregar tal cual
         final sizeMB = (item.length * 0.75) / 1024 / 1024; // Estimado de base64
         decompressedList.add(item);
-        print(
-            'ℹ️ Archivo ya está en base64 puro (${sizeMB.toStringAsFixed(2)}MB) - probablemente un video');
       }
     } catch (e) {
-      print('❌ Error procesando archivo: $e');
       // Si falla, intentar usar el original
       decompressedList.add(item);
     }
@@ -1342,11 +1280,9 @@ List<String> getAuditoresUserIds(List<dynamic> jsonUsers) {
           // El rol es un string directo, no un objeto
           String? rol = user['role']?.toString();
 
-          print('📦 Usuario: ${user['display_name']}, Rol: $rol');
 
           return rol == 'usuario';
         } catch (e) {
-          print('❌ Error procesando usuario: $e');
           return false;
         }
       })
@@ -1360,7 +1296,6 @@ List<String> getAuditoresUserIds(List<dynamic> jsonUsers) {
       .where((id) => id.isNotEmpty)
       .toList();
 
-  print('✅ Auditores encontrados: ${auditores.length}');
   return auditores;
 }
 
@@ -1472,7 +1407,6 @@ Uint8List _decodeBase64WithDecompression(String base64Data) {
       return base64Decode(cleanBase64);
     }
   } catch (e) {
-    print('❌ Error decodificando base64: $e');
     // Si falla completamente, retornar un array vacío en lugar de crashear
     return Uint8List(0);
   }
@@ -1531,29 +1465,24 @@ List<FFUploadedFile>? convertBase64StringToUploadFiles(
             ));
           }
         } catch (e) {
-          print('Error processing item $i: $e');
         }
       }
 
       return uploadFiles.isEmpty ? null : uploadFiles;
     } catch (e) {
-      print('Error parsing array format: $e');
     }
   }
 
   // Intentar parsear como JSON válido (formato: [{"name":..., "size":..., "base64":...}])
   try {
     if (base64String.trim().startsWith('[')) {
-      print('🔍 Intentando parsear JSON array...');
       final List<dynamic> jsonList = jsonDecode(base64String);
-      print('✅ JSON parseado exitosamente: ${jsonList.length} items');
 
       for (var item in jsonList) {
         try {
           String base64Data = item['base64'] ?? '';
           String fileName = item['name'] ?? '${fileType}_file';
 
-          print('📄 Procesando archivo: $fileName (base64 length: ${base64Data.length})');
 
           if (base64Data.isNotEmpty) {
             var bytes = _decodeBase64WithDecompression(base64Data);
@@ -1561,18 +1490,14 @@ List<FFUploadedFile>? convertBase64StringToUploadFiles(
               name: fileName,
               bytes: bytes,
             ));
-            print('✅ Archivo agregado: $fileName (${bytes.length} bytes)');
           }
         } catch (e) {
-          print('❌ Error processing JSON item: $e');
         }
       }
 
-      print('📊 Total archivos procesados: ${uploadFiles.length}');
       return uploadFiles.isEmpty ? null : uploadFiles;
     }
   } catch (e) {
-    print('❌ Not JSON format, trying legacy format: $e');
   }
 
   // Formato legacy: base64|||base64|||base64
@@ -1668,7 +1593,6 @@ List<FFUploadedFile>? convertBase64StringToUploadFiles(
         bytes: bytes,
       ));
     } catch (e) {
-      print('Error: $e');
     }
   }
 
@@ -1744,7 +1668,6 @@ String? convertirJSONaFormatoSQLite(dynamic jsonData) {
 
     return null;
   } catch (e) {
-    print('Error en convertirJSONaFormatoSQLite: $e');
     return null;
   }
 }
@@ -1833,13 +1756,11 @@ dynamic convertirFormatoSQLiteAJSON(String? sqliteData) {
 
         index++;
       } catch (e) {
-        print('Error procesando item: $e');
       }
     }
 
     return jsonList.isEmpty ? null : jsonList;
   } catch (e) {
-    print('Error en convertirFormatoSQLiteAJSON: $e');
     return null;
   }
 }

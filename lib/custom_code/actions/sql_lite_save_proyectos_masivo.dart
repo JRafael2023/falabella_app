@@ -26,7 +26,6 @@ Future<String> sqlLiteSaveProyectosMasivo(
 
     final countLocal = await DBProyectos.contarProyectos();
 
-    print('📊 SQLite: $countLocal | Supabase: ${rowsSupabase.length}');
 
     // Convertir ProjectsRow directamente a Proyecto usando fromProjectsRow
 
@@ -35,14 +34,11 @@ Future<String> sqlLiteSaveProyectosMasivo(
     }).toList();
 
     if (countLocal == 0) {
-      print('🔥 Sync completo');
       return await DBProyectos.insertProyectosMasivos(proyectos);
     } else {
-      print('🔄 Sync incremental');
       return await DBProyectos.insertProyectosIncrementales(proyectos);
     }
   } catch (e) {
-    print('❌ Error: $e');
     return "Error: $e";
   }
 }

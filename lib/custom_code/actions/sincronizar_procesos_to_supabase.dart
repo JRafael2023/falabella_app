@@ -26,7 +26,6 @@ Future<String> sincronizarProcesosToSupabase() async {
     );
 
     if (result.isEmpty) {
-      print('✅ No hay procesos pendientes por sincronizar');
       return 'No hay procesos pendientes por sincronizar';
     }
 
@@ -56,17 +55,14 @@ Future<String> sincronizarProcesosToSupabase() async {
           errores++;
         }
       } catch (e) {
-        print('❌ Error al sincronizar proceso: $e');
         errores++;
       }
     }
 
     final mensaje =
         '✅ Sincronización completada: $sincronizados procesos sincronizados, $errores errores';
-    print(mensaje);
     return mensaje;
   } catch (e) {
-    print('❌ Error en sincronización de procesos: $e');
     return 'Error en sincronización: $e';
   }
 }

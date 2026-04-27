@@ -27,10 +27,8 @@ Future<bool> updateProcesoInSupabase(ProcesoStruct proceso) async {
         .update(data)
         .eq('id', proceso.idProceso!);
 
-    print('✅ Proceso actualizado en Supabase');
     return true;
   } catch (e) {
-    print('❌ Error al actualizar proceso en Supabase: $e');
     return false;
   }
 }

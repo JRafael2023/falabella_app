@@ -20,7 +20,6 @@ import 'package:tottus/custom_code/Objetivo.dart';
 
 Future<List<ControlsRow>> obtenerControlesPorUsuario(String userId) async {
   try {
-    print('🔍 Obteniendo controles para usuario: $userId');
 
     // 1. Obtener PROYECTOS del usuario desde SUPABASE
     final proyectosSupabase = await ProjectsTable().queryRows(
@@ -28,11 +27,9 @@ Future<List<ControlsRow>> obtenerControlesPorUsuario(String userId) async {
     );
 
     if (proyectosSupabase.isEmpty) {
-      print('⚠️ No hay proyectos asignados a este usuario');
       return [];
     }
 
-    print('📊 Proyectos encontrados: ${proyectosSupabase.length}');
 
     // 2. Extraer IDs de proyectosa
     final idsProyectos = proyectosSupabase
@@ -41,7 +38,6 @@ Future<List<ControlsRow>> obtenerControlesPorUsuario(String userId) async {
         .toList();
 
     if (idsProyectos.isEmpty) {
-      print('⚠️ No hay IDs de proyectos válidos');
       return [];
     }
 
@@ -55,11 +51,9 @@ Future<List<ControlsRow>> obtenerControlesPorUsuario(String userId) async {
     }
 
     if (objetivosSQLite.isEmpty) {
-      print('⚠️ No hay objetivos en SQLite para estos proyectos');
       return [];
     }
 
-    print('📊 Objetivos encontrados: ${objetivosSQLite.length}');
 
     // 4. Extraer IDs de objetivos
     final idsObjetivos = objetivosSQLite
@@ -77,18 +71,14 @@ Future<List<ControlsRow>> obtenerControlesPorUsuario(String userId) async {
             queryFn: (q) => q!.eq('id_objective', id),
           );
         } catch (e) {
-          print('⚠️ Error/timeout descargando controles del objetivo $id: $e');
           return <ControlsRow>[];
         }
       }),
     );
     final controlesSupabase = resultadosPorObjetivo.expand((r) => r).toList();
 
-    print('📊 Controles encontrados: ${controlesSupabase.length}');
     return controlesSupabase;
   } catch (e, stackTrace) {
-    print('❌ Error obteniendo controles: $e');
-    print('Stack trace: $stackTrace');
     return [];
   }
 }

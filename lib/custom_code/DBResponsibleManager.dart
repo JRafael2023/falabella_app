@@ -16,7 +16,6 @@ class DBResponsibleManager {
           conflictAlgorithm: ConflictAlgorithm.replace);
       return result > 0 ? "ResponsibleManager agregado correctamente" : "Error: No se pudo agregar";
     } catch (e) {
-      print('Error al insertar ResponsibleManager: $e');
       return "Error al insertar ResponsibleManager: $e";
     }
   }
@@ -36,7 +35,6 @@ class DBResponsibleManager {
       );
       return result > 0 ? "ResponsibleManager actualizado correctamente" : "Error: No se pudo actualizar";
     } catch (e) {
-      print('Error al actualizar ResponsibleManager: $e');
       return "Error al actualizar ResponsibleManager: $e";
     }
   }
@@ -52,7 +50,6 @@ class DBResponsibleManager {
       );
       return result > 0 ? "ResponsibleManager eliminado correctamente" : "Error: No se pudo eliminar";
     } catch (e) {
-      print('Error al eliminar ResponsibleManager: $e');
       return "Error al eliminar ResponsibleManager: $e";
     }
   }
@@ -67,7 +64,6 @@ class DBResponsibleManager {
           orderBy: 'name ASC');
       return result.map((row) => ResponsibleManager.fromMap(row)).toList();
     } catch (e) {
-      print('Error al obtener ResponsibleManagers: $e');
       return [];
     }
   }
@@ -84,7 +80,6 @@ class DBResponsibleManager {
       }
       return "Se insertaron $count de ${supabaseData.length} ResponsibleManagers";
     } catch (e) {
-      print('Error insertBatchFromSupabase ResponsibleManager: $e');
       return "Error: $e";
     }
   }

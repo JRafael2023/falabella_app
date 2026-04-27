@@ -20,7 +20,6 @@ import 'package:open_file/open_file.dart';
 
 Future openArchive(FFUploadedFile? archive) async {
   if (archive == null || archive.bytes == null) {
-    print('❌ Archivo vacío o nulo');
     return;
   }
 
@@ -31,7 +30,6 @@ Future openArchive(FFUploadedFile? archive) async {
       final base64Data = base64Encode(archive.bytes!);
       final dataUrl = 'data:$mimeType;base64,$base64Data';
       await launchURL(dataUrl);
-      print('✅ Archivo abierto en WEB');
       return;
     }
 
@@ -44,18 +42,14 @@ Future openArchive(FFUploadedFile? archive) async {
     // Guardar bytes en archivo temporal
     final file = File(filePath);
     await file.writeAsBytes(archive.bytes!);
-    print('📁 Archivo guardado en: $filePath');
 
     // Abrir el archivo con la app predeterminada
     final result = await OpenFile.open(filePath);
 
     if (result.type == ResultType.done) {
-      print('✅ Archivo abierto correctamente');
     } else {
-      print('⚠️ No se pudo abrir: ${result.message}');
     }
   } catch (e) {
-    print('❌ Error al abrir archivo: $e');
   }
 }
 

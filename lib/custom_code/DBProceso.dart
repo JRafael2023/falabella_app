@@ -37,7 +37,6 @@ class DBProceso {
         return "Error: No se pudo agregar al Proceso";
       }
     } catch (e) {
-      print('Error al insertar proceso: $e');
       return "Error al insertar proceso: $e";
     }
   }
@@ -71,7 +70,6 @@ class DBProceso {
         return "Error: No se pudo actualizar el Proceso";
       }
     } catch (e) {
-      print('Error al actualizar proceso: $e');
       return "Error al actualizar proceso: $e";
     }
   }
@@ -96,7 +94,6 @@ class DBProceso {
         return "Error: No se pudo eliminar el Proceso";
       }
     } catch (e) {
-      print('Error al eliminar proceso: $e');
       return "Error al eliminar proceso: $e";
     }
   }
@@ -121,7 +118,6 @@ class DBProceso {
 
       return null;
     } catch (e) {
-      print('Error al obtener proceso por ID: $e');
       return null;
     }
   }
@@ -153,7 +149,6 @@ class DBProceso {
 
       return result.map((row) => metodoconvertidor(row)).toList();
     } catch (e) {
-      print('Error al obtener todos los procesos: $e');
       return [];
     }
   }
@@ -197,7 +192,6 @@ class DBProceso {
 
       return "Se insertaron $insertedCount procesos de ${procesos.length} correctamente";
     } catch (e) {
-      print('Error al insertar batch desde Supabase: $e');
       return "Error al insertar batch: $e";
     }
   }

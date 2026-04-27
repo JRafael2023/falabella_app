@@ -24,14 +24,12 @@ Future cargarDatosConCacheInteligente(
   bool forceFullSync = false,
 }) async {
   try {
-    print('🚀 Carga inteligente iniciada');
 
     // ============================================
     // VERIFICAR CONECTIVIDAD ANTES DE LLAMAR SUPABASE
     // ============================================
     final estaConectado = await checkInternetConecction();
     if (!estaConectado) {
-      print('📴 Sin conexión - saltando carga inteligente (modo offline)');
       return;
     }
 
@@ -43,7 +41,6 @@ Future cargarDatosConCacheInteligente(
     if (userRole.isEmpty) {
       // Fallback: intentar obtener de Supabase solo si userId es válido
       if (userId.isEmpty || userId == 'null') {
-        print('❌ userId inválido y sin rol en FFAppState - abortando');
         return;
       }
       try {
@@ -51,11 +48,9 @@ Future cargarDatosConCacheInteligente(
           queryFn: (q) => q!.eq('id', userId),
         );
         if (usuarioData.isEmpty) {
-          print('❌ Usuario no encontrado');
           return;
         }
       } catch (e) {
-        print('❌ Error obteniendo usuario: $e');
         return;
       }
     }
@@ -66,7 +61,6 @@ Future cargarDatosConCacheInteligente(
     if (!puedeUsarAPIs) {
       // Cargar solo desde cache/Supabase
       await _cargarRapidoDesdeCache(userId);
-      print('✅ Carga rápida completada');
       return;
     }
 
@@ -95,7 +89,6 @@ Future cargarDatosConCacheInteligente(
     final cacheExpirado = horasDesdeUltimaSync >= 8;
 
     if (cacheExpirado) {
-      print('⏰ Caché expirado (${horasDesdeUltimaSync.toStringAsFixed(1)}h) → sync completa');
     }
 
     // Detectar proyectos asignados que no tienen objetivos en FFAppState.
@@ -114,7 +107,6 @@ Future cargarDatosConCacheInteligente(
         if (idProyecto.isEmpty) continue;
         if (!idsConObjetivos.contains(idProyecto)) {
           hayProyectosNuevos = true;
-          print('🆕 Proyecto sin objetivos detectado: $idProyecto → forzando full sync');
           break;
         }
       }
@@ -134,7 +126,6 @@ Future cargarDatosConCacheInteligente(
         if (idObj.isEmpty) continue;
         if (!idsConControles.contains(idObj)) {
           hayObjetivosSinControles = true;
-          print('⚠️ Objetivo sin controles: ${obj['title']} ($idObj) → forzando full sync');
           break;
         }
       }
@@ -143,23 +134,19 @@ Future cargarDatosConCacheInteligente(
     final necesitaSyncCompleta = !tieneDatos || cacheExpirado || forceFullSync || hayProyectosNuevos || hayObjetivosSinControles;
 
     if (necesitaSyncCompleta) {
-      print('🔄 Sincronización completa iniciada');
 
       // Llamar a la función completa existente
       await cargarTodosLosDatosUsuario(userId);
 
       // Guardar timestamp de sync completa
       await prefs.setInt(cacheKey, ahora);
-      print('✅ Sincronización completa finalizada');
 
     } else {
       await _cargarRapidoDesdeCache(userId);
     }
 
-    print('✅ Carga inteligente completada');
 
   } catch (e) {
-    print('❌ Error en carga inteligente: $e');
     // No relanzar el error para no bloquear el flujo offline
   }
 }
@@ -171,8 +158,6 @@ Future _cargarRapidoDesdeCache(String userId) async {
   try {
     // Actualizar AppState con los datos que ya están en SQLite/FFAppState
     FFAppState().update(() {});
-    print('✅ Carga rápida: datos ya en FFAppState');
   } catch (e) {
-    print('❌ Error en carga rápida: $e');
   }
 }

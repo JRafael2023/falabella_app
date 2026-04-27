@@ -25,7 +25,6 @@ Future<bool> deleteGerenciaInSupabase(String gerenciaId) async {
 
     // Online: eliminó en Supabase → eliminar también de SQLite
     await DBGerencia.deleteGerencia(gerenciaId);
-    print('✅ Gerencia eliminada en Supabase y SQLite: $gerenciaId');
     return true;
   } catch (e) {
     // Offline: marcar como pendiente de eliminar en SQLite
@@ -37,10 +36,8 @@ Future<bool> deleteGerenciaInSupabase(String gerenciaId) async {
         where: 'idGerencia = ?',
         whereArgs: [gerenciaId],
       );
-      print('📌 Gerencia marcada como pendienteEliminar (offline): $gerenciaId');
       return true;
     } catch (e2) {
-      print('❌ Error al marcar gerencia como pendienteEliminar: $e2');
       return false;
     }
   }

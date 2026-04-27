@@ -21,7 +21,6 @@ class DBImpactType {
           ? "ImpactType agregado correctamente"
           : "Error: No se pudo agregar el ImpactType";
     } catch (e) {
-      print('Error al insertar ImpactType: $e');
       return "Error al insertar ImpactType: $e";
     }
   }
@@ -46,7 +45,6 @@ class DBImpactType {
           ? "ImpactType actualizado correctamente"
           : "Error: No se pudo actualizar el ImpactType";
     } catch (e) {
-      print('Error al actualizar ImpactType: $e');
       return "Error al actualizar ImpactType: $e";
     }
   }
@@ -66,7 +64,6 @@ class DBImpactType {
           ? "ImpactType eliminado correctamente"
           : "Error: No se pudo eliminar el ImpactType";
     } catch (e) {
-      print('Error al eliminar ImpactType: $e');
       return "Error al eliminar ImpactType: $e";
     }
   }
@@ -81,7 +78,6 @@ class DBImpactType {
           orderBy: 'name ASC');
       return result.map((row) => ImpactType.fromMap(row)).toList();
     } catch (e) {
-      print('Error al obtener ImpactTypes: $e');
       return [];
     }
   }
@@ -99,7 +95,6 @@ class DBImpactType {
       }
       return "Se insertaron $count de ${supabaseData.length} ImpactTypes";
     } catch (e) {
-      print('Error insertBatchFromSupabase ImpactType: $e');
       return "Error: $e";
     }
   }

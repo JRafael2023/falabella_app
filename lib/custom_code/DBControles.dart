@@ -43,7 +43,6 @@ class DBControles {
         return "Error: No se pudo agregar al Control";
       }
     } catch (e) {
-      print('Error al insertar control: $e');
       return "Error al insertar control: $e";
     }
   }
@@ -103,17 +102,13 @@ class DBControles {
     try {
       // Intentar con columnas v19
       final maps = await _query([..._colsBase, ..._colsV19]);
-      print("✅ listarControlesJson v19: ${maps.length} controles");
       return _buildResult(maps);
     } catch (_) {
       // Fallback: DB antigua sin columnas v19 (migración pendiente)
       try {
-        print("⚠️ listarControlesJson fallback sin v19 para $idObjetivo");
         final maps = await _query(_colsBase);
-        print("✅ listarControlesJson base: ${maps.length} controles");
         return _buildResult(maps);
       } catch (e) {
-        print("❌ Error al listar controles: $e");
         return [];
       }
     }
@@ -163,19 +158,16 @@ class DBControles {
           final p = await DBControlAttachments.obtenerPhotos(idControl);
           photos = p.isEmpty ? '' : p.join('|||');
         } catch (e) {
-          print("⚠️ CursorWindow photos $idControl: $e");
         }
         try {
           final v = await DBControlAttachments.obtenerVideos(idControl);
           video = v.isEmpty ? '' : v.join('|||');
         } catch (e) {
-          print("⚠️ CursorWindow video $idControl: $e");
         }
         try {
           final a = await DBControlAttachments.obtenerArchives(idControl);
           archives = a.isEmpty ? '' : a.join('|||');
         } catch (e) {
-          print("⚠️ CursorWindow archives $idControl: $e");
         }
 
         return {
@@ -189,7 +181,6 @@ class DBControles {
 
       return null;
     } catch (e) {
-      print("Error al obtener control completo: $e");
       return null;
     }
   }
@@ -216,7 +207,6 @@ class DBControles {
 
       return null;
     } catch (e) {
-      print("Error al obtener control_text: $e");
       return null;
     }
   }
@@ -231,12 +221,10 @@ class DBControles {
       // Realizamos una consulta con un filtro WHERE basado en idControl
       final List<Map<String, dynamic>> maps = await database.query('Controles');
 
-      print("Éxito: ${maps.length} controles encontrados");
 
       // Retornamos la lista de resultados filtrados
       return ("Éxito: ${maps.length} controles encontrados");
     } catch (e) {
-      print("Error al listar controles: $e");
       return ("Error al listar controles: $e");
     }
   }
@@ -253,7 +241,6 @@ class DBControles {
       // 🛡️ SAFETY: Never delete existing controls if the new list is empty.
       // This prevents data loss when a Supabase fetch times out or returns nothing.
       if (controles.isEmpty) {
-        print('⚠️ insertControlesMasivos: lista vacía para $objectiveId — sin cambios para proteger datos existentes');
         return 'Sin cambios (lista vacía)';
       }
 
@@ -306,13 +293,11 @@ class DBControles {
               control.toMap(),
             );
           } catch (e) {
-            print('Error al insertar control ${control.idControl}: $e');
           }
         }
       });
 
       // 3️⃣ GUARDAR ATTACHMENTS FUERA DE LA TRANSACCIÓN
-      print('💾 Guardando ${attachmentsToSave.length} controles con attachments...');
       for (var attachment in attachmentsToSave) {
         final idControl = attachment['idControl'] as String;
         final photos = attachment['photos'] as List<String>;
@@ -332,7 +317,6 @@ class DBControles {
 
       return "Controles eliminados y sincronizados correctamente";
     } catch (e) {
-      print('Error en la sincronización de controles: $e');
       return "Error en la sincronización de controles: $e";
     }
   }
@@ -391,7 +375,6 @@ class DBControles {
         return "Error: No se encontró el control para actualizar";
       }
     } catch (e) {
-      print('Error al actualizar control: $e');
       return "Error al actualizar control: $e";
     }
   }
@@ -429,7 +412,6 @@ class DBControles {
         whereArgs: [idObjetivo],
       );
     } catch (e) {
-      print('❌ Error listarControlesPendientesSync: $e');
       return [];
     }
   }
@@ -445,7 +427,6 @@ class DBControles {
       await database.execute('DROP TABLE IF EXISTS Controles');
       return "Tabla 'Controles' eliminada correctamente";
     } catch (e) {
-      print('Error al eliminar la tabla Controles: $e');
       return "Error al eliminar la tabla Controles: $e";
     }
   }

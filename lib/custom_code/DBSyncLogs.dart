@@ -30,10 +30,8 @@ class DBSyncLogs {
         'created_at': DateTime.now().toIso8601String(),
       });
 
-      print('SyncLog insertado: $syncId');
       return syncId;
     } catch (e) {
-      print('Error al insertar SyncLog: $e');
       return '';
     }
   }
@@ -63,9 +61,7 @@ class DBSyncLogs {
         whereArgs: [syncId],
       );
 
-      print('SyncLog actualizado: $syncId -> $syncStatus');
     } catch (e) {
-      print('Error al actualizar SyncLog: $e');
     }
   }
 
@@ -95,7 +91,6 @@ class DBSyncLogs {
 
       return maps;
     } catch (e) {
-      print('Error al listar SyncLogs: $e');
       return [];
     }
   }
@@ -114,7 +109,6 @@ class DBSyncLogs {
 
       return maps;
     } catch (e) {
-      print('Error al listar logs pendientes: $e');
       return [];
     }
   }
@@ -131,9 +125,7 @@ class DBSyncLogs {
         whereArgs: [syncId],
       );
 
-      print('SyncLog marcado como subido: $syncId');
     } catch (e) {
-      print('Error al marcar SyncLog como subido: $e');
     }
   }
 
@@ -165,7 +157,6 @@ class DBSyncLogs {
       }
       return null;
     } catch (e) {
-      print('Error al obtener ultimo sync: $e');
       return null;
     }
   }

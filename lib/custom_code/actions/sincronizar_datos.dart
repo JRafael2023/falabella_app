@@ -22,8 +22,6 @@ import 'package:tottus/custom_code/DBUsuarios.dart';
 
 Future<bool> sincronizarDatos(bool conectado) async {
   try {
-    print('🔄 Iniciando sincronización de datos...');
-    print('📡 Estado de conexión recibido: $conectado');
 
     // ========================================
     // 📊 CONTAR DATOS DESDE SQLITE
@@ -36,18 +34,14 @@ Future<bool> sincronizarDatos(bool conectado) async {
       // Contar Matrices (Proyectos)
       List<dynamic> proyectosJson = await DBProyectos.listarProyectos();
       totalMatrices = proyectosJson.length;
-      print('📊 Matrices encontradas: $totalMatrices');
     } catch (e) {
-      print('⚠️ Error contando matrices: $e');
       totalMatrices = 0;
     }
 
     try {
       // Contar Usuarios
       totalUsuarios = await DBUsuarios.contarUsuarios();
-      print('👥 Usuarios encontrados: $totalUsuarios');
     } catch (e) {
-      print('⚠️ Error contando usuarios: $e');
       totalUsuarios = 0;
     }
 
@@ -61,9 +55,7 @@ Future<bool> sincronizarDatos(bool conectado) async {
         FFAppState().matricesCargadas = totalMatrices;
         FFAppState().usuariosRegistrados = totalUsuarios;
       });
-      print('✅ App State actualizado correctamente');
     } catch (e) {
-      print('⚠️ Error actualizando App State: $e');
     }
 
     // ========================================
@@ -77,15 +69,12 @@ Future<bool> sincronizarDatos(bool conectado) async {
         '👥 Usuarios: $totalUsuarios\n'
         '🕐 ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())}';
 
-    print(mensaje);
 
     // ========================================
     // ✅ RETORNAR ESTADO DE CONEXIÓN
     // ========================================
     return conectado;
   } catch (e, stackTrace) {
-    print('❌ Error crítico en sincronización: $e');
-    print('📍 Stack trace: $stackTrace');
 
     // Intentar al menos establecer valores por defecto
     try {
@@ -94,7 +83,6 @@ Future<bool> sincronizarDatos(bool conectado) async {
         FFAppState().usuariosRegistrados = 0;
       });
     } catch (e2) {
-      print('❌ Error crítico en fallback: $e2');
     }
 
     // Retornar false porque hubo error

@@ -112,7 +112,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
     super.dispose();
   }
 
-  // ── Helper para construir un TextFormField estilizado ──────────────────────
   InputDecoration _inputDeco(BuildContext context) {
     return InputDecoration(
       isDense: true,
@@ -191,7 +190,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
         );
   }
 
-  // ── Modal del formulario de creación de usuario ───────────────────────────
   // rootContext = contexto del Scaffold principal, para mostrar SnackBars correctamente
   // refresh = setState del widget padre para refrescar dropdowns correctamente
   Widget _buildFormUsuario(BuildContext context, BuildContext rootContext, {VoidCallback? refresh}) {
@@ -257,7 +255,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // ── Nombre ──────────────────────────────────────
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,7 +279,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                               ),
                             ].divide(SizedBox(height: 5.0)),
                           ),
-                          // ── Correo ──────────────────────────────────────
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,7 +303,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                               ),
                             ].divide(SizedBox(height: 5.0)),
                           ),
-                          // ── Id Usuario (auto-generado, solo lectura) ────
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,7 +343,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                               ),
                             ].divide(SizedBox(height: 5.0)),
                           ),
-                          // ── Contraseña ──────────────────────────────────
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,7 +382,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                               ),
                             ].divide(SizedBox(height: 5.0)),
                           ),
-                          // ── País ────────────────────────────────────────
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,7 +446,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                               ),
                             ].divide(SizedBox(height: 5.0)),
                           ),
-                          // ── Rol ─────────────────────────────────────────
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -499,7 +491,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                               ),
                             ].divide(SizedBox(height: 5.0)),
                           ),
-                          // ── Mensaje de error inline ──────────────────────
                           if (_errorMsg != null)
                             Container(
                               width: double.infinity,
@@ -526,7 +517,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                                 ],
                               ),
                             ),
-                          // ── Botón Guardar ────────────────────────────────
                           Row(
                             mainAxisSize: MainAxisSize.max,
                             children: [

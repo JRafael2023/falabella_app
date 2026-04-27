@@ -16,7 +16,6 @@ class DBResponsibleAuditor {
           conflictAlgorithm: ConflictAlgorithm.replace);
       return result > 0 ? "ResponsibleAuditor agregado correctamente" : "Error: No se pudo agregar";
     } catch (e) {
-      print('Error al insertar ResponsibleAuditor: $e');
       return "Error al insertar ResponsibleAuditor: $e";
     }
   }
@@ -36,7 +35,6 @@ class DBResponsibleAuditor {
       );
       return result > 0 ? "ResponsibleAuditor actualizado correctamente" : "Error: No se pudo actualizar";
     } catch (e) {
-      print('Error al actualizar ResponsibleAuditor: $e');
       return "Error al actualizar ResponsibleAuditor: $e";
     }
   }
@@ -52,7 +50,6 @@ class DBResponsibleAuditor {
       );
       return result > 0 ? "ResponsibleAuditor eliminado correctamente" : "Error: No se pudo eliminar";
     } catch (e) {
-      print('Error al eliminar ResponsibleAuditor: $e');
       return "Error al eliminar ResponsibleAuditor: $e";
     }
   }
@@ -67,7 +64,6 @@ class DBResponsibleAuditor {
           orderBy: 'name ASC');
       return result.map((row) => ResponsibleAuditor.fromMap(row)).toList();
     } catch (e) {
-      print('Error al obtener ResponsibleAuditors: $e');
       return [];
     }
   }
@@ -84,7 +80,6 @@ class DBResponsibleAuditor {
       }
       return "Se insertaron $count de ${supabaseData.length} ResponsibleAuditors";
     } catch (e) {
-      print('Error insertBatchFromSupabase ResponsibleAuditor: $e');
       return "Error: $e";
     }
   }

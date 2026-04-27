@@ -36,7 +36,6 @@ class EditProcesoWidget extends StatefulWidget {
 class _EditProcesoWidgetState extends State<EditProcesoWidget> {
   late EditProcesoModel _model;
 
-  // ── Error inline ──────────────────────────────────────────────────────────
   String? _errorMsg;
 
   void _mostrarError(String msg) {
@@ -253,7 +252,6 @@ class _EditProcesoWidgetState extends State<EditProcesoWidget> {
                           ),
                         ].divide(SizedBox(height: 5.0)),
                       ),
-                      // ── Error inline ──────────────────────────────────────
                       if (_errorMsg != null)
                         Container(
                           width: double.infinity,

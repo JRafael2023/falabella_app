@@ -25,7 +25,6 @@ Future<bool> deleteEcosistemaInSupabase(String ecosistemaId) async {
 
     // Online: eliminó en Supabase → eliminar también de SQLite
     await DBEcosistema.deleteEcosistema(ecosistemaId);
-    print('✅ Ecosistema eliminado en Supabase y SQLite: $ecosistemaId');
     return true;
   } catch (e) {
     // Offline: marcar como pendiente de eliminar en SQLite
@@ -37,10 +36,8 @@ Future<bool> deleteEcosistemaInSupabase(String ecosistemaId) async {
         where: 'idEcosistema = ?',
         whereArgs: [ecosistemaId],
       );
-      print('📌 Ecosistema marcado como pendienteEliminar (offline): $ecosistemaId');
       return true;
     } catch (e2) {
-      print('❌ Error al marcar ecosistema como pendienteEliminar: $e2');
       return false;
     }
   }

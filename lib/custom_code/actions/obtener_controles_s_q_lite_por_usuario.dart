@@ -21,7 +21,6 @@ Future<List<dynamic>> obtenerControlesSQLitePorUsuario(
   List<ControlsRow>? controlesSupabasePreCargados,
 }) async {
   try {
-    print('🔍 Obteniendo controles pendientes de sync para usuario: $userId');
 
     // 1. Obtener proyectos del usuario desde SQLite
     final todosProyectos = await DBProyectos.listarProyectos();
@@ -30,7 +29,6 @@ Future<List<dynamic>> obtenerControlesSQLitePorUsuario(
         .toList();
 
     if (proyectosUsuario.isEmpty) {
-      print('⚠️ No hay proyectos para este usuario');
       return [];
     }
 
@@ -42,7 +40,6 @@ Future<List<dynamic>> obtenerControlesSQLitePorUsuario(
     final objetivosUsuario = objetivosListas.expand((l) => l).toList();
 
     if (objetivosUsuario.isEmpty) {
-      print('⚠️ No hay objetivos');
       return [];
     }
 
@@ -58,11 +55,9 @@ Future<List<dynamic>> obtenerControlesSQLitePorUsuario(
         .toList();
 
     if (idsPendientes.isEmpty) {
-      print('✅ No hay controles pendientes de sync');
       return [];
     }
 
-    print('⚡ Cargando datos completos de ${idsPendientes.length} controles pendientes...');
 
     // 4. Cargar datos completos en paralelo
     final completosLista = await Future.wait(
@@ -70,7 +65,6 @@ Future<List<dynamic>> obtenerControlesSQLitePorUsuario(
         try {
           return await DBControles.obtenerControlCompleto(id);
         } catch (e) {
-          print('⚠️ Error cargando control completo $id: $e');
           return null;
         }
       }),
@@ -81,11 +75,8 @@ Future<List<dynamic>> obtenerControlesSQLitePorUsuario(
         .cast<dynamic>()
         .toList();
 
-    print('✅ Controles pendientes de sync: ${controlesPendientes.length}');
     return controlesPendientes;
   } catch (e, stackTrace) {
-    print('❌ Error obteniendo controles pendientes: $e');
-    print('Stack trace: $stackTrace');
     return [];
   }
 }

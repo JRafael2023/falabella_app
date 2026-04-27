@@ -19,7 +19,6 @@ import 'package:file_picker/file_picker.dart'; // Para FilePicker
 Future<FFUploadedFile?> openVideoMp4() async {
   // Limite máximo de tamaño de archivo (en bytes) 100MB
   //
-  print("Emrtpalmetod;");
   const maxSize = 100 * 1024 * 1024; // 100 MB en bytes
 
   final result = await FilePicker.platform.pickFiles(
@@ -29,35 +28,26 @@ Future<FFUploadedFile?> openVideoMp4() async {
   );
 
   if (result == null) {
-    print("❌ No se seleccionó ningún archivo");
     return null;
   }
 
   final file = result.files.first;
   final String? extension = file.extension?.toLowerCase();
-  print("LOS BYES SON ${file.bytes}");
   // ✅ Validar que sea video .mp4
   if (extension == null || extension != 'mp4') {
-    print("⚠️ Archivo no permitido: $extension");
     return null;
   }
 
   // Verificar el tamaño del archivo
   final int fileSize = file.bytes!.lengthInBytes; // Tamaño del archivo en bytes
   if (fileSize > maxSize) {
-    print(
-        "⚠️ El archivo es demasiado grande. Tamaño: ${(fileSize / (1024 * 1024)).toStringAsFixed(2)} MB");
     return null; // Retorna null si el archivo excede el límite de tamaño
   }
 
-  print("✅ Archivo válido: ${file.name}");
-  print("🎥 Extensión: $extension");
-  print("📏 Tamaño: ${(fileSize / (1024 * 1024)).toStringAsFixed(2)} MB");
 
   // Convertir a bytes si lo vas a subir
   final Uint8List bytes = file.bytes!;
 
-  print("✅ Ruta completa del archivo: ${file.path}");
   final ffFile = FFUploadedFile(
     name: file.name,
     originalFilename: file.name,

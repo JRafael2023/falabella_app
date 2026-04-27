@@ -30,17 +30,14 @@ Future<String> sincronizarProcesosFromSupabase() async {
         await DBProceso.insertProceso(proceso, fromSupabase: true);
         sincronizados++;
       } catch (e) {
-        print('❌ Error al sincronizar proceso a SQLite: $e');
         errores++;
       }
     }
 
     final mensaje =
         '✅ Descarga completada: $sincronizados procesos descargados, $errores errores';
-    print(mensaje);
     return mensaje;
   } catch (e) {
-    print('❌ Error al descargar procesos desde Supabase: $e');
     return 'Error al descargar: $e';
   }
 }

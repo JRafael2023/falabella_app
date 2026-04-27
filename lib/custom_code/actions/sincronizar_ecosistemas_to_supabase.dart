@@ -26,7 +26,6 @@ Future<String> sincronizarEcosistemasToSupabase() async {
     );
 
     if (result.isEmpty) {
-      print('✅ No hay ecosistemas pendientes por sincronizar');
       return 'No hay ecosistemas pendientes por sincronizar';
     }
 
@@ -56,17 +55,14 @@ Future<String> sincronizarEcosistemasToSupabase() async {
           errores++;
         }
       } catch (e) {
-        print('❌ Error al sincronizar ecosistema: $e');
         errores++;
       }
     }
 
     final mensaje =
         '✅ Sincronización completada: $sincronizados ecosistemas sincronizados, $errores errores';
-    print(mensaje);
     return mensaje;
   } catch (e) {
-    print('❌ Error en sincronización de ecosistemas: $e');
     return 'Error en sincronización: $e';
   }
 }

@@ -27,7 +27,6 @@ class FFAppState extends ChangeNotifier {
             try {
               return jsonDecode(x);
             } catch (e) {
-              print("Can't decode persisted json. Error: $e.");
               return {};
             }
           }).toList() ??
@@ -50,7 +49,6 @@ class FFAppState extends ChangeNotifier {
             try {
               return jsonDecode(x);
             } catch (e) {
-              print("Can't decode persisted json. Error: $e.");
               return {};
             }
           }).toList() ??
@@ -61,7 +59,6 @@ class FFAppState extends ChangeNotifier {
             try {
               return jsonDecode(x);
             } catch (e) {
-              print("Can't decode persisted json. Error: $e.");
               return {};
             }
           }).toList() ??
@@ -72,7 +69,6 @@ class FFAppState extends ChangeNotifier {
             try {
               return jsonDecode(x);
             } catch (e) {
-              print("Can't decode persisted json. Error: $e.");
               return {};
             }
           }).toList() ??
@@ -85,7 +81,6 @@ class FFAppState extends ChangeNotifier {
                 try {
                   return TituloStruct.fromSerializableMap(jsonDecode(x));
                 } catch (e) {
-                  print("Can't decode persisted data type. Error: $e.");
                   return null;
                 }
               })
@@ -100,7 +95,6 @@ class FFAppState extends ChangeNotifier {
                 try {
                   return ProcesoStruct.fromSerializableMap(jsonDecode(x));
                 } catch (e) {
-                  print("Can't decode persisted data type. Error: $e.");
                   return null;
                 }
               })
@@ -115,7 +109,6 @@ class FFAppState extends ChangeNotifier {
                 try {
                   return GerenciaStruct.fromSerializableMap(jsonDecode(x));
                 } catch (e) {
-                  print("Can't decode persisted data type. Error: $e.");
                   return null;
                 }
               })
@@ -130,7 +123,6 @@ class FFAppState extends ChangeNotifier {
                 try {
                   return EcosistemaStruct.fromSerializableMap(jsonDecode(x));
                 } catch (e) {
-                  print("Can't decode persisted data type. Error: $e.");
                   return null;
                 }
               })
@@ -143,7 +135,6 @@ class FFAppState extends ChangeNotifier {
             try {
               return jsonDecode(x);
             } catch (e) {
-              print("Can't decode persisted json. Error: $e.");
               return {};
             }
           }).toList() ??
@@ -157,7 +148,6 @@ class FFAppState extends ChangeNotifier {
           _currentUser =
               UserStruct.fromSerializableMap(jsonDecode(serializedData));
         } catch (e) {
-          print("Can't decode persisted data type. Error: $e.");
         }
       }
     });
@@ -682,11 +672,6 @@ class FFAppState extends ChangeNotifier {
 
   void setControlTemporal(String idControl, Map<String, dynamic> datos) {
     _controlesTemporales[idControl] = datos;
-    print('💾 Control temporal guardado: $idControl');
-    print('   - Imágenes: ${datos['imagenes']?.length ?? 0}');
-    print('   - Videos: ${datos['videos']?.length ?? 0}');
-    print('   - Archivos: ${datos['archivos']?.length ?? 0}');
-    print('   - Texto: ${datos['texto']?.isNotEmpty ?? false}');
     // NO llamar notifyListeners() para evitar rebuilds innecesarios
   }
 
@@ -696,12 +681,10 @@ class FFAppState extends ChangeNotifier {
 
   void clearControlTemporal(String idControl) {
     _controlesTemporales.remove(idControl);
-    print('🗑️ Control temporal limpiado: $idControl');
   }
 
   void clearAllControlesTemporales() {
     _controlesTemporales.clear();
-    print('🗑️ Todos los controles temporales limpiados');
   }
 }
 

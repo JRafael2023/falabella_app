@@ -19,7 +19,6 @@ class DBUsuarios {
 
       return "Usuario insertado correctamente";
     } catch (e) {
-      print('Error insertUsuario: $e');
       return "Error insertUsuario: $e";
     }
   }
@@ -65,7 +64,6 @@ class DBUsuarios {
 
       return "Usuarios insertados correctamente";
     } catch (e) {
-      print('Error insertUsuariosMasivos: $e');
       return "Error insertUsuariosMasivos: $e";
     }
   }
@@ -85,7 +83,6 @@ class DBUsuarios {
       );
       return maps.map((e) => Usuario.fromMap(e)).toList();
     } catch (e) {
-      print("Error listarUsuarios: $e");
       return [];
     }
   }
@@ -107,7 +104,6 @@ class DBUsuarios {
 
       return rows > 0 ? "Marcado para eliminar" : "Usuario no encontrado";
     } catch (e) {
-      print('Error marcarPendienteEliminar: $e');
       return "Error: $e";
     }
   }
@@ -132,7 +128,6 @@ class DBUsuarios {
       }
       return null;
     } catch (e) {
-      print('Error getUsuarioByUserUid: $e');
       return null;
     }
   }
@@ -171,14 +166,11 @@ class DBUsuarios {
 
       // Listar todos para debug
       final allUsers = await db.query('Users');
-      print('📋 Usuarios en SQLite (${allUsers.length}):');
       for (var u in allUsers) {
-        print('   - email: ${u['email']}, uid: ${u['user_uid']}, role: ${u['role']}');
       }
 
       return null;
     } catch (e) {
-      print('Error getUsuarioByEmail: $e');
       return null;
     }
   }
@@ -200,7 +192,6 @@ class DBUsuarios {
 
       return rows > 0 ? "Usuario actualizado" : "Usuario no encontrado";
     } catch (e) {
-      print('Error updateUsuario: $e');
       return "Error updateUsuario: $e";
     }
   }
@@ -221,7 +212,6 @@ class DBUsuarios {
 
       return rows > 0 ? "Usuario eliminado" : "Usuario no encontrado";
     } catch (e) {
-      print('Error deleteUsuarioByUserUid: $e');
       return "Error deleteUsuarioByUserUid: $e";
     }
   }
@@ -243,7 +233,6 @@ class DBUsuarios {
 
       return result.isNotEmpty;
     } catch (e) {
-      print('Error existeUsuario: $e');
       return false;
     }
   }
@@ -259,7 +248,6 @@ class DBUsuarios {
       final result = await db.rawQuery('SELECT COUNT(*) FROM Users');
       return Sqflite.firstIntValue(result) ?? 0;
     } catch (e) {
-      print('Error contarUsuarios: $e');
       return 0;
     }
   }
@@ -275,7 +263,6 @@ class DBUsuarios {
       await db.delete('Users');
       return "Usuarios eliminados";
     } catch (e) {
-      print('Error deleteAllUsuarios: $e');
       return "Error deleteAllUsuarios: $e";
     }
   }

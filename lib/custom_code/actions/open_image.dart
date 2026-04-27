@@ -24,25 +24,14 @@ Future<FFUploadedFile?> openImage() async {
   );
 
   if (result == null) {
-    print("❌ No se seleccionó ningún archivo");
     return null;
   }
   final file = result.files.first;
   final String? extension = file.extension?.toLowerCase();
   final filePath = file.path;
-  print("✅ Ruta completa del archivo: $filePath");
-  print("LOS BYESxxxxx SON ${file.bytes}");
-  print(file?.bytes); //null
 
-  print("Nombre del archivo: ${file.name}");
-  print("Tamaño del archivo: ${file.size} bytes");
-  print("IDENTIFIE: ${file.identifier} ");
-  print("Extensión del archivo: ${file.extension}");
-  print("Ruta del archivo: ${file.path}");
-  print("Bytes del archivo: ${file.bytes?.length}");
 
   if (file.bytes == null) {
-    print("⚠️ No se pudieron obtener los bytes del archivo.");
     return null;
   }
 
@@ -58,15 +47,8 @@ Future<FFUploadedFile?> openImage() async {
         height = image.height.toDouble(); // Convertir a double
       }
     } catch (e) {
-      print("⚠️ Error al obtener las dimensiones de la imagen: $e");
     }
   }
-  print("AJUASTADOOOOOOOOOOOOOOOOOOOO");
-  print(file?.name);
-  print(height); //null
-  print(file?.name);
-  print(width); //null
-  print("AJUASTADOOOOOOOOOOOOOOOOOOOO");
 
   // Crear FFUploadedFile con double? para height y width
   final ffFile = FFUploadedFile(
@@ -76,7 +58,5 @@ Future<FFUploadedFile?> openImage() async {
     width: width, // Ahora es un double?
     originalFilename: file.name, // Usar el nombre original si lo necesitas
   );
-  print("Comparamos  ${ffFile.name}");
-  print("Comparamos  ${file?.name}");
   return ffFile;
 }

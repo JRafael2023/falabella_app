@@ -18,12 +18,10 @@ import '../sqlite_helper.dart';
 Future<List<dynamic>> sqlLiteListMatrices() async {
   final result = await DBMatrices.getAllMatrices();
 
-  print("El numero de elementos es ${result.length}");
 
   // Convertir a JSON
   final jsonList = result.map((matriz) => matriz.toJson()).toList();
 
-  print(jsonList);
 
   return jsonList;
 }

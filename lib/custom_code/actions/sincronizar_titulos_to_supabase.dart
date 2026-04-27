@@ -26,7 +26,6 @@ Future<String> sincronizarTitulosToSupabase() async {
     );
 
     if (result.isEmpty) {
-      print('✅ No hay títulos pendientes por sincronizar');
       return 'No hay títulos pendientes por sincronizar';
     }
 
@@ -56,17 +55,14 @@ Future<String> sincronizarTitulosToSupabase() async {
           errores++;
         }
       } catch (e) {
-        print('❌ Error al sincronizar título: $e');
         errores++;
       }
     }
 
     final mensaje =
         '✅ Sincronización completada: $sincronizados títulos sincronizados, $errores errores';
-    print(mensaje);
     return mensaje;
   } catch (e) {
-    print('❌ Error en sincronización de títulos: $e');
     return 'Error en sincronización: $e';
   }
 }

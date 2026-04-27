@@ -30,17 +30,14 @@ Future<String> sincronizarGerenciasFromSupabase() async {
         await DBGerencia.insertGerencia(gerencia, fromSupabase: true);
         sincronizados++;
       } catch (e) {
-        print('❌ Error al sincronizar gerencia a SQLite: $e');
         errores++;
       }
     }
 
     final mensaje =
         '✅ Descarga completada: $sincronizados gerencias descargadas, $errores errores';
-    print(mensaje);
     return mensaje;
   } catch (e) {
-    print('❌ Error al descargar gerencias desde Supabase: $e');
     return 'Error al descargar: $e';
   }
 }

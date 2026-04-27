@@ -39,7 +39,6 @@ Future<List<FFUploadedFile>> pickMultipleFiles() async {
 
     return uploadedFiles;
   } catch (e) {
-    print('❌ Error al seleccionar archivos: $e');
     return [];
   }
 }

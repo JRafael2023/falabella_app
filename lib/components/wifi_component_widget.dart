@@ -103,7 +103,6 @@ class _WifiComponentWidgetState extends State<WifiComponentWidget> {
                 onPressed: (random_data.randomInteger(1, 1) == 1)
                     ? null
                     : () {
-                        print('IconButton pressed ...');
                       },
               ),
             );
@@ -150,7 +149,6 @@ class _WifiComponentWidgetState extends State<WifiComponentWidget> {
                 onPressed: (random_data.randomInteger(1, 1) == 1)
                     ? null
                     : () {
-                        print('IconButton pressed ...');
                       },
               ),
             );

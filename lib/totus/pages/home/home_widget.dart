@@ -125,21 +125,16 @@ class _HomeWidgetState extends State<HomeWidget> {
           _model.loadingProgress = 0.6;
         });
 
-        // ── Sincronizar cambios offline pendientes a Supabase ─────────────────
         // Si el auditor creó/editó gerencias, ecosistemas, procesos o títulos
         // mientras estaba offline, se suben ahora que hay conexión.
         // Solo toca registros con sincronizadoNube=0, sincronizadoLocal=1.
         // No duplica porque verifica por ID personalizado antes de insertar.
         try {
-          print('🔄 Verificando cambios offline pendientes del auditor...');
           final syncResult = await actions.sincronizarAdmin();
           if (syncResult.huboCambiosPendientes) {
-            print('✅ Cambios offline sincronizados: ${syncResult.mensaje}');
           } else {
-            print('✅ Sin cambios offline pendientes');
           }
         } catch (e) {
-          print('⚠️ Error sincronizando pendientes: $e');
         }
 
         safeSetState(() {
@@ -148,11 +143,9 @@ class _HomeWidgetState extends State<HomeWidget> {
         });
 
         // 🚀 CARGA INTELIGENTE DE DATOS (Solo sync completa si es primera vez)
-        print('🚀 Iniciando carga inteligente de datos...');
         await actions.cargarDatosConCacheInteligente(
           FFAppState().currentUser!.id,
         );
-        print('✅ Carga inteligente finalizada');
 
         safeSetState(() {
           _model.loadingMessage = 'Finalizando...';
@@ -220,7 +213,6 @@ class _HomeWidgetState extends State<HomeWidget> {
         FFAppState().update(() {});
 
         // Modo offline: no llamar cargarDatosConCacheInteligente (requiere internet)
-        print('📴 Modo offline - datos cargados desde SQLite');
 
         if (!(FFAppState().currentUser != null)) {
           ScaffoldMessenger.of(context).showSnackBar(

@@ -47,7 +47,6 @@ Future<String> insertUsuarioSQLite(
 
     return resultado;
   } catch (e) {
-    print('❌ Error insertUsuarioSQLite: $e');
     return "❌ Error al insertar usuario: $e";
   }
 }

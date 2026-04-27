@@ -21,18 +21,15 @@ Future<List<dynamic>> sqLiteListUsers() async {
   try {
     final usuarios = await DBUsuarios.listarUsuarios();
 
-    print("📊 N° de usuarios: ${usuarios.length}");
 
     // Convertir los objetos Usuario a JSON/Map
     final usuariosJson = usuarios.map((usuario) => usuario.toJson()).toList();
 
     if (usuariosJson.isNotEmpty) {
-      print("✅ Primer usuario: ${usuariosJson.first}");
     }
 
     return usuariosJson;
   } catch (e) {
-    print("❌ Error en sqLiteListUsers: $e");
     return [];
   }
 }

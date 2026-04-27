@@ -58,7 +58,6 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
       // Generar nombre único para evitar conflictos entre múltiples videos
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final ruta = '${Directory.systemTemp.path}/temp_video_$timestamp.mp4';
-      print("Cadena :${ruta}");
       final videoFile = File(ruta);
 
       await videoFile
@@ -102,7 +101,6 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
         }
       });
     } catch (e) {
-      print("Error cargando video desde los bytes: $e");
       setState(() {
         _loading = false;
       });
@@ -171,7 +169,6 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
 
     // Limpiar archivo temporal
     _tempVideoFile?.delete().catchError((e) {
-      print("Error eliminando archivo temporal: $e");
     });
 
     super.dispose(); // Llamamos al dispose() de la clase base

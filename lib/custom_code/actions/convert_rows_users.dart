@@ -30,11 +30,9 @@ Future<List<dynamic>> convertRowsUsers(List<UsersRow> rowsUsers) async {
       };
     }).toList();
 
-    print('✅ Convertidos ${usuarios.length} usuarios de Supabase');
 
     return usuarios;
   } catch (e) {
-    print('❌ Error en convertRowsUsers: $e');
     return [];
   }
 }

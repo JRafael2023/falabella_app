@@ -913,7 +913,6 @@ class _EditProjectWidgetState extends State<EditProjectWidget> {
                           ].divide(SizedBox(height: 5.0)),
                         ),
                       ),
-                      // ── Mensaje de error inline ─────────────────────────
                       if (_errorMsg != null)
                         Container(
                           width: double.infinity,

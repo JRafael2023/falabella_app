@@ -44,7 +44,6 @@ Future<String> updateUsuarioSQLite(
 
     return resultado;
   } catch (e) {
-    print('❌ Error updateUsuarioSQLite: $e');
     return "❌ Error al actualizar usuario: $e";
   }
 }

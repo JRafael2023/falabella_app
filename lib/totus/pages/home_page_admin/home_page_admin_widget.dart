@@ -65,7 +65,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
         final ultimoSync = await DBSyncLogs.getUltimoSync();
         if (ultimoSync != null && ultimoSync['sync_end'] != null) {
           String syncEndStr = ultimoSync['sync_end'].toString();
-          print('📅 sync_end raw de SQLite: $syncEndStr');
 
           // Parsear como UTC y convertir a local
           DateTime? fecha;
@@ -76,14 +75,12 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
             fecha = DateTime.tryParse(syncEndStr);
           }
 
-          print('📅 fecha parseada: $fecha');
           if (fecha != null) {
             FFAppState().ultimaSincronizacion = fecha;
             safeSetState(() {});
           }
         }
       } catch (e) {
-        print('⚠️ Error cargando último sync: $e');
       }
     });
 
@@ -121,10 +118,8 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
       if (!mounted) return;
       if (projects.isNotEmpty) {
         FFAppState().jsonHighbondProjects = projects.cast<dynamic>();
-        print('✅ Proyectos cargados desde Supabase: ${projects.length}');
       }
     }).catchError((e) {
-      print('⚠️ Error cargando proyectos desde cache: $e');
     });
   }
 
@@ -318,7 +313,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                 ),
                                 showLoadingIndicator: true,
                                 onPressed: () async {
-                                  // ── Verificar conexión ────────────────────
                                   if (!(_model.estaconectado ?? false)) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
@@ -335,10 +329,8 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                     return;
                                   }
 
-                                  // ── Sincronización inteligente ────────────
                                   final syncResult = await actions.sincronizarAdmin();
 
-                                  // ── Recargar listas en AppState ───────────
                                   _model.masivodb = await actions.sqlLiteListProyectos();
                                   _model.usersMasivo = await actions.sqLiteListUsers();
                                   FFAppState().jsonProyectos =
@@ -347,7 +339,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                       _model.usersMasivo!.toList().cast<dynamic>();
                                   safeSetState(() {});
 
-                                  // ── Mostrar resultado ─────────────────────
                                   if (context.mounted) {
                                     // El mensaje ya viene con ✅ o sin prefijo desde sincronizarAdmin
                                     final bool sinCambios = syncResult.exito && !syncResult.huboCambiosPendientes && syncResult.usuariosSincronizados == 0;
@@ -949,7 +940,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                             hoverColor: Colors.transparent,
                             highlightColor: Colors.transparent,
                             onTap: () async {
-                              // ── Callback local para actualizar el diálogo ─
                               void Function(String paso, int actual, int total)? actualizarProgreso;
 
                               // Estado del diálogo de progreso
@@ -957,7 +947,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                               int progresoActual = 0;
                               int progresoTotal = 0;
 
-                              // ── Mostrar diálogo de progreso (solo informativo) ─
                               showDialog(
                                 context: context,
                                 barrierDismissible: false,
@@ -983,7 +972,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                           child: Column(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              // ── Ícono animado ─────────────
                                               Container(
                                                 width: 64.0,
                                                 height: 64.0,
@@ -998,7 +986,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                                 ),
                                               ),
                                               const SizedBox(height: 16.0),
-                                              // ── Título ───────────────────
                                               const Text(
                                                 'Importando hallazgos',
                                                 style: TextStyle(
@@ -1007,7 +994,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                                 ),
                                               ),
                                               const SizedBox(height: 8.0),
-                                              // ── Paso actual ──────────────
                                               Text(
                                                 progresoPaso,
                                                 textAlign: TextAlign.center,
@@ -1017,7 +1003,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                                 ),
                                               ),
                                               const SizedBox(height: 16.0),
-                                              // ── Barra de progreso ─────────
                                               ClipRRect(
                                                 borderRadius: BorderRadius.circular(8.0),
                                                 child: LinearProgressIndicator(
@@ -1059,18 +1044,15 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                 },
                               );
 
-                              // ── Ejecutar importación COMPLETA ─────────────
                               final ImportResult importResult = await actions.importarHallazgos(
                                 onProgress: (paso, actual, total) {
                                   actualizarProgreso?.call(paso, actual, total);
                                 },
                               );
 
-                              // ── Cerrar diálogo de progreso ────────────────
                               if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
                               actualizarProgreso = null;
 
-                              // ── Mostrar diálogo de resultado ──────────────
                               if (context.mounted) {
                                 await showDialog(
                                   context: context,
@@ -1085,7 +1067,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            // ── Ícono resultado ───────────
                                             Container(
                                               width: 64.0,
                                               height: 64.0,
@@ -1106,7 +1087,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                               ),
                                             ),
                                             const SizedBox(height: 16.0),
-                                            // ── Título resultado ──────────
                                             Text(
                                               importResult.success
                                                   ? '✅ Importación completada'
@@ -1117,7 +1097,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                               ),
                                             ),
                                             const SizedBox(height: 12.0),
-                                            // ── Resumen ───────────────────
                                             Container(
                                               width: double.infinity,
                                               padding: const EdgeInsets.all(12.0),
@@ -1131,7 +1110,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                               ),
                                             ),
                                             const SizedBox(height: 20.0),
-                                            // ── Botones ───────────────────
                                             Column(
                                               children: [
                                                 // Botón ACEPTAR (siempre visible)
@@ -1161,7 +1139,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                                       onPressed: () async {
                                                         Navigator.pop(resultContext);
 
-                                                        // ── Diálogo de progreso rollback ──
                                                         void Function(String, int, int)? actualizarRollback;
                                                         String rollbackPaso = 'Deshaciendo cambios...';
                                                         int rollbackActual = 0;
@@ -1265,7 +1242,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                                           );
                                                         }
 
-                                                        // ── Ejecutar rollback ──
                                                         await actions.deshacerImportacion(
                                                           result: importResult,
                                                           onProgress: (paso, actual, total) {
@@ -1273,13 +1249,11 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                                           },
                                                         );
 
-                                                        // ── Cerrar diálogo rollback ──
                                                         if (context.mounted) {
                                                           Navigator.of(context, rootNavigator: true).pop();
                                                         }
                                                         actualizarRollback = null;
 
-                                                        // ── Confirmar rollback completado ──
                                                         if (context.mounted) {
                                                           showDialog(
                                                             context: context,

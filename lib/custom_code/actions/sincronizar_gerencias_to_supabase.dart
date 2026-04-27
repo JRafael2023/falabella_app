@@ -26,7 +26,6 @@ Future<String> sincronizarGerenciasToSupabase() async {
     );
 
     if (result.isEmpty) {
-      print('✅ No hay gerencias pendientes por sincronizar');
       return 'No hay gerencias pendientes por sincronizar';
     }
 
@@ -56,17 +55,14 @@ Future<String> sincronizarGerenciasToSupabase() async {
           errores++;
         }
       } catch (e) {
-        print('❌ Error al sincronizar gerencia: $e');
         errores++;
       }
     }
 
     final mensaje =
         '✅ Sincronización completada: $sincronizados gerencias sincronizadas, $errores errores';
-    print(mensaje);
     return mensaje;
   } catch (e) {
-    print('❌ Error en sincronización de gerencias: $e');
     return 'Error en sincronización: $e';
   }
 }

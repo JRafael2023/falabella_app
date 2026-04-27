@@ -85,7 +85,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
     super.dispose();
   }
 
-  // ── Modal: formulario Crear Proceso ────────────────────────────────────────
   Widget _buildFormProceso(
     BuildContext context,
     String? errorMsg,
@@ -115,7 +114,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // ── Título del modal + botón X ─────────────────────────────
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(16.0, 12.0, 8.0, 0.0),
                   child: Row(
@@ -142,7 +140,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
                     ],
                   ),
                 ),
-                // ── Formulario ─────────────────────────────────────────────
                 Padding(
                   padding: const EdgeInsetsDirectional.fromSTEB(4.0, 4.0, 4.0, 4.0),
                   child: Form(
@@ -155,7 +152,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // ── Nombre ───────────────────────────────────────
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,7 +244,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
                               ),
                             ].divide(const SizedBox(height: 5.0)),
                           ),
-                          // ── Error inline ─────────────────────────────────
                           if (errorMsg != null)
                             Container(
                               width: double.infinity,
@@ -271,7 +266,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
                                 ],
                               ),
                             ),
-                          // ── Botón Guardar ────────────────────────────────
                           Row(
                             mainAxisSize: MainAxisSize.max,
                             children: [
@@ -492,7 +486,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  // ── Título + botón Crear ──────────────────────────────────
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -540,7 +533,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
                     ],
                   ),
                   const SizedBox(height: 12.0),
-                  // ── Lista ─────────────────────────────────────────────────
                   Expanded(
                     child: Builder(
                       builder: (context) {

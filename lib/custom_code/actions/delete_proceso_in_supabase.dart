@@ -25,7 +25,6 @@ Future<bool> deleteProcesoInSupabase(String procesoId) async {
 
     // Online: eliminó en Supabase → eliminar también de SQLite
     await DBProceso.deleteProceso(procesoId);
-    print('✅ Proceso eliminado en Supabase y SQLite: $procesoId');
     return true;
   } catch (e) {
     // Offline: marcar como pendiente de eliminar en SQLite (no borrar todavía)
@@ -37,10 +36,8 @@ Future<bool> deleteProcesoInSupabase(String procesoId) async {
         where: 'idProceso = ?',
         whereArgs: [procesoId],
       );
-      print('📌 Proceso marcado como pendienteEliminar (offline): $procesoId');
       return true;
     } catch (e2) {
-      print('❌ Error al marcar proceso como pendienteEliminar: $e2');
       return false;
     }
   }

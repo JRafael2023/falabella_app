@@ -26,7 +26,6 @@ Future<List<FFUploadedFile>?> openImageList() async {
   );
 
   if (result == null || result.files.isEmpty) {
-    print("❌ No se seleccionó ningún archivo");
     return []; // Retornar lista vacía en lugar de null
   }
 
@@ -46,11 +45,8 @@ Future<List<FFUploadedFile>?> openImageList() async {
       continue; // Saltar al siguiente archivo
     }
 
-    print("✅ Archivo válido: ${file.name}");
-    print("📸 Extensión: $extension");
 
     final filePath = file.path;
-    print("✅ Ruta completa del archivo: $filePath");
 
     // Convertir a bytes si lo vas a subir
     final Uint8List bytes = file.bytes!;
@@ -73,19 +69,15 @@ Future<List<FFUploadedFile>?> openImageList() async {
 
   // Verificar si hay archivos no válidos
   if (invalidFiles.isNotEmpty) {
-    print("⚠️ Los siguientes archivos no son válidos y fueron omitidos: ");
     invalidFiles.forEach((fileName) {
-      print(" - $fileName");
     });
   }
 
   // Verificar si se subieron archivos válidos
   if (uploadedFiles.isEmpty) {
-    print("❌ No se seleccionaron archivos válidos.");
     return []; // Si no hay archivos válidos, retornar lista vacía
   }
 
-  print("✅ Archivos válidos seleccionados: ${uploadedFiles.length}");
 
   return uploadedFiles; // Devolver la lista de archivos válidos
 }

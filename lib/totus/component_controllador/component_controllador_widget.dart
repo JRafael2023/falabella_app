@@ -1539,7 +1539,6 @@ class _ComponentControlladorWidgetState
                                             riskActualLevelId,
                                             riesgoActual,
                                             causaRaiz) async {
-                                          print('💾 Guardando datos de hallazgo TEMPORALMENTE...');
 
                                           // Guardar en _model (memoria local del componente)
                                           _model.titulo = tituloObservacion;
@@ -1712,7 +1711,6 @@ class _ComponentControlladorWidgetState
                         final proyecto = await DBProyectos.getProyectoByIdProject(FFAppState().idproyect);
                         resolvedProjectName = proyecto?.name ?? '';
                         if (resolvedProjectName.isNotEmpty) {
-                          print('📦 projectName resuelto desde SQLite: $resolvedProjectName');
                         }
                       }
 

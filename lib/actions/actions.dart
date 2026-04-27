@@ -39,7 +39,6 @@ Future sync(
   void _logTiempo(String etapa) {
     final ms = _stopwatch.elapsedMilliseconds;
     final seg = (ms / 1000).toStringAsFixed(1);
-    print('⏱️ [$seg s] $etapa');
   }
 
   // ========================================
@@ -76,9 +75,7 @@ Future sync(
         'controls_updated': [],
         'device_info': syncId,
       });
-      print('✅ SyncLog insertado en Supabase: $syncId');
     } catch (e) {
-      print('⚠️ Error insertando SyncLog en Supabase: $e');
     }
   }
 
@@ -177,9 +174,7 @@ Future sync(
               'sync_end': syncEnd.toIso8601String(),
             })
             .eq('device_info', syncId);
-        print('✅ SyncLog actualizado en Supabase: completed');
       } catch (e) {
-        print('⚠️ Error actualizando SyncLog en Supabase: $e');
       }
 
       // Actualizar última sincronización en AppState
@@ -190,7 +185,6 @@ Future sync(
       // Recargar desde cache/SQLite (sin forzar HighBond).
       // forceFullSync: false → si el cache es reciente usa SQLite (rápido).
       // Solo llama HighBond si el cache expiró (> 8 horas), no en cada sync.
-      print('🚀 Recargando datos con cache inteligente...');
       await actions.cargarDatosConCacheInteligente(
         FFAppState().currentUser!.id,
         forceFullSync: false,
@@ -199,9 +193,6 @@ Future sync(
 
       _stopwatch.stop();
       final _totalSeg = (_stopwatch.elapsedMilliseconds / 1000).toStringAsFixed(1);
-      print('🏁 ================================');
-      print('🏁 SYNC TOTAL: $_totalSeg segundos');
-      print('🏁 ================================');
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -245,11 +236,9 @@ Future sync(
       });
 
       // 🚀 CARGAR TODOS LOS DATOS (Objetivos + Controles) - OFFLINE
-      print('🚀 Cargando todos los datos después de sincronizar (OFFLINE)...');
       await actions.cargarTodosLosDatosUsuario(
         FFAppState().currentUser!.id,
       );
-      print('✅ Carga completa finalizada');
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -266,7 +255,6 @@ Future sync(
     // ========================================
     // ❌ ACTUALIZAR SYNC LOG - ERROR
     // ========================================
-    print('❌ Error en sync: $e');
     await DBSyncLogs.updateSyncLog(
       syncId: syncId,
       syncStatus: 'error',

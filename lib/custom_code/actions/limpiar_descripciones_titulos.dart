@@ -20,7 +20,6 @@ import '/custom_code/sqlite_helper.dart';
 /// ejecuta una vez para limpiar datos incorrectos
 Future<String> limpiarDescripcionesTitulos() async {
   try {
-    print('🧹 Iniciando limpieza de descripciones de títulos...');
 
     final database = await DBHelper.db;
     if (database == null) {
@@ -33,10 +32,8 @@ Future<String> limpiarDescripcionesTitulos() async {
       {'description': ''},
     );
 
-    print('✅ Se limpiaron $result registros');
     return '✅ Se limpiaron $result descripciones de títulos';
   } catch (e) {
-    print('❌ Error al limpiar descripciones: $e');
     return '❌ Error: $e';
   }
 }

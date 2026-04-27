@@ -20,7 +20,6 @@ import 'package:tottus/custom_code/sqlite_helper.dart';
 /// Obtener todos los ecosistemas desde Supabase
 Future<List<EcosistemaStruct>> getEcosistemasFromSupabase() async {
   try {
-    print('📥 Consultando ecosistemas desde Supabase...');
     final response = await SupaFlow.client
         .from('Ecosystems')
         .select()
@@ -28,17 +27,14 @@ Future<List<EcosistemaStruct>> getEcosistemasFromSupabase() async {
         .order('created_at', ascending: false);
 
     if (response == null) {
-      print('⚠️ No hay ecosistemas en Supabase');
       return [];
     }
 
-    print('📊 Respuesta de Supabase: ${response.length} registros');
 
     final List<EcosistemaStruct> ecosistemas = [];
 
     for (var item in (response as List)) {
       try {
-        print('🔄 Procesando: ${item['name']} - ID: ${item['id']}');
         final ecosistema = EcosistemaStruct(
           id: item['id'] as String?,
           idEcosistema: (item['ecosystem_id'] as String?) ?? (item['id'] as String?),
@@ -53,15 +49,11 @@ Future<List<EcosistemaStruct>> getEcosistemasFromSupabase() async {
         );
         ecosistemas.add(ecosistema);
       } catch (e) {
-        print('❌ Error procesando item: ${item['name']} - Error: $e');
       }
     }
 
-    print(
-        '✅ ${ecosistemas.length} ecosistemas obtenidos exitosamente desde Supabase');
     return ecosistemas;
   } catch (e) {
-    print('❌ Error al obtener ecosistemas desde Supabase: $e');
     return [];
   }
 }

@@ -537,7 +537,6 @@ String _serializeList(List? list) {
     return json.encode(list, toEncodable: _toEncodable);
   } catch (_) {
     if (kDebugMode) {
-      print("List serialization failed. Returning empty list.");
     }
     return '[]';
   }
@@ -549,7 +548,6 @@ String _serializeJson(dynamic jsonVar, [bool isList = false]) {
     return json.encode(jsonVar, toEncodable: _toEncodable);
   } catch (_) {
     if (kDebugMode) {
-      print("Json serialization failed. Returning empty json.");
     }
     return isList ? '[]' : '{}';
   }

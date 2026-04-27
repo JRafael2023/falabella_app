@@ -82,7 +82,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
     super.dispose();
   }
 
-  // ── Modal: formulario Crear Gerencia ───────────────────────────────────────
   Widget _buildFormGerencia(
     BuildContext context,
     String? errorMsg,
@@ -113,7 +112,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // ── Título del modal + botón X ────────────────────────────
                   Padding(
                     padding: const EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 0.0),
                     child: Row(
@@ -143,7 +141,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
                       ],
                     ),
                   ),
-                  // ── Formulario ────────────────────────────────────────────
                   Form(
                     key: _model.formKey,
                     autovalidateMode: AutovalidateMode.disabled,
@@ -153,7 +150,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // ── Nombre ────────────────────────────────────────
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +242,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
                               ),
                             ].divide(const SizedBox(height: 5.0)),
                           ),
-                          // ── Error inline ──────────────────────────────────
                           if (errorMsg != null)
                             Container(
                               width: double.infinity,
@@ -269,7 +264,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
                                 ],
                               ),
                             ),
-                          // ── Botón Guardar ─────────────────────────────────
                           Row(
                             mainAxisSize: MainAxisSize.max,
                             children: [
@@ -489,7 +483,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  // ── Título + botón Crear ──────────────────────────────────
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -543,7 +536,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
                     ],
                   ),
                   const SizedBox(height: 12.0),
-                  // ── Lista ─────────────────────────────────────────────────
                   Expanded(
                     child: Builder(
                       builder: (context) {

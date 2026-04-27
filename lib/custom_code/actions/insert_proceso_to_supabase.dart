@@ -23,7 +23,6 @@ Future<String> insertProcesoToSupabase(ProcesoStruct proceso) async {
       'updated_at': DateTime.now().toIso8601String(),
     };
 
-    print('📤 Insertando proceso en Supabase: ${proceso.nombre}');
 
     final response =
         await SupaFlow.client.from('Processes').insert(data).select();
@@ -32,7 +31,6 @@ Future<String> insertProcesoToSupabase(ProcesoStruct proceso) async {
       final insertedRow = response[0];
       final insertedId = insertedRow['id'] as String;
       final processId = insertedRow['process_id'] as String? ?? '';
-      print('✅ Proceso insertado en Supabase con ID: $insertedId, process_id: $processId');
 
       // También insertar en SQLite con el process_id correcto
       if (processId.isNotEmpty) {
@@ -44,16 +42,13 @@ Future<String> insertProcesoToSupabase(ProcesoStruct proceso) async {
           ),
           fromSupabase: true,
         );
-        print('✅ Proceso también insertado en SQLite: $processId');
       }
 
       return processId.isNotEmpty ? processId : insertedId;
     } else {
-      print('❌ Error al insertar proceso en Supabase: response vacío');
       return '';
     }
   } catch (e) {
-    print('❌ Error al insertar proceso en Supabase: $e');
     return '';
   }
 }

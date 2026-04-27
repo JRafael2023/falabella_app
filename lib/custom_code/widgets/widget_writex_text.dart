@@ -75,7 +75,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
     _initializeSpeech();
   }
 
-  // ─── INICIALIZACIÓN ONLINE ────────────────────────────────────────────────
 
   Future<void> _initializeSpeech() async {
     try {
@@ -110,7 +109,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
     }
   }
 
-  // ─── BOTÓN PRINCIPAL ──────────────────────────────────────────────────────
 
   Future<void> _listen() async {
     if (_isTranscribing) return; // No interrumpir mientras transcribe
@@ -136,7 +134,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
     }
   }
 
-  // ─── MODO ONLINE ──────────────────────────────────────────────────────────
 
   Future<void> _listenOnline() async {
     if (!_speechInitialized) await _initializeSpeech();
@@ -223,7 +220,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
     if (_finalText.isNotEmpty) widget.action(_finalText);
   }
 
-  // ─── MODO OFFLINE: GRABAR ─────────────────────────────────────────────────
 
   Future<void> _listenOffline() async {
     // Permiso de micrófono
@@ -287,7 +283,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
     }
   }
 
-  // ─── MODO OFFLINE: PARAR Y TRANSCRIBIR ───────────────────────────────────
 
   Future<void> _stopOffline() async {
     final path = await _recorder?.stop();
@@ -464,7 +459,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
     }
   }
 
-  // ─── MENSAJES DE ERROR ────────────────────────────────────────────────────
 
   void _showPermissionError() {
     if (!mounted) return;
@@ -495,7 +489,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
     );
   }
 
-  // ─── CICLO DE VIDA ────────────────────────────────────────────────────────
 
   @override
   void didUpdateWidget(WidgetWritexText oldWidget) {
@@ -516,7 +509,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
     super.dispose();
   }
 
-  // ─── UI ───────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {

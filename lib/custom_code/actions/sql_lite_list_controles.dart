@@ -23,7 +23,5 @@ Future<List<dynamic>> sqlLiteListControles(String idObjetivo) async {
   final result = await DBControles.listarControlesJson(idObjetivo);
   //final result = await DBControles.listarControlesJson(idObjetivo);
 
-  print("El numero delementosxxxxxxxx es  ${result.length}");
-  print(result);
   return result;
 }

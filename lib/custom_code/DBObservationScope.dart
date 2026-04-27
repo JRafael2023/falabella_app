@@ -21,7 +21,6 @@ class DBObservationScope {
           ? "ObservationScope agregado correctamente"
           : "Error: No se pudo agregar el ObservationScope";
     } catch (e) {
-      print('Error al insertar ObservationScope: $e');
       return "Error al insertar ObservationScope: $e";
     }
   }
@@ -46,7 +45,6 @@ class DBObservationScope {
           ? "ObservationScope actualizado correctamente"
           : "Error: No se pudo actualizar el ObservationScope";
     } catch (e) {
-      print('Error al actualizar ObservationScope: $e');
       return "Error al actualizar ObservationScope: $e";
     }
   }
@@ -67,7 +65,6 @@ class DBObservationScope {
           ? "ObservationScope eliminado correctamente"
           : "Error: No se pudo eliminar el ObservationScope";
     } catch (e) {
-      print('Error al eliminar ObservationScope: $e');
       return "Error al eliminar ObservationScope: $e";
     }
   }
@@ -82,7 +79,6 @@ class DBObservationScope {
           orderBy: 'name ASC');
       return result.map((row) => ObservationScope.fromMap(row)).toList();
     } catch (e) {
-      print('Error al obtener ObservationScopes: $e');
       return [];
     }
   }
@@ -100,7 +96,6 @@ class DBObservationScope {
       }
       return "Se insertaron $count de ${supabaseData.length} ObservationScopes";
     } catch (e) {
-      print('Error insertBatchFromSupabase ObservationScope: $e');
       return "Error: $e";
     }
   }

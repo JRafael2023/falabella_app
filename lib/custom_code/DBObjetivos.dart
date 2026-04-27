@@ -19,7 +19,6 @@ class DBObjetivos {
 
       return "Objetivo insertado correctamente";
     } catch (e) {
-      print('Error insertObjetivo: $e');
       return "Error insertObjetivo: $e";
     }
   }
@@ -56,7 +55,6 @@ class DBObjetivos {
 
       return "Objetivos sincronizados correctamente";
     } catch (e) {
-      print('Error insertObjetivosMasivos: $e');
       return "Error insertObjetivosMasivos: $e";
     }
   }
@@ -79,7 +77,6 @@ class DBObjetivos {
 
       return maps.map((e) => Objetivo.fromMap(e)).toList();
     } catch (e) {
-      print('Error listarObjetivosPorProyecto: $e');
       return [];
     }
   }
@@ -95,7 +92,6 @@ class DBObjetivos {
       final maps = await db.query('Objetivos');
       return maps.map((e) => Objetivo.fromMap(e)).toList();
     } catch (e) {
-      print('Error listarObjetivos: $e');
       return [];
     }
   }
@@ -122,7 +118,6 @@ class DBObjetivos {
       }
       return null;
     } catch (e) {
-      print('Error getObjetivoByIdObjetivo: $e');
       return null;
     }
   }
@@ -145,7 +140,6 @@ class DBObjetivos {
 
       return rows > 0 ? "Objetivo eliminado" : "Objetivo no encontrado";
     } catch (e) {
-      print('Error deleteObjetivoByIdObjetivo: $e');
       return "Error deleteObjetivoByIdObjetivo: $e";
     }
   }
@@ -167,7 +161,6 @@ class DBObjetivos {
 
       return result.isNotEmpty;
     } catch (e) {
-      print('Error existeObjetivo: $e');
       return false;
     }
   }
@@ -183,7 +176,6 @@ class DBObjetivos {
       final result = await db.rawQuery('SELECT COUNT(*) FROM Objetivos');
       return Sqflite.firstIntValue(result) ?? 0;
     } catch (e) {
-      print('Error contarObjetivos: $e');
       return 0;
     }
   }
@@ -199,7 +191,6 @@ class DBObjetivos {
       await db.delete('Objetivos');
       return "Objetivos eliminados";
     } catch (e) {
-      print('Error deleteAllObjetivos: $e');
       return "Error deleteAllObjetivos: $e";
     }
   }
@@ -215,7 +206,6 @@ class DBObjetivos {
       await db.execute('DROP TABLE IF EXISTS Objetivos');
       return "Tabla Objetivos eliminada";
     } catch (e) {
-      print('Error dropObjetivosTable: $e');
       return "Error dropObjetivosTable: $e";
     }
   }

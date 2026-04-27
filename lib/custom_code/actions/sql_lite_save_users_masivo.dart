@@ -19,28 +19,23 @@ import 'package:tottus/custom_code/Usuario.dart';
 Future<String> sqlLiteSaveUsersMasivo(List<UsersRow> rowsSupabase) async {
   try {
     if (rowsSupabase.isEmpty) {
-      print('⚠️ No hay usuarios disponibles para guardar');
       return 'No hay usuarios disponibles';
     }
 
     final countLocal = await DBUsuarios.contarUsuarios();
 
-    print('📊 Users SQLite: $countLocal | Supabase: ${rowsSupabase.length}');
 
     // Convertir UsersRow a Usuario usando el factory fromUsersRow
     List<Usuario> usuarios = rowsSupabase.map<Usuario>((row) {
       return Usuario.fromUsersRow(row);
     }).toList();
 
-    print('🔄 Guardando ${usuarios.length} usuarios en SQLite...');
 
     // Insertar usuarios masivamente (usa ConflictAlgorithm.replace)
     final resultado = await DBUsuarios.insertUsuariosMasivos(usuarios);
 
-    print('✅ $resultado');
     return resultado;
   } catch (e) {
-    print('❌ Error en sqlLiteSaveUsersMasivo: $e');
     return "Error: $e";
   }
 }

@@ -23,7 +23,6 @@ Future<String> insertEcosistemaToSupabase(EcosistemaStruct ecosistema) async {
       'updated_at': DateTime.now().toIso8601String(),
     };
 
-    print('📤 Insertando ecosistema en Supabase: ${ecosistema.nombre}');
 
     final response =
         await SupaFlow.client.from('Ecosystems').insert(data).select();
@@ -32,7 +31,6 @@ Future<String> insertEcosistemaToSupabase(EcosistemaStruct ecosistema) async {
       final insertedRow = response[0];
       final insertedId = insertedRow['id'] as String;
       final ecosystemId = insertedRow['ecosystem_id'] as String? ?? '';
-      print('✅ Ecosistema insertado en Supabase con ID: $insertedId, ecosystem_id: $ecosystemId');
 
       // También insertar en SQLite con el ecosystem_id correcto
       if (ecosystemId.isNotEmpty) {
@@ -44,16 +42,13 @@ Future<String> insertEcosistemaToSupabase(EcosistemaStruct ecosistema) async {
           ),
           fromSupabase: true,
         );
-        print('✅ Ecosistema también insertado en SQLite: $ecosystemId');
       }
 
       return ecosystemId.isNotEmpty ? ecosystemId : insertedId;
     } else {
-      print('❌ Error al insertar ecosistema en Supabase: response vacío');
       return '';
     }
   } catch (e) {
-    print('❌ Error al insertar ecosistema en Supabase: $e');
     return '';
   }
 }

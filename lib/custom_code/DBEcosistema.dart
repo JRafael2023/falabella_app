@@ -38,7 +38,6 @@ class DBEcosistema {
         return "Error: No se pudo agregar el Ecosistema";
       }
     } catch (e) {
-      print('Error al insertar ecosistema: $e');
       return "Error al insertar ecosistema: $e";
     }
   }
@@ -73,7 +72,6 @@ class DBEcosistema {
         return "Error: No se pudo actualizar el Ecosistema";
       }
     } catch (e) {
-      print('Error al actualizar ecosistema: $e');
       return "Error al actualizar ecosistema: $e";
     }
   }
@@ -99,7 +97,6 @@ class DBEcosistema {
         return "Error: No se pudo eliminar el Ecosistema";
       }
     } catch (e) {
-      print('Error al eliminar ecosistema: $e');
       return "Error al eliminar ecosistema: $e";
     }
   }
@@ -126,7 +123,6 @@ class DBEcosistema {
 
       return null;
     } catch (e) {
-      print('Error al obtener ecosistema por ID: $e');
       return null;
     }
   }
@@ -141,7 +137,6 @@ class DBEcosistema {
 
       return result.map((row) => metodoconvertidorEcosistema(row)).toList();
     } catch (e) {
-      print('Error al obtener todos los ecosistemas: $e');
       return [];
     }
   }

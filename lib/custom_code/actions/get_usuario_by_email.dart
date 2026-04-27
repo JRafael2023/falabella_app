@@ -22,7 +22,6 @@ Future<dynamic> getUsuarioByEmail(String email) async {
       return null;
     }
 
-    print('🔍 Buscando usuario: $email');
 
     // 1️⃣ Primero buscar en jsonUsers del AppState (funciona offline sin BD)
     final jsonUsers = FFAppState().jsonUsers;
@@ -36,7 +35,6 @@ Future<dynamic> getUsuarioByEmail(String email) async {
         orElse: () => null,
       );
       if (found != null) {
-        print('✅ Usuario encontrado en AppState: ${found['display_name'] ?? found['email']}');
         return found;
       }
     }
@@ -45,14 +43,11 @@ Future<dynamic> getUsuarioByEmail(String email) async {
     final usuario = await DBUsuarios.getUsuarioByEmail(email);
 
     if (usuario != null) {
-      print('✅ Usuario encontrado en SQLite: ${usuario.displayName ?? usuario.email}');
       return usuario.toMap();
     } else {
-      print('❌ Usuario no encontrado en AppState ni SQLite');
       return null;
     }
   } catch (e) {
-    print('❌ Error: $e');
     return null;
   }
 }

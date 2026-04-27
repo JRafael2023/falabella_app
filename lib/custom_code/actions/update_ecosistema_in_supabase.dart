@@ -27,10 +27,8 @@ Future<bool> updateEcosistemaInSupabase(EcosistemaStruct ecosistema) async {
         .update(data)
         .eq('id', ecosistema.idEcosistema!);
 
-    print('✅ Ecosistema actualizado en Supabase');
     return true;
   } catch (e) {
-    print('❌ Error al actualizar ecosistema en Supabase: $e');
     return false;
   }
 }

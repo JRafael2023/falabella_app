@@ -21,7 +21,6 @@ class DBEcosystemSupport {
           ? "EcosystemSupport agregado correctamente"
           : "Error: No se pudo agregar el EcosystemSupport";
     } catch (e) {
-      print('Error al insertar EcosystemSupport: $e');
       return "Error al insertar EcosystemSupport: $e";
     }
   }
@@ -46,7 +45,6 @@ class DBEcosystemSupport {
           ? "EcosystemSupport actualizado correctamente"
           : "Error: No se pudo actualizar el EcosystemSupport";
     } catch (e) {
-      print('Error al actualizar EcosystemSupport: $e');
       return "Error al actualizar EcosystemSupport: $e";
     }
   }
@@ -67,7 +65,6 @@ class DBEcosystemSupport {
           ? "EcosystemSupport eliminado correctamente"
           : "Error: No se pudo eliminar el EcosystemSupport";
     } catch (e) {
-      print('Error al eliminar EcosystemSupport: $e');
       return "Error al eliminar EcosystemSupport: $e";
     }
   }
@@ -82,7 +79,6 @@ class DBEcosystemSupport {
           orderBy: 'name ASC');
       return result.map((row) => EcosystemSupport.fromMap(row)).toList();
     } catch (e) {
-      print('Error al obtener EcosystemSupports: $e');
       return [];
     }
   }
@@ -100,7 +96,6 @@ class DBEcosystemSupport {
       }
       return "Se insertaron $count de ${supabaseData.length} EcosystemSupports";
     } catch (e) {
-      print('Error insertBatchFromSupabase EcosystemSupport: $e');
       return "Error: $e";
     }
   }

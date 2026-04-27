@@ -21,7 +21,6 @@ class DBRiskType {
           ? "RiskType agregado correctamente"
           : "Error: No se pudo agregar el RiskType";
     } catch (e) {
-      print('Error al insertar RiskType: $e');
       return "Error al insertar RiskType: $e";
     }
   }
@@ -46,7 +45,6 @@ class DBRiskType {
           ? "RiskType actualizado correctamente"
           : "Error: No se pudo actualizar el RiskType";
     } catch (e) {
-      print('Error al actualizar RiskType: $e');
       return "Error al actualizar RiskType: $e";
     }
   }
@@ -66,7 +64,6 @@ class DBRiskType {
           ? "RiskType eliminado correctamente"
           : "Error: No se pudo eliminar el RiskType";
     } catch (e) {
-      print('Error al eliminar RiskType: $e');
       return "Error al eliminar RiskType: $e";
     }
   }
@@ -81,7 +78,6 @@ class DBRiskType {
           orderBy: 'name ASC');
       return result.map((row) => RiskType.fromMap(row)).toList();
     } catch (e) {
-      print('Error al obtener RiskTypes: $e');
       return [];
     }
   }
@@ -99,7 +95,6 @@ class DBRiskType {
       }
       return "Se insertaron $count de ${supabaseData.length} RiskTypes";
     } catch (e) {
-      print('Error insertBatchFromSupabase RiskType: $e');
       return "Error: $e";
     }
   }

@@ -44,7 +44,6 @@ class CreateProyectosModel extends FlutterFlowModel<CreateProyectosWidget> {
 
   Usuario? test;
 
-  // ── Selector Highbond ──────────────────────────────────────────────────────
   /// true = mostrar dropdown de proyectos Highbond, false = ingresar ID manual
   bool usarDropdownHighbond = false;
   String? selectedHighbondProjectId;

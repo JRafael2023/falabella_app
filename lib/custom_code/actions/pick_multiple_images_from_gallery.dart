@@ -40,7 +40,6 @@ Future<List<FFUploadedFile>> pickMultipleImagesFromGallery() async {
 
     return uploadedFiles;
   } catch (e) {
-    print('❌ Error al seleccionar imágenes: $e');
     return [];
   }
 }

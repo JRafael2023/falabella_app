@@ -66,7 +66,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
       if (fecha != null) {
         final formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(fecha);
         _model.ultimaSyncText = formattedDate;
-        print('🕒 Última sincronización actualizada: $formattedDate');
       } else {
         _model.ultimaSyncText = 'No hay sincronizaciones';
       }

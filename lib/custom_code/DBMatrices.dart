@@ -21,7 +21,6 @@ class DBMatrices {
           ? "Matriz agregada correctamente"
           : "Error: No se pudo agregar la Matriz";
     } catch (e) {
-      print('Error al insertar matriz: $e');
       return "Error al insertar matriz: $e";
     }
   }
@@ -39,7 +38,6 @@ class DBMatrices {
         orderBy: 'id ASC',
       );
     } catch (e) {
-      print("Error al listar matrices: $e");
       return [];
     }
   }
@@ -59,7 +57,6 @@ class DBMatrices {
 
       return maps.map((e) => Matrices.fromMap(e)).toList();
     } catch (e) {
-      print('Error al obtener matrices: $e');
       return [];
     }
   }
@@ -78,7 +75,6 @@ class DBMatrices {
 
       return maps.isNotEmpty ? Matrices.fromMap(maps.first) : null;
     } catch (e) {
-      print('Error al obtener matriz por ID: $e');
       return null;
     }
   }
@@ -97,7 +93,6 @@ class DBMatrices {
 
       return maps.isNotEmpty ? Matrices.fromMap(maps.first) : null;
     } catch (e) {
-      print('Error al obtener matriz por idMatriz: $e');
       return null;
     }
   }
@@ -121,7 +116,6 @@ class DBMatrices {
           ? "Matriz actualizada correctamente"
           : "Error: No se pudo actualizar la Matriz";
     } catch (e) {
-      print('Error al actualizar matriz: $e');
       return "Error al actualizar matriz: $e";
     }
   }
@@ -145,7 +139,6 @@ class DBMatrices {
           ? "Matriz eliminada correctamente"
           : "Error: No se pudo eliminar la Matriz";
     } catch (e) {
-      print('Error al eliminar matriz: $e');
       return "Error al eliminar matriz: $e";
     }
   }
@@ -165,7 +158,6 @@ class DBMatrices {
           ? "Matriz eliminada permanentemente"
           : "Error: No se pudo eliminar la Matriz";
     } catch (e) {
-      print('Error al eliminar permanentemente matriz: $e');
       return "Error al eliminar permanentemente matriz: $e";
     }
   }
@@ -185,7 +177,6 @@ class DBMatrices {
 
       return maps.map((e) => Matrices.fromMap(e)).toList();
     } catch (e) {
-      print('Error al buscar matrices: $e');
       return [];
     }
   }
@@ -202,7 +193,6 @@ class DBMatrices {
 
       return Sqflite.firstIntValue(result) ?? 0;
     } catch (e) {
-      print('Error al contar matrices: $e');
       return 0;
     }
   }
@@ -218,7 +208,6 @@ class DBMatrices {
       await database.execute('DROP TABLE IF EXISTS Matrices');
       return "Tabla 'Matrices' eliminada correctamente";
     } catch (e) {
-      print('Error al eliminar la tabla Matrices: $e');
       return "Error al eliminar la tabla Matrices: $e";
     }
   }
@@ -248,7 +237,6 @@ class DBMatrices {
 
       return "Matrices sincronizadas correctamente";
     } catch (e) {
-      print('Error insertMatricesMasivas: $e');
       return "Error insertMatricesMasivas: $e";
     }
   }
@@ -283,7 +271,6 @@ class DBMatrices {
 
       return "✅ $nuevos nuevas | $ignorados ya existían";
     } catch (e) {
-      print('Error insertMatricesIncrementales: $e');
       return "Error: $e";
     }
   }

@@ -46,7 +46,6 @@ Future<String> loginWithSupabaseAuth(
       return 'La contraseña debe tener al menos 6 caracteres';
     }
 
-    print('Intentando login con email: $email');
 
     // Intentar iniciar sesión con Supabase Auth
     final response = await SupaFlow.client.auth.signInWithPassword(
@@ -58,7 +57,6 @@ Future<String> loginWithSupabaseAuth(
       return 'Credenciales inválidas';
     }
 
-    print('Login exitoso con Supabase Auth. UID: ${response.user!.id}');
 
     // Buscar el usuario en la tabla Users
     final userRows = await UsersTable().queryRows(
@@ -66,15 +64,12 @@ Future<String> loginWithSupabaseAuth(
     );
 
     if (userRows.isEmpty) {
-      print('Usuario autenticado pero no existe en tabla Users');
       return 'Usuario no encontrado en el sistema';
     }
 
-    print('Usuario encontrado en tabla Users');
 
     return 'OK';
   } on AuthException catch (e) {
-    print('Error de autenticación: ${e.message}');
 
     if (e.message.contains('Invalid login credentials')) {
       return 'El correo o la contraseña no son correctos. Verifica tus datos e intenta nuevamente';
@@ -86,10 +81,8 @@ Future<String> loginWithSupabaseAuth(
       return 'Error de autenticación: ${e.message}';
     }
   } on SocketException {
-    print('Error de red en login: sin conexión a internet');
     return 'Sin conexión a internet. Verifica tu red e intenta nuevamente';
   } on TimeoutException {
-    print('Timeout en login');
     return 'La conexión tardó demasiado. Verifica tu red e intenta nuevamente';
   } catch (e) {
     final msg = e.toString().toLowerCase();
@@ -100,7 +93,6 @@ Future<String> loginWithSupabaseAuth(
         msg.contains('host')) {
       return 'Sin conexión a internet. Verifica tu red e intenta nuevamente';
     }
-    print('Error inesperado en login: $e');
     return 'Error al iniciar sesión. Intenta nuevamente';
   }
 }

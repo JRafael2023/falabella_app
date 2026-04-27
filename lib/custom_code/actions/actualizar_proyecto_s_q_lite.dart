@@ -52,7 +52,6 @@ Future<String> actualizarProyectoSQLite(
       return "⚠️ Proyecto no encontrado";
     }
   } catch (e) {
-    print('❌ Error actualizarProyectoSQLite: $e');
     return "❌ Error al actualizar proyecto: $e";
   }
 }

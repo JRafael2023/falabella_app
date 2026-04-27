@@ -24,13 +24,10 @@ import '/backend/api_requests/api_calls.dart' as api_calls;
 /// 4. Para cada objetivo → controles desde SQLite
 Future cargarTodosLosDatosUsuario(String userId) async {
   try {
-    print('🚀 ===== CARGA COMPLETA DE DATOS =====');
-    print('👤 Usuario UUID: $userId');
 
     // ============================================
     // 1️⃣ OBTENER USER_UID DEL USUARIO
     // ============================================
-    print('\n👤 Paso 1: Obteniendo user_uid...');
 
     // Usar uidUsuario de FFAppState directamente (evita query con userId nulo)
     String userUid = FFAppState().currentUser.uidUsuario ?? '';
@@ -46,36 +43,30 @@ Future cargarTodosLosDatosUsuario(String userId) async {
             userUid = usuarioSupabase.first.userUid ?? '';
           }
         } catch (e) {
-          print('⚠️ Error obteniendo user_uid desde Supabase: $e');
         }
       }
     }
 
     if (userUid.isEmpty || userUid == 'null') {
-      print('⚠️ No se pudo obtener user_uid válido');
       FFAppState().jsonObjetivos = [];
       FFAppState().jsonControles = [];
       return;
     }
 
-    print('✅ user_uid: $userUid');
 
     // ============================================
     // 2️⃣ OBTENER PROYECTOS DEL USUARIO DESDE SUPABASE
     // ============================================
-    print('\n📦 Paso 2: Obteniendo proyectos por assign_user = $userUid...');
     final proyectosSupabase = await ProjectsTable().queryRows(
       queryFn: (q) => q!.eq('assign_user', userUid),
     );
 
     if (proyectosSupabase.isEmpty) {
-      print('⚠️ No hay proyectos asignados a user_uid: $userUid');
       FFAppState().jsonObjetivos = [];
       FFAppState().jsonControles = [];
       return;
     }
 
-    print('✅ Proyectos encontrados: ${proyectosSupabase.length}');
 
     // Extraer IDs de proyectos
     final idsProyectos = proyectosSupabase
@@ -83,12 +74,10 @@ Future cargarTodosLosDatosUsuario(String userId) async {
         .where((id) => id.isNotEmpty)
         .toList();
 
-    print('📋 IDs de proyectos: $idsProyectos');
 
     // ============================================
     // 3️⃣ CARGAR OBJETIVOS - VALIDAR CON API PRIMERO
     // ============================================
-    print('\n🎯 Paso 3: Cargando objetivos de ${idsProyectos.length} proyectos...');
 
     List<dynamic> todosObjetivosJSON = [];
     List<String> proyectosConObjetivos = [];
@@ -104,7 +93,6 @@ Future cargarTodosLosDatosUsuario(String userId) async {
 
       await Future.wait(batch.map((idProyecto) async {
         try {
-          print('  🔍 Validando proyecto $idProyecto con API...');
 
           // Llamar API de objetivos
           final apiObjetivos = await api_calls.SupabaseFunctionsGroup
@@ -112,7 +100,6 @@ Future cargarTodosLosDatosUsuario(String userId) async {
               .call(idProject: idProyecto);
 
           if (apiObjetivos?.succeeded ?? false) {
-            print('  ✅ API respondió OK - Guardando en SQLite...');
 
             // Guardar objetivos en SQLite
             await sqLiteSaveObjetivosMasivo(
@@ -136,7 +123,6 @@ Future cargarTodosLosDatosUsuario(String userId) async {
                 final completados = controles.where((c) => c['completed'] == 1 || c['completed'] == true).length;
                 final progressReal = totalControles > 0 ? (completados / totalControles) : 0.0;
 
-                print('📊 Objetivo ${obj.title}: $completados/$totalControles completados = ${(progressReal * 100).toStringAsFixed(0)}%');
 
                 return {
                   'id_objective': obj.idObjetivo,
@@ -151,12 +137,9 @@ Future cargarTodosLosDatosUsuario(String userId) async {
 
               todosObjetivosJSON.addAll(objetivosJSON);
               totalObjetivos += objetivosJSON.length;
-              print(
-                  '  ✓ Proyecto $idProyecto: ${objetivosJSON.length} objetivos');
             }
           } else {
             // ⚡ API falló (offline o error) → cargar desde SQLite directamente
-            print('  ⚠️ API falló para $idProyecto - usando SQLite como fallback');
             final objetivosSQLite =
                 await DBObjetivos.listarObjetivosPorProyecto(idProyecto);
             if (objetivosSQLite.isNotEmpty) {
@@ -179,18 +162,13 @@ Future cargarTodosLosDatosUsuario(String userId) async {
               })).then((list) => list.toList());
               todosObjetivosJSON.addAll(objetivosJSON);
               totalObjetivos += objetivosJSON.length;
-              print('  ✓ Proyecto $idProyecto (SQLite): ${objetivosJSON.length} objetivos');
             }
           }
         } catch (e) {
-          print('  ❌ Error en proyecto $idProyecto: $e');
         }
       }));
     }
 
-    print('✅ Total objetivos cargados: $totalObjetivos');
-    print(
-        '📋 Proyectos con objetivos: ${proyectosConObjetivos.length} de ${idsProyectos.length}');
 
     // Guardar en FFAppState
     FFAppState().jsonObjetivos = todosObjetivosJSON;
@@ -198,7 +176,6 @@ Future cargarTodosLosDatosUsuario(String userId) async {
     // ============================================
     // 4️⃣ CARGAR CONTROLES - REUSAR CACHE DEL PASO 3
     // ============================================
-    print('\n🎮 Paso 4: Cargando controles de $totalObjetivos objetivos...');
 
     List<dynamic> todosControlesJSON = [];
     int totalControles = 0;
@@ -210,7 +187,6 @@ Future cargarTodosLosDatosUsuario(String userId) async {
         .toList();
 
     if (idsObjetivos.isEmpty) {
-      print('⚠️ No hay objetivos para cargar controles');
       FFAppState().jsonControles = [];
       return;
     }
@@ -276,11 +252,9 @@ Future cargarTodosLosDatosUsuario(String userId) async {
                 e.toString().contains('SocketException') ||
                 e.toString().contains('Connection reset');
             if (esRetriable && intento < 2) {
-              print('  ⏱️ Error de red en $idObjetivo (intento $intento) → reintentando en 2s...');
               await Future.delayed(const Duration(seconds: 2));
               return cargarControlesConRetry(intento + 1);
             }
-            print('  ❌ Error en $idObjetivo (intento $intento): $e');
           }
           return <dynamic>[];
         }
@@ -295,7 +269,6 @@ Future cargarTodosLosDatosUsuario(String userId) async {
       }
     }
 
-    print('✅ Total controles cargados: $totalControles');
 
     // Guardar en FFAppState
     FFAppState().jsonControles = todosControlesJSON;
@@ -304,15 +277,7 @@ Future cargarTodosLosDatosUsuario(String userId) async {
     // ============================================
     // RESUMEN FINAL
     // ============================================
-    print('\n📊 ===== RESUMEN DE CARGA =====');
-    print('✅ user_uid: $userUid');
-    print('✅ Proyectos: ${idsProyectos.length}');
-    print('✅ Objetivos: $totalObjetivos (de ${proyectosConObjetivos.length} proyectos)');
-    print('✅ Controles: $totalControles');
-    print('================================\n');
   } catch (e, stackTrace) {
-    print('❌ ERROR EN CARGA COMPLETA: $e');
-    print('Stack trace: $stackTrace');
     FFAppState().jsonObjetivos = [];
     FFAppState().jsonControles = [];
   }

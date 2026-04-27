@@ -41,7 +41,6 @@ Future<String> combineAndSyncControls(
       return 'Error: La API de controles no retornó datos';
     }
 
-    print('📥 Procesando ${apiResponseDescription.length} controles');
 
     // 🔹 PASO 1: CREAR mapa de walkthrough_ids (OPTIMIZADO)
     final walkthroughMap = Map<String, String>.fromEntries(
@@ -115,7 +114,6 @@ Future<String> combineAndSyncControls(
               e.toString().contains('SocketException') ||
               e.toString().contains('Connection reset');
           if (!isRetriable || _attempt == 3) rethrow;
-          print('⏱️ Error de red en página $_pageFrom (intento $_attempt) → reintentando en ${_attempt}s...');
           await Future.delayed(Duration(seconds: _attempt));
         }
       }
@@ -125,7 +123,6 @@ Future<String> combineAndSyncControls(
         _hasMore = false; // última página
       } else {
         _pageFrom += _pageSize;
-        print('📄 Página cargada: ${existingControls.length} controles hasta ahora...');
       }
     }
 
@@ -139,8 +136,6 @@ Future<String> combineAndSyncControls(
           )),
     );
 
-    print(
-        '📊 Existentes: ${existingMap.length}, Nuevos: ${apiResponseDescription.length - existingMap.length}');
 
     // 🔹 PASO 4: PREPARAR operaciones (UPDATE vs INSERT)
     final toUpdate = <Map<String, dynamic>>[];
@@ -154,8 +149,6 @@ Future<String> combineAndSyncControls(
       if (existing != null) {
         // ⚡ CRÍTICO: SI YA EXISTE EN SQLITE, PRESERVAR completed/finding_status/photos/etc
         // Solo actualizar title/description/walkthrough_id de la API
-        print(
-            '🔄 Control $controlId existente - preservando completed=${existing['completed']}, finding=${existing['finding_status']}');
 
         // 🔒 CARGAR DATOS LOCALES DE SQLITE (fuente de verdad para campos editados offline)
         // Supabase puede tener datos desactualizados si el usuario modificó offline sin sincronizar
@@ -314,13 +307,9 @@ Future<String> combineAndSyncControls(
         '${supabaseResult['updated']} actualizados, '
         '${supabaseResult['inserted']} insertados';
 
-    print(message);
-    print('📱 SQLite: $sqliteResult');
 
     return message;
   } catch (e, stackTrace) {
-    print('❌ Error: $e');
-    print('📋 Stack: $stackTrace');
     // Rethrow errores de red/timeout para que el caller pueda reintentar
     final isRetriable = e.toString().contains('57014') ||
         e.toString().contains('statement timeout') ||
@@ -354,13 +343,11 @@ Future<String?> _resolveAttachment(
   try {
     final localList = await loadLocal();
     if (localList.isNotEmpty) {
-      print('✅ Usando ${localList.length} adjuntos locales (local tiene prioridad)');
       return localList.join(Control.separator);
     }
   } catch (_) {}
   // Local vacío → usar Supabase como fuente (primera carga)
   if (supabaseValue != null && supabaseValue.isNotEmpty) {
-    print('📥 Local vacío, usando adjuntos de Supabase');
     return supabaseValue;
   }
   return null;

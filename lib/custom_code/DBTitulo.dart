@@ -38,7 +38,6 @@ class DBTitulo {
         return "Error: No se pudo agregar el Título";
       }
     } catch (e) {
-      print('Error al insertar título: $e');
       return "Error al insertar título: $e";
     }
   }
@@ -73,7 +72,6 @@ class DBTitulo {
         return "Error: No se pudo actualizar el Título";
       }
     } catch (e) {
-      print('Error al actualizar título: $e');
       return "Error al actualizar título: $e";
     }
   }
@@ -99,7 +97,6 @@ class DBTitulo {
         return "Error: No se pudo eliminar el Título";
       }
     } catch (e) {
-      print('Error al eliminar título: $e');
       return "Error al eliminar título: $e";
     }
   }
@@ -122,7 +119,6 @@ class DBTitulo {
 
       return null;
     } catch (e) {
-      print('Error al obtener título por ID: $e');
       return null;
     }
   }
@@ -156,7 +152,6 @@ class DBTitulo {
 
       return result.map((row) => metodoConvertidor(row)).toList();
     } catch (e) {
-      print('Error al obtener títulos: $e');
       return [];
     }
   }
@@ -200,7 +195,6 @@ class DBTitulo {
 
       return "Se insertaron $insertedCount títulos de ${titulos.length} correctamente";
     } catch (e) {
-      print('Error al insertar batch desde Supabase: $e');
       return "Error al insertar batch: $e";
     }
   }

@@ -84,7 +84,6 @@ class _GetvideoCustomWidgetRutaLocalState
         });
       });
     } catch (e) {
-      print("Error cargando video desde la ruta: $e");
       setState(() {
         _loading = false;
       });

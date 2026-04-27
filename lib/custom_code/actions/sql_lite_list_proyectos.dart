@@ -22,7 +22,6 @@ Future<List<dynamic>> sqlLiteListProyectos() async {
     final userRole = FFAppState().currentUser?.rol ?? '';
 
     if (userUid.isEmpty) {
-      print("⚠️ No hay usuario actual, retornando lista vacía");
       return [];
     }
 
@@ -35,8 +34,6 @@ Future<List<dynamic>> sqlLiteListProyectos() async {
         ? todosProyectos
         : todosProyectos.where((p) => p.assignUser == userUid).toList();
 
-    print("📊 Total proyectos en SQLite: ${todosProyectos.length}");
-    print("✅ Proyectos para $userRole ($userUid): ${proyectosFiltrados.length}");
 
     // 🔥 CONVERTIR A MAPS para que getJsonField funcione
     final List<dynamic> proyectosMap =
@@ -44,13 +41,10 @@ Future<List<dynamic>> sqlLiteListProyectos() async {
 
     // Debug: mostrar los primeros proyectos
     if (proyectosMap.isNotEmpty) {
-      print("📋 Primer proyecto: ${proyectosMap.first['name']}");
-      print("   Tipo: ${proyectosMap.first.runtimeType}");
     }
 
     return proyectosMap;
   } catch (e) {
-    print("❌ Error en sqlLiteListProyectos: $e");
     return []; // Retornar lista vacía en caso de error
   }
 }

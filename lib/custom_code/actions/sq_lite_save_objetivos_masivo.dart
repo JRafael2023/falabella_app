@@ -87,8 +87,6 @@ Future<String> sqLiteSaveObjetivosMasivo(dynamic jsonObjetivos) async {
           actualizados++;
         } else {
           // Tiene cambios locales, NO sobrescribir
-          print(
-              'Objetivo ${objetivo.idObjetivo} tiene cambios locales pendientes, no se actualiza');
         }
       }
     }

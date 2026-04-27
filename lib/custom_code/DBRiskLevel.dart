@@ -21,7 +21,6 @@ class DBRiskLevel {
           ? "RiskLevel agregado correctamente"
           : "Error: No se pudo agregar el RiskLevel";
     } catch (e) {
-      print('Error al insertar RiskLevel: $e');
       return "Error al insertar RiskLevel: $e";
     }
   }
@@ -46,7 +45,6 @@ class DBRiskLevel {
           ? "RiskLevel actualizado correctamente"
           : "Error: No se pudo actualizar el RiskLevel";
     } catch (e) {
-      print('Error al actualizar RiskLevel: $e');
       return "Error al actualizar RiskLevel: $e";
     }
   }
@@ -66,7 +64,6 @@ class DBRiskLevel {
           ? "RiskLevel eliminado correctamente"
           : "Error: No se pudo eliminar el RiskLevel";
     } catch (e) {
-      print('Error al eliminar RiskLevel: $e');
       return "Error al eliminar RiskLevel: $e";
     }
   }
@@ -81,7 +78,6 @@ class DBRiskLevel {
           orderBy: 'name ASC');
       return result.map((row) => RiskLevel.fromMap(row)).toList();
     } catch (e) {
-      print('Error al obtener RiskLevels: $e');
       return [];
     }
   }
@@ -94,7 +90,6 @@ class DBRiskLevel {
           where: 'risk_level_id = ?', whereArgs: [riskLevelId]);
       return result.isNotEmpty ? RiskLevel.fromMap(result.first) : null;
     } catch (e) {
-      print('Error al obtener RiskLevel por ID: $e');
       return null;
     }
   }
@@ -112,7 +107,6 @@ class DBRiskLevel {
       }
       return "Se insertaron $count de ${supabaseData.length} RiskLevels";
     } catch (e) {
-      print('Error insertBatchFromSupabase RiskLevel: $e');
       return "Error: $e";
     }
   }

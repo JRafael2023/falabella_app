@@ -30,17 +30,14 @@ Future<String> sincronizarEcosistemasFromSupabase() async {
         await DBEcosistema.insertEcosistema(ecosistema, fromSupabase: true);
         sincronizados++;
       } catch (e) {
-        print('❌ Error al sincronizar ecosistema a SQLite: $e');
         errores++;
       }
     }
 
     final mensaje =
         '✅ Descarga completada: $sincronizados ecosistemas descargados, $errores errores';
-    print(mensaje);
     return mensaje;
   } catch (e) {
-    print('❌ Error al descargar ecosistemas desde Supabase: $e');
     return 'Error al descargar: $e';
   }
 }

@@ -19,7 +19,6 @@ class DBProyectos {
 
       return "Proyecto insertado correctamente";
     } catch (e) {
-      print('Error insertProyecto: $e');
       return "Error insertProyecto: $e";
     }
   }
@@ -49,7 +48,6 @@ class DBProyectos {
 
       return "Proyectos sincronizados correctamente";
     } catch (e) {
-      print('Error insertProyectosMasivos: $e');
       return "Error insertProyectosMasivos: $e";
     }
   }
@@ -65,7 +63,6 @@ class DBProyectos {
       final maps = await db.query('Proyectos');
       return maps.map((e) => Proyecto.fromMap(e)).toList();
     } catch (e) {
-      print('Error listarProyectos: $e');
       return [];
     }
   }
@@ -90,7 +87,6 @@ class DBProyectos {
       }
       return null;
     } catch (e) {
-      print('Error getProyectoByIdProject: $e');
       return null;
     }
   }
@@ -111,7 +107,6 @@ class DBProyectos {
 
       return rows > 0 ? "Proyecto eliminado" : "Proyecto no encontrado";
     } catch (e) {
-      print('Error deleteProyectoByIdProject: $e');
       return "Error deleteProyectoByIdProject: $e";
     }
   }
@@ -133,7 +128,6 @@ class DBProyectos {
 
       return result.isNotEmpty;
     } catch (e) {
-      print('Error existeProyecto: $e');
       return false;
     }
   }
@@ -157,7 +151,6 @@ class DBProyectos {
           ? "Proyecto actualizado correctamente"
           : "Proyecto no encontrado";
     } catch (e) {
-      print('Error updateProyecto: $e');
       return "Error updateProyecto: $e";
     }
   }
@@ -173,7 +166,6 @@ class DBProyectos {
       final result = await db.rawQuery('SELECT COUNT(*) FROM Proyectos');
       return Sqflite.firstIntValue(result) ?? 0;
     } catch (e) {
-      print('Error contarProyectos: $e');
       return 0;
     }
   }
@@ -189,7 +181,6 @@ class DBProyectos {
       await db.delete('Proyectos');
       return "Proyectos eliminados";
     } catch (e) {
-      print('Error deleteAllProyectos: $e');
       return "Error deleteAllProyectos: $e";
     }
   }
@@ -205,7 +196,6 @@ class DBProyectos {
       await db.execute('DROP TABLE IF EXISTS Proyectos');
       return "Tabla Proyectos eliminada";
     } catch (e) {
-      print('Error dropProyectosTable: $e');
       return "Error dropProyectosTable: $e";
     }
   }
@@ -252,7 +242,6 @@ class DBProyectos {
 
       return "✅ $nuevos nuevos | $actualizados actualizados";
     } catch (e) {
-      print('Error insertProyectosIncrementales: $e');
       return "Error: $e";
     }
   }
@@ -268,7 +257,6 @@ class DBProyectos {
     try {
       final db = await DBHelper.db;
       if (db == null) {
-        print('❌ DB no disponible');
         return 0.0;
       }
 
@@ -280,7 +268,6 @@ class DBProyectos {
       );
 
       if (objetivosResult.isEmpty) {
-        print('⚠️ No hay objetivos para el proyecto $idProject');
         return 0.0;
       }
 
@@ -288,7 +275,6 @@ class DBProyectos {
       final idsObjetivos =
           objetivosResult.map((obj) => obj['id_objetivo'] as String).toList();
 
-      print('📊 Proyecto $idProject tiene ${idsObjetivos.length} objetivos');
 
       // PASO 3: Contar TODOS los controles y los completados
       int totalControles = 0;
@@ -309,8 +295,6 @@ class DBProyectos {
             .length;
       }
 
-      print('📊 Total controles: $totalControles');
-      print('📊 Controles completados: $controlesCompletados');
 
       // PASO 4: Calcular el progreso
       double progress = 0.0;
@@ -318,7 +302,6 @@ class DBProyectos {
         progress = (controlesCompletados / totalControles) * 100.0;
       }
 
-      print('📊 Progress calculado: $progress%');
 
       // PASO 5: Actualizar el campo progress en la tabla Proyectos
       await db.update(
@@ -328,11 +311,9 @@ class DBProyectos {
         whereArgs: [idProject],
       );
 
-      print('✅ Progress actualizado en DB: $progress%');
 
       return progress;
     } catch (e) {
-      print('❌ Error al calcular progress: $e');
       return 0.0;
     }
   }

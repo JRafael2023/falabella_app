@@ -24,7 +24,6 @@ Future<String> insertTituloToSupabase(TituloStruct titulo) async {
       'updated_at': DateTime.now().toIso8601String(),
     };
 
-    print('📤 Insertando título en Supabase: ${titulo.nombre}');
 
     final response = await SupaFlow.client.from('Titles').insert(data).select();
 
@@ -32,7 +31,6 @@ Future<String> insertTituloToSupabase(TituloStruct titulo) async {
       final insertedRow = response[0];
       final insertedId = insertedRow['id'] as String;
       final titlesId = insertedRow['titles_id'] as String? ?? '';
-      print('✅ Título insertado en Supabase con ID: $insertedId, titles_id: $titlesId');
 
       // También insertar en SQLite con el titles_id correcto
       if (titlesId.isNotEmpty) {
@@ -44,16 +42,13 @@ Future<String> insertTituloToSupabase(TituloStruct titulo) async {
           ),
           fromSupabase: true,
         );
-        print('✅ Título también insertado en SQLite: $titlesId');
       }
 
       return titlesId.isNotEmpty ? titlesId : insertedId;
     } else {
-      print('❌ Error al insertar título en Supabase: response vacío');
       return '';
     }
   } catch (e) {
-    print('❌ Error al insertar título en Supabase: $e');
     return '';
   }
 }

@@ -34,7 +34,6 @@ class EditRiskLevelWidget extends StatefulWidget {
 class _EditRiskLevelWidgetState extends State<EditRiskLevelWidget> {
   late EditRiskLevelModel _model;
 
-  // ── Error inline ──────────────────────────────────────────────────────────
   String? _errorMsg;
 
   void _mostrarError(String msg) {
@@ -204,7 +203,6 @@ class _EditRiskLevelWidgetState extends State<EditRiskLevelWidget> {
                           ),
                         ].divide(const SizedBox(height: 5.0)),
                       ),
-                      // ── Error inline ──────────────────────────────────────
                       if (_errorMsg != null)
                         Container(
                           width: double.infinity,
