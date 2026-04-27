@@ -88,7 +88,6 @@ class ControlsRow extends SupabaseDataRow {
   String? get controlText => getField<String>('control_text');
   set controlText(String? value) => setField<String>('control_text', value);
 
-  // ⭐ v19 campos adicionales del hallazgo
   String? get tituloObservacion => getField<String>('titulo_observacion');
   set tituloObservacion(String? value) => setField<String>('titulo_observacion', value);
 

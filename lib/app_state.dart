@@ -140,7 +140,6 @@ class FFAppState extends ChangeNotifier {
           }).toList() ??
           _jsonMatrices;
     });
-    // jsonHighbondProjects no se persiste (son 15k+ registros, se recarga desde Supabase al iniciar)
     _safeInit(() {
       if (prefs.containsKey('ff_currentUser')) {
         try {
@@ -615,11 +614,9 @@ class FFAppState extends ChangeNotifier {
         'ff_jsonMatrices', _jsonMatrices.map((x) => jsonEncode(x)).toList());
   }
 
-  // 🌐 Proyectos de Highbond cacheados (persistente, se refresca online en Home)
   List<dynamic> _jsonHighbondProjects = [];
   List<dynamic> get jsonHighbondProjects => _jsonHighbondProjects;
   set jsonHighbondProjects(List<dynamic> value) {
-    // Solo en memoria — son 15k+ registros, persistir en SharedPreferences bloquea la UI
     _jsonHighbondProjects = value;
   }
 
@@ -642,8 +639,6 @@ class FFAppState extends ChangeNotifier {
     prefs.setBool('ff_noInternetDialogShown', value);
   }
 
-  // 🗂️ Almacenamiento temporal de datos de hallazgo (NO persistente)
-  // Clave: id_control, Valor: Map con datos del hallazgo
   Map<String, Map<String, dynamic>> _hallazgosTemporales = {};
   Map<String, Map<String, dynamic>> get hallazgosTemporales => _hallazgosTemporales;
 
@@ -658,21 +653,16 @@ class FFAppState extends ChangeNotifier {
 
   void clearHallazgoTemporal(String idControl) {
     _hallazgosTemporales.remove(idControl);
-    // NO llamar notifyListeners() aquí para evitar rebuild innecesario
   }
 
   void clearAllHallazgosTemporales() {
     _hallazgosTemporales.clear();
-    // NO llamar notifyListeners() aquí para evitar rebuild innecesario
   }
 
-  // 💾 Almacenamiento temporal COMPLETO de controles (imágenes, texto, estado, etc.)
-  // Clave: id_control, Valor: Map con TODOS los datos del control
   Map<String, Map<String, dynamic>> _controlesTemporales = {};
 
   void setControlTemporal(String idControl, Map<String, dynamic> datos) {
     _controlesTemporales[idControl] = datos;
-    // NO llamar notifyListeners() para evitar rebuilds innecesarios
   }
 
   Map<String, dynamic>? getControlTemporal(String idControl) {

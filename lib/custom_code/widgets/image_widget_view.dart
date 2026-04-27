@@ -9,7 +9,6 @@ import 'index.dart'; // Imports other custom widgets
 import '/custom_code/actions/index.dart'; // Imports custom actions
 import '/flutter_flow/custom_functions.dart'; // Imports custom functions
 import 'package:flutter/material.dart';
-// Begin custom widget code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import '/custom_code/widgets/index.dart';
@@ -44,7 +43,6 @@ class _ImageWidgetViewState extends State<ImageWidgetView> {
     _imageFuture = _loadImage();
   }
 
-  /// Carga segura del archivo local. Si no existe, usa placeholder.
   Future<ImageProvider> _loadImage() async {
     final path = widget.rutalocal;
 

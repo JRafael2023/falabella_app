@@ -26,16 +26,13 @@ Future<String> sqlLiteSaveMatricesMasivo(
     final countLocal = await DBMatrices.countMatrices();
 
 
-    // Debug: Ver qué recibe desde Supabase
     if (rowsSupabaseMatriz.isNotEmpty) {
     }
 
-    // Convertir MatricesRow a Matrices
     List<Matrices> matrices = rowsSupabaseMatriz.map<Matrices>((row) {
       return Matrices.fromMatricesRow(row);
     }).toList();
 
-    // Debug: Ver qué se convirtió
     if (matrices.isNotEmpty) {
     }
 

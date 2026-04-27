@@ -26,7 +26,6 @@ Future<String> updateUsuarioSQLite(
   bool status,
 ) async {
   try {
-    // Crear objeto Usuario con los datos actualizados
     final usuario = Usuario(
       userUid: userUid,
       email: email,
@@ -39,7 +38,6 @@ Future<String> updateUsuarioSQLite(
       status: status,
     );
 
-    // ✅ Usar la función de DBUsuarios
     final resultado = await DBUsuarios.updateUsuario(usuario);
 
     return resultado;

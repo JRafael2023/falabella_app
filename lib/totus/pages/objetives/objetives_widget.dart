@@ -56,7 +56,6 @@ class _ObjetivesWidgetState extends State<ObjetivesWidget>
     super.initState();
     _model = createModel(context, () => ObjetivesModel());
 
-    // Inicializar timer pausable de internet
     initInternetCheck(context, onConnectionChanged: (isConnected) {
       _model.estaconectado = isConnected;
       if (mounted) {
@@ -295,7 +294,6 @@ class _ObjetivesWidgetState extends State<ObjetivesWidget>
                         if (FFAppState().jsonObjetivos.isNotEmpty) {
                           return Builder(
                             builder: (context) {
-                              // Filtrar objetivos del proyecto actual
                               final arreglo = FFAppState()
                                   .jsonObjetivos
                                   .where((obj) =>
@@ -507,7 +505,6 @@ class _ObjetivesWidgetState extends State<ObjetivesWidget>
                                               ),
                                               FFButtonWidget(
                                                 onPressed: () async {
-                                                  // Guardar ID del objetivo actual
                                                   FFAppState().idobejetivo =
                                                       getJsonField(
                                                     arregloItem,
@@ -515,8 +512,6 @@ class _ObjetivesWidgetState extends State<ObjetivesWidget>
                                                   ).toString();
                                                   safeSetState(() {});
 
-                                                  // NO HACER LLAMADAS API - Los datos ya están precargados
-                                                  // La página de controles los filtrará automáticamente
 
                                                   context.goNamed(
                                                     ControlesWidget.routeName,

@@ -9,7 +9,6 @@ import 'index.dart'; // Imports other custom widgets
 import '/custom_code/actions/index.dart'; // Imports custom actions
 import '/flutter_flow/custom_functions.dart'; // Imports custom functions
 import 'package:flutter/material.dart';
-// Begin custom widget code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'dart:async';
@@ -45,20 +44,17 @@ class WidgetWritexText extends StatefulWidget {
 }
 
 class _WidgetWritexTextState extends State<WidgetWritexText> {
-  // === MODO ONLINE (speech_to_text) ===
   late stt.SpeechToText _speech;
   bool _speechInitialized = false;
   String? _localeId;
   bool _userStoppedManually = false;
   bool _isSavingText = false;
 
-  // === MODO OFFLINE (grabar → transcribir) ===
   static Model? _voskModel;           // static: se comparte entre instancias
   static bool _voskModelLoading = false;
   AudioRecorder? _recorder;           // graba a archivo WAV
   bool _isTranscribing = false;       // muestra "Transcribiendo..."
 
-  // === ESTADO COMPARTIDO ===
   bool _isListening = false;
   bool _isOnline = true;
   String _finalText = '';
@@ -222,17 +218,14 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
 
 
   Future<void> _listenOffline() async {
-    // Permiso de micrófono
     PermissionStatus status = await Permission.microphone.request();
     if (status.isDenied || status.isPermanentlyDenied) {
       _showPermissionError();
       return;
     }
 
-    // Cargar modelo Vosk si no está listo (solo una vez)
     if (_voskModel == null) {
       if (_voskModelLoading) {
-        // Otra instancia ya está cargando — esperar máx 15s
         int espera = 0;
         while (_voskModelLoading && espera < 150) {
           await Future.delayed(const Duration(milliseconds: 100));
@@ -260,11 +253,9 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
       }
     }
 
-    // Preparar ruta del archivo temporal
     final dir = await getTemporaryDirectory();
     final path = '${dir.path}/vosk_recording.wav';
 
-    // Grabar como WAV para poder leer el header y saber el formato real
     try {
       await _recorder!.start(
         const RecordConfig(
@@ -306,7 +297,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
       final wavBytes = await File(path).readAsBytes();
       debugPrint('[VOSK] Tamaño WAV total: ${wavBytes.length} bytes');
 
-      // Leer header WAV para conocer el formato REAL grabado
       int actualSampleRate = 16000;
       int audioFormat = 1;
       int bitsPerSample = 16;
@@ -322,18 +312,15 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
       debugPrint('[VOSK] WAV header → format=$audioFormat (1=PCM,3=Float), '
           'channels=$numChannels, sampleRate=$actualSampleRate, bits=$bitsPerSample');
 
-      // Extraer PCM (skip header)
       final pcmData = _extractPcmFromWav(wavBytes);
       debugPrint('[VOSK] PCM extraído: ${pcmData.length} bytes '
           '(~${(pcmData.length / (actualSampleRate * numChannels * (bitsPerSample ~/ 8))).toStringAsFixed(1)}s)');
 
-      // Detectar si el audio es silencio y calcular amplitud RMS real
       if (pcmData.isNotEmpty) {
         final nonZero = pcmData.where((b) => b != 0).length;
         final silencePct = ((1 - nonZero / pcmData.length) * 100).toStringAsFixed(1);
         debugPrint('[VOSK] Silencio estimado: $silencePct%');
 
-        // Calcular RMS de las muestras PCM 16-bit (little-endian)
         double sumSq = 0;
         int sampleCount = 0;
         for (int i = 0; i + 1 < pcmData.length; i += 2) {
@@ -368,7 +355,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
         return;
       }
 
-      // Chunk dinámico según sample rate real
       final chunkSize = actualSampleRate ~/ 4 * (bitsPerSample ~/ 8);
       final List<String> parts = [];
       int chunkCount = 0;
@@ -386,7 +372,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
           final text = _extractText(raw);
           if (text.isNotEmpty) parts.add(text);
         } else {
-          // Cada 5 chunks mostrar resultado parcial para diagnóstico
           if (chunkCount % 5 == 0) {
             final partial = await recognizer.getPartialResult();
             debugPrint('[VOSK] chunk $chunkCount (parcial) → "$partial"');
@@ -396,7 +381,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
 
       debugPrint('[VOSK] Total chunks: $chunkCount, aceptados: $chunksAceptados');
 
-      // Resultado final — captura lo que quedó en el buffer
       final finalRaw = await recognizer.getFinalResult();
       debugPrint('[VOSK] getFinalResult: $finalRaw');
       final finalText = _extractText(finalRaw);
@@ -429,10 +413,8 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
     }
   }
 
-  /// Extrae los bytes PCM del archivo WAV (busca el chunk "data")
   List<int> _extractPcmFromWav(Uint8List wavBytes) {
     try {
-      // Buscar el marcador "data" (0x64 0x61 0x74 0x61) en el header
       for (int i = 12; i < wavBytes.length - 8; i++) {
         if (wavBytes[i]     == 0x64 && wavBytes[i + 1] == 0x61 &&
             wavBytes[i + 2] == 0x74 && wavBytes[i + 3] == 0x61) {
@@ -442,14 +424,12 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
           }
         }
       }
-      // Fallback: saltar los primeros 44 bytes del header estándar
       return wavBytes.length > 44 ? wavBytes.sublist(44) : [];
     } catch (_) {
       return wavBytes.length > 44 ? wavBytes.sublist(44) : [];
     }
   }
 
-  /// Extrae el texto del JSON de Vosk
   String _extractText(String json) {
     try {
       final decoded = jsonDecode(json) as Map<String, dynamic>;
@@ -520,7 +500,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Spinner mientras transcribe
           if (_isTranscribing)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -557,7 +536,6 @@ class _WidgetWritexTextState extends State<WidgetWritexText> {
               ),
             ),
 
-          // Etiqueta de estado
           if (!_isTranscribing)
             Padding(
               padding: const EdgeInsets.only(top: 4.0),

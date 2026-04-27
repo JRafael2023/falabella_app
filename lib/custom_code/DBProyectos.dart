@@ -3,9 +3,6 @@ import 'package:sqflite/sqflite.dart';
 import 'Proyecto.dart';
 
 class DBProyectos {
-  // ============================================
-  // INSERTAR PROYECTO
-  // ============================================
   static Future<String> insertProyecto(Proyecto proyecto) async {
     try {
       final db = await DBHelper.db;
@@ -23,9 +20,6 @@ class DBProyectos {
     }
   }
 
-  // ============================================
-  // INSERTAR PROYECTOS MASIVOS (SYNC TOTAL)
-  // ============================================
   static Future<String> insertProyectosMasivos(
     List<Proyecto> proyectos,
   ) async {
@@ -34,7 +28,6 @@ class DBProyectos {
       if (db == null) return "Error: DB no disponible";
 
       await db.transaction((txn) async {
-        // 🔥 sync full
         await txn.delete('Proyectos');
 
         for (final proyecto in proyectos) {
@@ -52,9 +45,6 @@ class DBProyectos {
     }
   }
 
-  // ============================================
-  // LISTAR PROYECTOS
-  // ============================================
   static Future<List<Proyecto>> listarProyectos() async {
     try {
       final db = await DBHelper.db;
@@ -67,9 +57,6 @@ class DBProyectos {
     }
   }
 
-  // ============================================
-  // OBTENER PROYECTO POR ID_PROJECT
-  // ============================================
   static Future<Proyecto?> getProyectoByIdProject(String idProject) async {
     try {
       final db = await DBHelper.db;
@@ -91,9 +78,6 @@ class DBProyectos {
     }
   }
 
-  // ============================================
-  // ELIMINAR PROYECTO POR ID_PROJECT
-  // ============================================
   static Future<String> deleteProyectoByIdProject(String idProject) async {
     try {
       final db = await DBHelper.db;
@@ -111,9 +95,6 @@ class DBProyectos {
     }
   }
 
-  // ============================================
-  // EXISTE PROYECTO
-  // ============================================
   static Future<bool> existeProyecto(String idProject) async {
     try {
       final db = await DBHelper.db;
@@ -121,7 +102,7 @@ class DBProyectos {
 
       final result = await db.query(
         'Proyectos',
-        where: 'idProyecto = ?', // ⚠️ Sin guion bajo
+        where: 'idProyecto = ?',
         whereArgs: [idProject],
         limit: 1,
       );
@@ -132,9 +113,6 @@ class DBProyectos {
     }
   }
 
-  // ============================================
-  // ACTUALIZAR PROYECTO
-  // ============================================
   static Future<String> updateProyecto(Proyecto proyecto) async {
     try {
       final db = await DBHelper.db;
@@ -155,9 +133,6 @@ class DBProyectos {
     }
   }
 
-  // ============================================
-  // CONTAR PROYECTOS
-  // ============================================
   static Future<int> contarProyectos() async {
     try {
       final db = await DBHelper.db;
@@ -170,9 +145,6 @@ class DBProyectos {
     }
   }
 
-  // ============================================
-  // ELIMINAR TODOS LOS PROYECTOS
-  // ============================================
   static Future<String> deleteAllProyectos() async {
     try {
       final db = await DBHelper.db;
@@ -185,9 +157,6 @@ class DBProyectos {
     }
   }
 
-  // ============================================
-  // DROP TABLE (DEV ONLY)
-  // ============================================
   static Future<String> dropProyectosTable() async {
     try {
       final db = await DBHelper.db;
@@ -200,9 +169,6 @@ class DBProyectos {
     }
   }
 
-  // ============================================
-// INSERTAR PROYECTOS INCREMENTALES
-// ============================================
   static Future<String> insertProyectosIncrementales(
     List<Proyecto> proyectos,
   ) async {
@@ -224,8 +190,6 @@ class DBProyectos {
           );
           nuevos++;
         } else {
-          // ✅ Actualizar progress desde Supabase para mantenerlo sincronizado
-          // Esto evita que el modo offline muestre progreso incorrecto (ej: 100% cuando es 78%)
           await db.update(
             'Proyectos',
             {
@@ -246,12 +210,6 @@ class DBProyectos {
     }
   }
 
-  // ============================================
-  // CALCULAR Y ACTUALIZAR PROGRESS DE PROYECTO
-  // ============================================
-  // Esta función calcula el progreso basándose en:
-  // progress = (controles completados / total controles) * 100
-  // Recorre: Proyecto -> Objetivos -> Controles
   static Future<double> calcularYActualizarProgressProyecto(
       String idProject) async {
     try {
@@ -260,7 +218,6 @@ class DBProyectos {
         return 0.0;
       }
 
-      // PASO 1: Obtener todos los objetivos de este proyecto
       final objetivosResult = await db.query(
         'Objetivos',
         where: 'project_id = ?',
@@ -271,12 +228,10 @@ class DBProyectos {
         return 0.0;
       }
 
-      // PASO 2: Extraer los IDs de los objetivos
       final idsObjetivos =
           objetivosResult.map((obj) => obj['id_objetivo'] as String).toList();
 
 
-      // PASO 3: Contar TODOS los controles y los completados
       int totalControles = 0;
       int controlesCompletados = 0;
 
@@ -289,21 +244,18 @@ class DBProyectos {
 
         totalControles += controlesResult.length;
 
-        // Contar los completados (completed = 1)
         controlesCompletados += controlesResult
             .where((control) => control['completed'] == 1)
             .length;
       }
 
 
-      // PASO 4: Calcular el progreso
       double progress = 0.0;
       if (totalControles > 0) {
         progress = (controlesCompletados / totalControles) * 100.0;
       }
 
 
-      // PASO 5: Actualizar el campo progress en la tabla Proyectos
       await db.update(
         'Proyectos',
         {'progress': progress},

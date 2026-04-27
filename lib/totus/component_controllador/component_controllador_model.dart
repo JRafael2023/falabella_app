@@ -25,7 +25,6 @@ import 'package:provider/provider.dart';
 
 class ComponentControlladorModel
     extends FlutterFlowModel<ComponentControlladorWidget> {
-  ///  Local state fields for this component.
 
   int? selectStateControl;
 
@@ -91,7 +90,6 @@ class ComponentControlladorModel
 
   String? nivelRiesgo;
 
-  // ⭐ v19 campos adicionales del hallazgo
   String? riskLevelId;
   String? publicationStatusId;
   String? estadoPublicacion;
@@ -117,11 +115,8 @@ class ComponentControlladorModel
     updateFn(hallazgo ??= HallazgoStruct());
   }
 
-  ///  State fields for stateful widgets in this component.
 
-  // Model for ContainerText component.
   late ContainerTextModel containerTextModel;
-  // State field(s) for txtdescripcion widget.
   FocusNode? txtdescripcionFocusNode;
   TextEditingController? txtdescripcionTextController;
   String? Function(BuildContext, String?)?
@@ -133,46 +128,30 @@ class ComponentControlladorModel
   FFUploadedFile uploadedLocalFile_imagenesUploadCaptura =
       FFUploadedFile(bytes: Uint8List.fromList([]), originalFilename: '');
 
-  // Stores action output result for [Custom Action - pickMultipleImagesFromGallery] action in Container widget.
   List<FFUploadedFile>? uploadList;
   bool isDataUploading_videoflutterflowwidgetx = false;
   FFUploadedFile uploadedLocalFile_videoflutterflowwidgetx =
       FFUploadedFile(bytes: Uint8List.fromList([]), originalFilename: '');
 
-  // Stores action output result for [Custom Action - pickMultipleVideosFromGallery] action in Container widget.
   List<FFUploadedFile>? uploadListVideo;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in btnGuardarControl widget.
   bool? estaconectado;
-  // Stores action output result for [Backend Call - API (Update Control Highbond Inefectivo)] action in btnGuardarControl widget.
   ApiCallResponse? apiResultsjoEfectivo;
-  // Stores action output result for [Backend Call - API (Update Control Highbond)] action in btnGuardarControl widget.
   ApiCallResponse? updateControlEfectivo;
-  // Stores action output result for [Backend Call - API (Update Control Highbond)] action in btnGuardarControl widget.
   ApiCallResponse? updateControlEfectivosinImagenes;
-  // Stores action output result for [Backend Call - API (Update Control Highbond Inefectivo)] action in btnGuardarControl widget.
   ApiCallResponse? apiResultInefectivo;
-  // Stores action output result for [Backend Call - API (Update Control Highbond)] action in btnGuardarControl widget.
   ApiCallResponse? updateControlAPIEfectgivo;
-  // Stores action output result for [Backend Call - API (Update Control Highbond)] action in btnGuardarControl widget.
   ApiCallResponse? updateControlInefectivosinImagenes;
-  // Stores action output result for [Backend Call - API (Update Control Highbond Inefectivo)] action in btnGuardarControl widget.
   ApiCallResponse? apiResultInefectivoSinAdjuntos;
-  // Stores action output result for [Custom Action - sqlLiteListControles] action in btnGuardarControl widget.
   List<dynamic>? sqliListInefectivono;
-  // Stores action output result for [Custom Action - sqlLiteListControles] action in btnGuardarControl widget.
   List<dynamic>? sqListControles2;
 
-  /// 🔍 Detectar si hay cambios sin guardar
   bool tieneCambiosSinGuardar() {
-    // Verificar si hay archivos/imágenes/videos agregados
     bool tieneArchivos = listImagesData.isNotEmpty ||
                          listvideomp4Data.isNotEmpty ||
                          listarchiveData.isNotEmpty;
 
-    // Verificar si se modificó la descripción
     bool descripcionModificada = txtdescripcionTextController?.text.isNotEmpty ?? false;
 
-    // Verificar si hay datos de hallazgo
     bool tieneHallazgo = titulo != null ||
                          gerencia != null ||
                          ecosistema != null ||

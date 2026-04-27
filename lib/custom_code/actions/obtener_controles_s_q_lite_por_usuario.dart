@@ -22,7 +22,6 @@ Future<List<dynamic>> obtenerControlesSQLitePorUsuario(
 }) async {
   try {
 
-    // 1. Obtener proyectos del usuario desde SQLite
     final todosProyectos = await DBProyectos.listarProyectos();
     final proyectosUsuario = todosProyectos
         .where((p) => p.assignUser == userId)
@@ -32,7 +31,6 @@ Future<List<dynamic>> obtenerControlesSQLitePorUsuario(
       return [];
     }
 
-    // 2. Obtener objetivos de esos proyectos (en paralelo)
     final objetivosListas = await Future.wait(
       proyectosUsuario.map((p) =>
           DBObjetivos.listarObjetivosPorProyecto(p.idProject)),
@@ -43,7 +41,6 @@ Future<List<dynamic>> obtenerControlesSQLitePorUsuario(
       return [];
     }
 
-    // 3. Obtener controles con pendiente_sync = 1 (en paralelo)
     final pendientesListas = await Future.wait(
       objetivosUsuario.map((obj) =>
           DBControles.listarControlesPendientesSync(obj.idObjetivo)),
@@ -59,7 +56,6 @@ Future<List<dynamic>> obtenerControlesSQLitePorUsuario(
     }
 
 
-    // 4. Cargar datos completos en paralelo
     final completosLista = await Future.wait(
       idsPendientes.map((id) async {
         try {

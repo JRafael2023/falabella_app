@@ -32,7 +32,6 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 
 class HomeProyectsModel extends FlutterFlowModel<HomeProyectsWidget> {
-  ///  Local state fields for this page.
 
   List<dynamic> noIniciadasJson = [];
   void addToNoIniciadasJson(dynamic item) => noIniciadasJson.add(item);
@@ -75,38 +74,25 @@ class HomeProyectsModel extends FlutterFlowModel<HomeProyectsWidget> {
 
   String ultimaSyncText = 'Cargando...';
 
-  ///  State fields for stateful widgets in this page.
 
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in HomeProyects widget.
   bool? estaconectado;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // Model for MatrizDinamicOn.
   late MatrizDinamicModel matrizDinamicOnModel;
-  // Model for MatrizDinamicOff.
   late MatrizDinamicModel matrizDinamicOffModel;
-  // State field(s) for txtid widget.
   FocusNode? txtidFocusNode;
   TextEditingController? txtidTextController;
   String? Function(BuildContext, String?)? txtidTextControllerValidator;
   Completer<ApiCallResponse>? apiRequestCompleter3;
-  // Models for ContainerExpress dynamic component.
   late FlutterFlowDynamicModels<ContainerExpressModel> containerExpressModels1;
-  // Models for ContainerExpress dynamic component.
   late FlutterFlowDynamicModels<ContainerExpressModel> containerExpressModels2;
   Completer<ApiCallResponse>? apiRequestCompleter1;
-  // Models for ContainerExpress dynamic component.
   late FlutterFlowDynamicModels<ContainerExpressModel> containerExpressModels3;
-  // Models for ContainerExpress dynamic component.
   late FlutterFlowDynamicModels<ContainerExpressModel> containerExpressModels4;
   Completer<ApiCallResponse>? apiRequestCompleter2;
-  // Models for ContainerCompleta dynamic component.
   late FlutterFlowDynamicModels<ContainerCompletaModel>
       containerCompletaModels1;
-  // Models for ContainerCompleta dynamic component.
   late FlutterFlowDynamicModels<ContainerCompletaModel>
       containerCompletaModels2;
 
@@ -148,15 +134,12 @@ class HomeProyectsModel extends FlutterFlowModel<HomeProyectsWidget> {
     containerCompletaModels2.dispose();
   }
 
-  /// Action blocks.
   Future objetives(
     BuildContext context, {
     required String? idProyecto,
     String? title,
     String? tipoMatriz,
   }) async {
-    // NO HACER NADA - Los datos ya están precargados en FFAppState().jsonObjetivos
-    // La página de objetivos los filtrará automáticamente por id_project
     FFAppState().idproyect = idProyecto!;
     FFAppState().projectName = title ?? '';
     FFAppState().update(() {});
@@ -176,7 +159,6 @@ class HomeProyectsModel extends FlutterFlowModel<HomeProyectsWidget> {
     );
   }
 
-  /// Additional helper methods.
   Future waitForApiRequestCompleted3({
     double minWait = 0,
     double maxWait = double.infinity,

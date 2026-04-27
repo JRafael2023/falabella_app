@@ -13,7 +13,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class EditGerenciaModel extends FlutterFlowModel<EditGerenciaWidget> {
-  ///  Local state fields for this component.
 
   List<GerenciaStruct> listGerencias = [];
   void addToListGerencias(GerenciaStruct item) => listGerencias.add(item);
@@ -27,10 +26,8 @@ class EditGerenciaModel extends FlutterFlowModel<EditGerenciaWidget> {
           int index, Function(GerenciaStruct) updateFn) =>
       listGerencias[index] = updateFn(listGerencias[index]);
 
-  ///  State fields for stateful widgets in this component.
 
   final formKey = GlobalKey<FormState>();
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
@@ -42,13 +39,9 @@ class EditGerenciaModel extends FlutterFlowModel<EditGerenciaWidget> {
     return null;
   }
 
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Button widget.
   bool? estaconectado;
-  // Stores action output result for [Backend Call - Update Row(s)] action in Button widget.
   List<ManagementsRow>? updateEcosistema;
-  // Stores action output result for [Custom Action - getGerenciasFromSupabase] action in Button widget.
   List<GerenciaStruct>? returnGerencias;
-  // Stores action output result for [Custom Class Method - DBGerencia.getAllGerencias] action in Button widget.
   List<GerenciaStruct>? gerenciasoffline;
 
   @override

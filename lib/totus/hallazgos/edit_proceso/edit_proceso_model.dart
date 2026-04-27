@@ -13,7 +13,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class EditProcesoModel extends FlutterFlowModel<EditProcesoWidget> {
-  ///  Local state fields for this component.
 
   List<ProcesoStruct> listProcesos = [];
   void addToListProcesos(ProcesoStruct item) => listProcesos.add(item);
@@ -24,10 +23,8 @@ class EditProcesoModel extends FlutterFlowModel<EditProcesoWidget> {
   void updateListProcesosAtIndex(int index, Function(ProcesoStruct) updateFn) =>
       listProcesos[index] = updateFn(listProcesos[index]);
 
-  ///  State fields for stateful widgets in this component.
 
   final formKey = GlobalKey<FormState>();
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
@@ -39,13 +36,10 @@ class EditProcesoModel extends FlutterFlowModel<EditProcesoWidget> {
     return null;
   }
 
-  // State field(s) for txtabrev widget.
   FocusNode? txtabrevFocusNode;
   TextEditingController? txtabrevTextController;
   String? Function(BuildContext, String?)? txtabrevTextControllerValidator;
-  // Stores action output result for [Custom Action - getProcesosFromSupabase] action in Button widget.
   List<ProcesoStruct>? returnProcesos;
-  // Stores action output result for [Custom Class Method - DBProceso.getAllProcesos] action in Button widget.
   List<ProcesoStruct>? procesosoffline;
 
   @override

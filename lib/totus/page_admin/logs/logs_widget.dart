@@ -48,7 +48,6 @@ class _LogsWidgetState extends State<LogsWidget> with WidgetsBindingObserver, In
     super.initState();
     _model = createModel(context, () => LogsModel());
 
-    // ⚡ Inicializar timer de internet con soporte para pausar cuando se minimiza
     initInternetCheck(context, onConnectionChanged: (isConnected) {
       _model.estaconectado = isConnected;
       if (mounted) {
@@ -57,7 +56,6 @@ class _LogsWidgetState extends State<LogsWidget> with WidgetsBindingObserver, In
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Logs es página de admin → cargar TODOS los proyectos sin filtrar por usuario
       final todosProyectos = await DBProyectos.listarProyectos();
       final usuarios = await actions.sqLiteListUsers();
       FFAppState().update(() {
@@ -71,7 +69,6 @@ class _LogsWidgetState extends State<LogsWidget> with WidgetsBindingObserver, In
 
   @override
   void dispose() {
-    // ⚡ Limpiar timer de internet
     disposeInternetCheck();
     _model.dispose();
 
@@ -842,9 +839,7 @@ class _LogsWidgetState extends State<LogsWidget> with WidgetsBindingObserver, In
                                               .call()))
                                     .future,
                                 builder: (context, snapshot) {
-                                  // Show loading indicator
                                   if (!snapshot.hasData) {
-                                    // ✅ Error de red / sin conexión
                                     if (snapshot.hasError) {
                                       return Center(
                                         child: Padding(
@@ -893,7 +888,6 @@ class _LogsWidgetState extends State<LogsWidget> with WidgetsBindingObserver, In
                                   }
                                   final containerTasksGetTaksHighbondResponse =
                                       snapshot.data!;
-                                  // ✅ FIX: jsonBody puede ser null cuando no hay conexión
                                   final arrayTasks =
                                       (containerTasksGetTaksHighbondResponse
                                               .jsonBody?['data']?['tasks'] as List?) ??

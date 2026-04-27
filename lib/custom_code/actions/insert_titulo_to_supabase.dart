@@ -14,7 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:tottus/custom_code/DBTitulo.dart';
 import 'package:tottus/custom_code/sqlite_helper.dart';
 
-/// Insertar un título en Supabase
 Future<String> insertTituloToSupabase(TituloStruct titulo) async {
   try {
     final Map<String, dynamic> data = {
@@ -32,7 +31,6 @@ Future<String> insertTituloToSupabase(TituloStruct titulo) async {
       final insertedId = insertedRow['id'] as String;
       final titlesId = insertedRow['titles_id'] as String? ?? '';
 
-      // También insertar en SQLite con el titles_id correcto
       if (titlesId.isNotEmpty) {
         await DBTitulo.insertTitulo(
           TituloStruct(

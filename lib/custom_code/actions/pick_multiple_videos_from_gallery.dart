@@ -17,7 +17,6 @@ Future<List<FFUploadedFile>> pickMultipleVideosFromGallery() async {
   try {
     final ImagePicker picker = ImagePicker();
 
-    // Seleccionar múltiples videos de la galería
     final List<XFile> videos = await picker.pickMultipleMedia(
       imageQuality: 100,
     );
@@ -26,11 +25,9 @@ Future<List<FFUploadedFile>> pickMultipleVideosFromGallery() async {
       return [];
     }
 
-    // Convertir XFile a FFUploadedFile (solo videos)
     List<FFUploadedFile> uploadedFiles = [];
 
     for (var video in videos) {
-      // Filtrar solo archivos de video
       if (video.path.toLowerCase().endsWith('.mp4') ||
           video.path.toLowerCase().endsWith('.mov') ||
           video.path.toLowerCase().endsWith('.avi') ||

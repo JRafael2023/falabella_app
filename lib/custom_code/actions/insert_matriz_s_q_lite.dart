@@ -21,7 +21,6 @@ Future<String> insertMatrizSQLite(
   String name,
 ) async {
   try {
-    // Crear objeto Matrices
     final matriz = Matrices(
       idMatriz: idMatriz,
       name: name,
@@ -29,7 +28,6 @@ Future<String> insertMatrizSQLite(
       status: true,
     );
 
-    // ✅ Usar la función de DBMatrices
     final resultado = await DBMatrices.insertMatriz(matriz);
 
     return resultado;

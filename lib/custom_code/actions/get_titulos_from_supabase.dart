@@ -16,7 +16,6 @@ import 'index.dart'; // Imports other custom actions
 import 'package:tottus/custom_code/DBTitulo.dart';
 import 'package:tottus/custom_code/sqlite_helper.dart';
 
-/// Obtener todos los títulos desde Supabase
 Future<List<TituloStruct>> getTitulosFromSupabase() async {
   try {
     final response = await SupaFlow.client

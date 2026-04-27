@@ -25,13 +25,11 @@ Future<String> sqlLiteSaveUsersMasivo(List<UsersRow> rowsSupabase) async {
     final countLocal = await DBUsuarios.contarUsuarios();
 
 
-    // Convertir UsersRow a Usuario usando el factory fromUsersRow
     List<Usuario> usuarios = rowsSupabase.map<Usuario>((row) {
       return Usuario.fromUsersRow(row);
     }).toList();
 
 
-    // Insertar usuarios masivamente (usa ConflictAlgorithm.replace)
     final resultado = await DBUsuarios.insertUsuariosMasivos(usuarios);
 
     return resultado;

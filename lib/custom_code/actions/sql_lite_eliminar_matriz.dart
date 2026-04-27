@@ -16,8 +16,6 @@ import 'index.dart'; // Imports other custom actions
 import '../sqlite_helper.dart';
 
 Future<String> sqlLiteEliminarMatriz(String idMatriz) async {
-  // Add your function code here!
-  //
 
   var result = await DBMatrices.deleteMatriz(idMatriz);
 

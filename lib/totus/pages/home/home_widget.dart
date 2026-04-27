@@ -39,9 +39,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     super.initState();
     _model = createModel(context, () => HomeModel());
 
-    // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      // Iniciar con el primer mensaje y el timer
       _model.loadingStartTime = DateTime.now();
       _startLoadingTimer();
 
@@ -97,7 +95,6 @@ class _HomeWidgetState extends State<HomeWidget> {
           createdAt: _model.qUser?.firstOrNull?.createdAt,
         );
 
-        // Ahora que tenemos currentUser, cargar proyectos filtrados por usuario
         _model.qOnProjects = await actions.sqlLiteListProyectos();
         _model.qOnMatrices = await actions.sqlLiteListMatrices();
         _model.qJSONROwsSupabase = await actions.convertRowsUsers(
@@ -125,10 +122,6 @@ class _HomeWidgetState extends State<HomeWidget> {
           _model.loadingProgress = 0.6;
         });
 
-        // Si el auditor creó/editó gerencias, ecosistemas, procesos o títulos
-        // mientras estaba offline, se suben ahora que hay conexión.
-        // Solo toca registros con sincronizadoNube=0, sincronizadoLocal=1.
-        // No duplica porque verifica por ID personalizado antes de insertar.
         try {
           final syncResult = await actions.sincronizarAdmin();
           if (syncResult.huboCambiosPendientes) {
@@ -142,7 +135,6 @@ class _HomeWidgetState extends State<HomeWidget> {
           _model.loadingProgress = 0.7;
         });
 
-        // 🚀 CARGA INTELIGENTE DE DATOS (Solo sync completa si es primera vez)
         await actions.cargarDatosConCacheInteligente(
           FFAppState().currentUser!.id,
         );
@@ -152,8 +144,6 @@ class _HomeWidgetState extends State<HomeWidget> {
           _model.loadingProgress = 1.0;
         });
       } else {
-        // OFFLINE: Ya tiene datos en SQLite, cargar directamente sin animación
-        // 1️⃣ Primero obtener usuario para tener uidUsuario disponible
         _model.returnLOginOFF = await actions.getUsuarioByEmail(
           widget!.email!,
         );
@@ -163,7 +153,6 @@ class _HomeWidgetState extends State<HomeWidget> {
         _model.getEcosistemas = await actions.getEcosistemasFromSQLite();
         _model.getGerencias = await actions.getGerenciasFromSQLite();
 
-        // 2️⃣ Setear currentUser ANTES de llamar sqlLiteListProyectos (necesita uidUsuario)
         FFAppState().currentUser = UserStruct(
           id: getJsonField(
             _model.returnLOginOFF,
@@ -192,7 +181,6 @@ class _HomeWidgetState extends State<HomeWidget> {
           createdAt: DateTime.fromMicrosecondsSinceEpoch(1767502800000000),
         );
 
-        // 3️⃣ Ahora cargar proyectos/matrices con uidUsuario ya disponible
         _model.qoffProyectos = await actions.sqlLiteListProyectos();
         _model.qoffMatrices = await actions.sqlLiteListMatrices();
 
@@ -212,7 +200,6 @@ class _HomeWidgetState extends State<HomeWidget> {
             _model.getEcosistemas!.toList().cast<EcosistemaStruct>();
         FFAppState().update(() {});
 
-        // Modo offline: no llamar cargarDatosConCacheInteligente (requiere internet)
 
         if (!(FFAppState().currentUser != null)) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -302,7 +289,6 @@ class _HomeWidgetState extends State<HomeWidget> {
                     ),
                   ),
                   SizedBox(height: 60.0),
-                  // Barra de progreso: animada si está en Controles, normal si no
                   _model.loadingMessage.contains('Controles')
                       ? LinearProgressIndicator(
                           backgroundColor: Colors.white.withOpacity(0.3),

@@ -18,7 +18,6 @@ Future<String> sincronizarGerenciasToSupabase() async {
   try {
     final database = await DBHelper.db;
 
-    // Obtener gerencias no sincronizadas
     final List<Map<String, dynamic>> result = await database.query(
       'Gerencias',
       where: 'sincronizadoNube = ? AND sincronizadoLocal = ?',
@@ -36,11 +35,9 @@ Future<String> sincronizarGerenciasToSupabase() async {
       try {
         final gerencia = await DBGerencia.metodoconvertidorGerencia(map);
 
-        // Insertar en Supabase
         final supabaseId = await insertGerenciaToSupabase(gerencia);
 
         if (supabaseId.isNotEmpty) {
-          // Marcar como sincronizado en SQLite
           await database.update(
             'Gerencias',
             {

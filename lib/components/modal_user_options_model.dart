@@ -11,15 +11,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class ModalUserOptionsModel extends FlutterFlowModel<ModalUserOptionsWidget> {
-  ///  State fields for stateful widgets in this component.
 
-  // Stores action output result for [Custom Action - sqEliminarUsuarios] action in Container widget.
   String? dataUser;
-  // Stores action output result for [Custom Action - sqLiteListUsers] action in Container widget.
   List<dynamic>? returnListUserSInConexion;
-  // Stores action output result for [Custom Action - sqEliminarUsuarios] action in Container widget.
   String? dataUserSqLite;
-  // Stores action output result for [Custom Action - sqLiteListUsers] action in Container widget.
   List<dynamic>? returnSqListUsers;
 
   @override

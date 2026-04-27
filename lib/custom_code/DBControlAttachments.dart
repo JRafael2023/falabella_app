@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 
 class DBControlAttachments {
-  /// Guardar un attachment (photo, video, archive)
   static Future<void> guardarAttachment({
     required String idControl,
     required String attachmentType, // 'photo', 'video', 'archive'
@@ -27,7 +26,6 @@ class DBControlAttachments {
 
   }
 
-  /// Guardar múltiples photos (en paralelo)
   static Future<void> guardarPhotos(String idControl, List<String> photos) async {
     await eliminarAttachmentsPorTipo(idControl, 'photo');
     await Future.wait([
@@ -42,7 +40,6 @@ class DBControlAttachments {
     ]);
   }
 
-  /// Guardar múltiples videos (en paralelo)
   static Future<void> guardarVideos(String idControl, List<String> videos) async {
     await eliminarAttachmentsPorTipo(idControl, 'video');
     await Future.wait([
@@ -57,7 +54,6 @@ class DBControlAttachments {
     ]);
   }
 
-  /// Guardar múltiples archives (en paralelo)
   static Future<void> guardarArchives(String idControl, List<String> archives) async {
     await eliminarAttachmentsPorTipo(idControl, 'archive');
     await Future.wait([
@@ -72,7 +68,6 @@ class DBControlAttachments {
     ]);
   }
 
-  /// Obtener photos de un control
   static Future<List<String>> obtenerPhotos(String idControl) async {
     final db = await DBHelper.db;
     final results = await db.query(
@@ -86,7 +81,6 @@ class DBControlAttachments {
     return results.map((row) => row['attachment_data'] as String).toList();
   }
 
-  /// Obtener videos de un control (lista, igual que obtenerPhotos)
   static Future<List<String>> obtenerVideos(String idControl) async {
     final db = await DBHelper.db;
     final results = await db.query(
@@ -100,7 +94,6 @@ class DBControlAttachments {
     return results.map((row) => row['attachment_data'] as String).toList();
   }
 
-  /// Obtener archives de un control
   static Future<List<String>> obtenerArchives(String idControl) async {
     final db = await DBHelper.db;
     final results = await db.query(
@@ -114,7 +107,6 @@ class DBControlAttachments {
     return results.map((row) => row['attachment_data'] as String).toList();
   }
 
-  /// Contar photos de un control
   static Future<int> contarPhotos(String idControl) async {
     final db = await DBHelper.db;
     final result = await db.rawQuery(
@@ -124,7 +116,6 @@ class DBControlAttachments {
     return Sqflite.firstIntValue(result) ?? 0;
   }
 
-  /// Contar archives de un control
   static Future<int> contarArchives(String idControl) async {
     final db = await DBHelper.db;
     final result = await db.rawQuery(
@@ -134,7 +125,6 @@ class DBControlAttachments {
     return Sqflite.firstIntValue(result) ?? 0;
   }
 
-  /// Verificar si tiene video
   static Future<bool> tieneVideo(String idControl) async {
     final db = await DBHelper.db;
     final result = await db.rawQuery(
@@ -144,8 +134,6 @@ class DBControlAttachments {
     return (Sqflite.firstIntValue(result) ?? 0) > 0;
   }
 
-  /// Obtener contadores de attachments para múltiples controles en UNA sola query
-  /// Retorna: { idControl: { 'photos': int, 'archives': int, 'hasVideo': bool } }
   static Future<Map<String, Map<String, dynamic>>> contarAttachmentsPorLote(
       List<String> idControles) async {
     if (idControles.isEmpty) return {};
@@ -171,7 +159,6 @@ class DBControlAttachments {
     return counts;
   }
 
-  /// Eliminar attachments por tipo
   static Future<void> eliminarAttachmentsPorTipo(String idControl, String attachmentType) async {
     final db = await DBHelper.db;
     await db.delete(
@@ -181,7 +168,6 @@ class DBControlAttachments {
     );
   }
 
-  /// Eliminar todos los attachments de un control
   static Future<void> eliminarTodosAttachments(String idControl) async {
     final db = await DBHelper.db;
     await db.delete(
@@ -191,7 +177,6 @@ class DBControlAttachments {
     );
   }
 
-  /// Obtener todos los attachments de un control (para sincronización, en paralelo)
   static Future<Map<String, dynamic>> obtenerTodosAttachments(String idControl) async {
     final results = await Future.wait([
       obtenerPhotos(idControl),
@@ -202,8 +187,6 @@ class DBControlAttachments {
     final videos = results[1];
     final archives = results[2];
 
-    // 🔥 USAR FORMATO SIMPLE: base64|||base64|||base64
-    // El formato JSON manual está causando problemas con strings muy largos
     return {
       'photos': photos.isEmpty ? '' : photos.join('|||'),
       'video': videos.isEmpty ? '' : videos.join('|||'),
@@ -211,7 +194,6 @@ class DBControlAttachments {
     };
   }
 
-  /// Obtener extensión según tipo de archivo
   static String _getExtension(String tipo) {
     switch (tipo) {
       case 'image':

@@ -32,7 +32,6 @@ Future<String> insertProcesoToSupabase(ProcesoStruct proceso) async {
       final insertedId = insertedRow['id'] as String;
       final processId = insertedRow['process_id'] as String? ?? '';
 
-      // También insertar en SQLite con el process_id correcto
       if (processId.isNotEmpty) {
         await DBProceso.insertProceso(
           ProcesoStruct(

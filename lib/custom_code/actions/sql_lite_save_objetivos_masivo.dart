@@ -22,8 +22,6 @@ import 'package:tottus/custom_code/Objetivo.dart';
 import '../sqlite_helper.dart';
 
 Future<String> sqlLiteSaveObjetivosMasivo(List<dynamic> appstateJson) async {
-  // Add your function code here!
-  //
 
   List<Objetivo> objetivo = appstateJson.map<Objetivo>((item) {
     return Objetivo.fromMap(item);

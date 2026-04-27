@@ -27,7 +27,6 @@ class Proceso {
     };
   }
 
-  // Método fromJson() para convertir de JSON a Proceso
   factory Proceso.fromJson(Map<String, dynamic> json) {
     return Proceso(
       id: json['id'],

@@ -21,7 +21,6 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:provider/provider.dart';
 
 class ControlesModel extends FlutterFlowModel<ControlesWidget> {
-  ///  Local state fields for this page.
 
   bool hayCambiosSinGuardar = false;
 
@@ -52,25 +51,17 @@ class ControlesModel extends FlutterFlowModel<ControlesWidget> {
 
   dynamic jsontest;
 
-  ///  State fields for stateful widgets in this page.
 
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Controles widget.
   bool? estaconectado;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // State field(s) for txtid widget.
   FocusNode? txtidFocusNode;
   TextEditingController? txtidTextController;
   String? Function(BuildContext, String?)? txtidTextControllerValidator;
-  // Models for ComponentControllador dynamic component.
   late FlutterFlowDynamicModels<ComponentControlladorModel>
       componentControlladorModels;
-  // Stores action output result for [Custom Action - recargarControlesDesdeSQL] action in ComponentControllador widget.
   List<dynamic>? listControlesON;
-  // Model for loadingListTottus component.
   late LoadingListTottusModel loadingListTottusModel;
 
   @override

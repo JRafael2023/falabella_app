@@ -5,7 +5,6 @@ class FFIcons {
 
   static const String _myFlutterAppFamily = 'MyFlutterApp';
 
-  // MyFlutterApp
   static const IconData kitem1 =
       IconData(0xe800, fontFamily: _myFlutterAppFamily);
   static const IconData kitem =

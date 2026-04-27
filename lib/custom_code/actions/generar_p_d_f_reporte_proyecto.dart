@@ -29,16 +29,12 @@ import 'dart:io';
 Future<String> generarPDFReporteProyecto(String idProject) async {
   try {
 
-    // ============================================
-    // PASO 1: OBTENER DATOS DESDE SQLITE
-    // ============================================
 
     final proyecto = await DBProyectos.getProyectoByIdProject(idProject);
     if (proyecto == null) return '❌ Proyecto no encontrado';
 
     final objetivos = await DBObjetivos.listarObjetivosPorProyecto(idProject);
 
-    // Estructura: [{ objetivo, controles: [{ control, fotos: [Uint8List] }] }]
     final List<Map<String, dynamic>> seccionesPorObjetivo = [];
     int totalInefectivos = 0;
 
@@ -51,23 +47,18 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
       for (var map in controlesJson) {
         final control = Control.fromMap(map);
 
-        // ✅ Solo incluir controles INEFECTIVOS (findingStatus == 0)
         if (control.findingStatus != 0) continue;
 
         totalInefectivos++;
 
-        // control_text no se carga en listarControlesJson (campo grande),
-        // obtenerlo por separado para el PDF
         if ((control.controlText ?? '').isEmpty) {
           control.controlText =
               await DBControles.obtenerControlText(control.idControl);
         }
 
-        // Cargar fotos desde ControlAttachments (fotos tomadas en la app)
         final List<String> fotosBase64 =
             await _obtenerFotosSeguro(control.idControl);
 
-        // Si no hay fotos en ControlAttachments, intentar desde campo photos del control
         if (fotosBase64.isEmpty && (control.photos?.isNotEmpty ?? false)) {
           final fotosDesdeControl =
               _extraerFotosDesdeControlPhotos(control.photos!);
@@ -88,7 +79,6 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
         });
       }
 
-      // Solo agregar objetivos que tienen controles inefectivos
       if (controlesConFotos.isNotEmpty) {
         seccionesPorObjetivo.add({
           'objetivo': objetivo,
@@ -98,18 +88,13 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
     }
 
 
-    // ============================================
-    // PASO 2: CREAR DOCUMENTO PDF
-    // ============================================
 
     final pdf = pw.Document();
     final font = await PdfGoogleFonts.notoSansRegular();
     final fontBold = await PdfGoogleFonts.notoSansBold();
 
-    // Construir widgets de forma síncrona usando los datos ya precargados
     final List<pw.Widget> contenido = [];
 
-    // Título
     contenido.add(pw.Center(
       child: pw.Text(
         'REPORTE PRELIMINAR DE AUDITORÍA',
@@ -118,7 +103,6 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
     ));
     contenido.add(pw.SizedBox(height: 8));
 
-    // Proyecto
     contenido.add(pw.Text(
       'Proyecto: ${proyecto.name}',
       style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold),
@@ -127,19 +111,16 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
     contenido.add(pw.Divider(thickness: 2));
     contenido.add(pw.SizedBox(height: 12));
 
-    // Resumen
     contenido.add(pw.Text(
       'Controles Inefectivos: $totalInefectivos',
       style: pw.TextStyle(fontSize: 11, color: PdfColors.red700),
     ));
     contenido.add(pw.SizedBox(height: 16));
 
-    // ---- Por objetivo ----
     for (final seccion in seccionesPorObjetivo) {
       final Objetivo obj = seccion['objetivo'];
       final List<Map<String, dynamic>> controles = seccion['controles'];
 
-      // Cabecera de objetivo
       contenido.add(pw.Container(
         width: double.infinity,
         padding: pw.EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -159,7 +140,6 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
       ));
       contenido.add(pw.SizedBox(height: 8));
 
-      // Controles de este objetivo
       for (final item in controles) {
         final Control ctrl = item['control'];
         final List<Uint8List> fotos = item['fotos'];
@@ -168,14 +148,12 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
 
         final List<pw.Widget> camposControl = [];
 
-        // Pregunta del control
         camposControl.add(pw.Text(
           _limpiarHTML(ctrl.title),
           style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
         ));
         camposControl.add(pw.SizedBox(height: 4));
 
-        // Badge estado
         camposControl.add(pw.Row(
           children: [
             pw.Container(
@@ -217,13 +195,11 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
         ));
         camposControl.add(pw.SizedBox(height: 6));
 
-        // Resultados del procedimiento
         if ((ctrl.controlText ?? '').isNotEmpty) {
           camposControl.add(_buildCampo(
               'Resultados del procedimiento', ctrl.controlText, fontBold));
         }
 
-        // Fotos
         if (fotos.isNotEmpty) {
           camposControl.add(pw.SizedBox(height: 6));
           camposControl.add(pw.Text(
@@ -233,7 +209,6 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
           ));
           camposControl.add(pw.SizedBox(height: 4));
 
-          // Grid de 3 fotos por fila
           final List<pw.Widget> filas = [];
           for (int i = 0; i < fotos.length; i += 3) {
             final rowItems = <pw.Widget>[];
@@ -253,7 +228,6 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
                 ),
               ));
             }
-            // Rellenar espacios vacíos si la fila no tiene 3
             while (rowItems.length < 3) {
               rowItems.add(pw.Expanded(child: pw.SizedBox()));
             }
@@ -283,7 +257,6 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
       contenido.add(pw.SizedBox(height: 8));
     }
 
-    // Pie de página
     contenido.add(pw.Divider(thickness: 1));
     contenido.add(pw.SizedBox(height: 4));
     contenido.add(pw.Text(
@@ -304,9 +277,6 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
       ),
     );
 
-    // ============================================
-    // PASO 3: IMPRIMIR / GUARDAR
-    // ============================================
 
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => pdf.save(),
@@ -319,11 +289,7 @@ Future<String> generarPDFReporteProyecto(String idProject) async {
   }
 }
 
-// ============================================
-// FUNCIONES AUXILIARES
-// ============================================
 
-/// Construye un campo etiqueta: valor
 pw.Widget _buildCampo(String etiqueta, String? valor, pw.Font fontBold) {
   if (valor == null || valor.isEmpty) return pw.SizedBox.shrink();
   return pw.Padding(
@@ -346,13 +312,10 @@ pw.Widget _buildCampo(String etiqueta, String? valor, pw.Font fontBold) {
   );
 }
 
-/// Obtiene fotos leyendo cada fila en chunks de 500KB con substr()
-/// para evitar CursorWindow overflow en Android (límite ~2MB por fila)
 Future<List<String>> _obtenerFotosSeguro(String idControl) async {
   try {
     final db = await DBHelper.db;
 
-    // 1. Contar cuántas fotos hay (query liviana, solo devuelve un int)
     final countResult = await db.rawQuery(
       'SELECT COUNT(*) as cnt FROM ControlAttachments '
       'WHERE id_control = ? AND attachment_type = ?',
@@ -361,13 +324,11 @@ Future<List<String>> _obtenerFotosSeguro(String idControl) async {
     final count = (countResult.first['cnt'] as int?) ?? 0;
     if (count == 0) return [];
 
-    // 2. Para cada foto, obtener el length() y luego leer en chunks de 400KB
     const chunkSize = 400000; // 400KB < 2MB límite Android
     final List<String> fotos = [];
 
     for (int i = 0; i < count; i++) {
       try {
-        // 2a. Obtener tamaño total (solo devuelve un número, nunca overflow)
         final lenResult = await db.rawQuery(
           'SELECT length(attachment_data) as len FROM ControlAttachments '
           'WHERE id_control = ? AND attachment_type = ? AND attachment_index = ?',
@@ -377,7 +338,6 @@ Future<List<String>> _obtenerFotosSeguro(String idControl) async {
         final totalLen = (lenResult.first['len'] as int?) ?? 0;
         if (totalLen == 0) continue;
 
-        // 2b. Leer en fragmentos con substr() (1-indexed en SQLite)
         final buffer = StringBuffer();
         int offset = 1;
         while (offset <= totalLen) {
@@ -405,13 +365,9 @@ Future<List<String>> _obtenerFotosSeguro(String idControl) async {
   }
 }
 
-/// Extrae fotos base64 desde el campo photos del control
-/// El campo puede ser JSON array: [{"name":..., "base64":...}]
-/// o strings separados por |||
 List<String> _extraerFotosDesdeControlPhotos(String photosField) {
   final result = <String>[];
   try {
-    // Intentar parsear como JSON array de Supabase
     final trimmed = photosField.trim();
     if (trimmed.startsWith('[')) {
       final List<dynamic> lista = json.decode(trimmed);
@@ -423,7 +379,6 @@ List<String> _extraerFotosDesdeControlPhotos(String photosField) {
       }
       return result;
     }
-    // Fallback: separado por |||
     final partes = photosField.split('|||');
     for (final p in partes) {
       if (p.isNotEmpty) result.add(p);
@@ -433,18 +388,15 @@ List<String> _extraerFotosDesdeControlPhotos(String photosField) {
   return result;
 }
 
-/// Decodifica base64 con soporte GZIP y prefijo "GZIP:"
 Uint8List? _decodeBase64Foto(String b64) {
   try {
     if (b64.isEmpty) return null;
     String cleaned = b64.trim();
 
-    // Quitar prefijo literal "GZIP:" que agrega la app
     if (cleaned.startsWith('GZIP:')) {
       cleaned = cleaned.substring(5);
     }
 
-    // Quitar prefijo data:image/...;base64,
     if (cleaned.contains(',')) {
       cleaned = cleaned.split(',').last;
     }
@@ -452,7 +404,6 @@ Uint8List? _decodeBase64Foto(String b64) {
     cleaned = cleaned.replaceAll('\n', '').replaceAll('\r', '');
     final bytes = base64Decode(cleaned);
 
-    // Detectar GZIP por magic bytes (0x1f 0x8b)
     if (bytes.length >= 2 && bytes[0] == 0x1f && bytes[1] == 0x8b) {
       return Uint8List.fromList(GZipCodec().decode(bytes));
     }
@@ -462,7 +413,6 @@ Uint8List? _decodeBase64Foto(String b64) {
   }
 }
 
-/// Limpia etiquetas HTML
 String _limpiarHTML(String? str, {int maxLength = 800}) {
   if (str == null || str.isEmpty) return '';
   String cleaned =

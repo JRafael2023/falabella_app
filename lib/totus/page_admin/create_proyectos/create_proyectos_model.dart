@@ -26,7 +26,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class CreateProyectosModel extends FlutterFlowModel<CreateProyectosWidget> {
-  ///  Local state fields for this page.
 
   Proyecto? proyecto;
 
@@ -44,24 +43,18 @@ class CreateProyectosModel extends FlutterFlowModel<CreateProyectosWidget> {
 
   Usuario? test;
 
-  /// true = mostrar dropdown de proyectos Highbond, false = ingresar ID manual
   bool usarDropdownHighbond = false;
   String? selectedHighbondProjectId;
   String? selectedHighbondProjectName;
   FormFieldController<String>? highbondProjectController;
   List<Map> displayedHighbondProjects = [];
 
-  ///  State fields for stateful widgets in this page.
 
   final formKey = GlobalKey<FormState>();
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in CreateProyectos widget.
   bool? estaconectado;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // State field(s) for txtid widget.
   FocusNode? txtidFocusNode;
   TextEditingController? txtidTextController;
   String? Function(BuildContext, String?)? txtidTextControllerValidator;
@@ -73,45 +66,29 @@ class CreateProyectosModel extends FlutterFlowModel<CreateProyectosWidget> {
     return null;
   }
 
-  // Stores action output result for [Backend Call - API (Get Projects Highbond)] action in btnSearchProject widget.
   ApiCallResponse? apiProyects;
-  // State field(s) for cbomatrix widget.
   String? cbomatrixValue;
   FormFieldController<String>? cbomatrixValueController;
-  // State field(s) for cboUserAssign widget.
   String? cboUserAssignValue;
   FormFieldController<String>? cboUserAssignValueController;
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
-  // State field(s) for txtdesc widget.
   FocusNode? txtdescFocusNode;
   TextEditingController? txtdescTextController;
   String? Function(BuildContext, String?)? txtdescTextControllerValidator;
-  // State field(s) for txtopinion widget.
   FocusNode? txtopinionFocusNode;
   TextEditingController? txtopinionTextController;
   String? Function(BuildContext, String?)? txtopinionTextControllerValidator;
-  // Stores action output result for [Backend Call - API (Get Projects Highbond)] action in Button widget.
   ApiCallResponse? apiProyectsCREATE;
-  // Stores action output result for [Backend Call - Insert Row] action in Button widget.
   ProjectsRow? returnCreateProject;
-  // Stores action output result for [Custom Action - sqlLiteListProyectos] action in Button widget.
   List<dynamic>? retunListSQLiteON;
-  // Stores action output result for [Custom Action - sqlLiteListProyectos] action in Button widget.
   List<dynamic>? retunListSQLiteOFF;
-  // Models for cardProjects dynamic component.
   late FlutterFlowDynamicModels<CardProjectsModel> cardProjectsModels1;
-  // Stores action output result for [Custom Action - sqlLiteEliminarProyectos] action in cardProjects widget.
   String? data;
-  // Stores action output result for [Custom Action - sqlLiteListProyectos] action in cardProjects widget.
   List<dynamic>? returnsqllistSIBNBD;
-  // Models for cardProjects dynamic component.
   late FlutterFlowDynamicModels<CardProjectsModel> cardProjectsModels2;
-  // Stores action output result for [Custom Action - sqlLiteEliminarProyectos] action in cardProjects widget.
   String? dataSQLLite;
-  // Stores action output result for [Custom Action - sqlLiteListProyectos] action in cardProjects widget.
   List<dynamic>? returnsqllistSQlLite;
 
   @override

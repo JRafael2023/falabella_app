@@ -43,9 +43,7 @@ class _HallazgosWidgetState extends State<HallazgosWidget> with TickerProviderSt
     super.initState();
     _model = createModel(context, () => HallazgosModel());
 
-    // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      // Inicializar timer pausable de internet
     initInternetCheck(context, onConnectionChanged: (isConnected) {
       _model.estaconectado = isConnected;
       if (mounted) {

@@ -10,11 +10,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class NoiniciadaModel extends FlutterFlowModel<NoiniciadaWidget> {
-  ///  State fields for stateful widgets in this component.
 
-  // Model for ContainerExpress component.
   late ContainerExpressModel containerExpressModel;
-  // Model for ContainerCompleta component.
   late ContainerCompletaModel containerCompletaModel;
 
   @override

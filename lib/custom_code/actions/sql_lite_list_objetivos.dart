@@ -18,16 +18,13 @@ import '../sqlite_helper.dart';
 
 Future<List<dynamic>> sqlLiteListObjetivos(String idProyecto) async {
   try {
-    // Obtener lista de objetos Objetivo
     final List<Objetivo> objetivos =
         await DBObjetivos.listarObjetivosPorProyecto(idProyecto);
 
 
-    // ✅ Convertir a JSON usando toJson() de la clase Objetivo
     final List<dynamic> objetivosJson =
         objetivos.map((obj) => obj.toJson()).toList();
 
-    // ✅ Debug: imprimir el primer objetivo
     if (objetivosJson.isNotEmpty) {
     }
 

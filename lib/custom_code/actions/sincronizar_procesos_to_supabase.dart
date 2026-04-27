@@ -18,7 +18,6 @@ Future<String> sincronizarProcesosToSupabase() async {
   try {
     final database = await DBHelper.db;
 
-    // Obtener procesos no sincronizados
     final List<Map<String, dynamic>> result = await database.query(
       'Procesos',
       where: 'sincronizadoNube = ? AND sincronizadoLocal = ?',
@@ -36,11 +35,9 @@ Future<String> sincronizarProcesosToSupabase() async {
       try {
         final proceso = await DBProceso.metodoconvertidor(map);
 
-        // Insertar en Supabase
         final supabaseId = await insertProcesoToSupabase(proceso);
 
         if (supabaseId.isNotEmpty) {
-          // Marcar como sincronizado en SQLite
           await database.update(
             'Procesos',
             {

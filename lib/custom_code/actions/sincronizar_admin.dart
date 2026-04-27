@@ -69,10 +69,6 @@ class SyncAdminResult {
   });
 }
 
-// Lógica: Supabase es la fuente de verdad.
-// - ID en SQLite pero NO en Supabase → eliminar de SQLite
-// - ID en Supabase pero NO en SQLite → insertar en SQLite
-// - ID en ambos → no hacer nada
 Future<SyncAdminResult> sincronizarAdmin() async {
 
   int gerenciasSinc = 0;
@@ -93,10 +89,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
   try {
     final db = await DBHelper.db;
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // FASE 0: SUBIR ELIMINACIONES PENDIENTES OFFLINE (pendienteEliminar = 1)
-    // Registros eliminados offline que aún no se han borrado en Supabase
-    // ══════════════════════════════════════════════════════════════════════════
     final eliminacionesPendientes = {
       'Gerencias':            {'tabla': 'Managements',         'campoId': 'idGerencia',               'campoSupabase': 'management_id'},
       'Ecosistemas':          {'tabla': 'Ecosystems',           'campoId': 'idEcosistema',             'campoSupabase': 'ecosystem_id'},
@@ -129,7 +121,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
           try {
             await SupaFlow.client.from(supaTabla).delete().eq(campoSupabase, id);
 
-            // Confirmado en Supabase → borrar de SQLite
             await db.delete(sqliteTabla, where: '$campoId = ?', whereArgs: [id]);
             if (sqliteTabla == 'Users') usuariosEliminados++;
           } catch (e) {
@@ -139,9 +130,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
       }
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // GERENCIAS
-    // ══════════════════════════════════════════════════════════════════════════
     try {
       final gerenciasSupaResponse = await SupaFlow.client
           .from('Managements')
@@ -159,7 +147,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
           .where((id) => id.isNotEmpty)
           .toSet();
 
-      // En SQLite pero NO en Supabase → eliminar de SQLite
       final eliminar = idsSQLite.difference(idsSupabase);
       if (eliminar.isNotEmpty) {
         huboCambios = true;
@@ -168,7 +155,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
         }
       }
 
-      // En Supabase pero NO en SQLite → insertar en SQLite
       final insertar = idsSupabase.difference(idsSQLite);
       if (insertar.isNotEmpty) {
         huboCambios = true;
@@ -189,9 +175,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
     } catch (e) {
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // ECOSISTEMAS
-    // ══════════════════════════════════════════════════════════════════════════
     try {
       final ecosSupaResponse = await SupaFlow.client
           .from('Ecosystems')
@@ -209,7 +192,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
           .where((id) => id.isNotEmpty)
           .toSet();
 
-      // En SQLite pero NO en Supabase → eliminar
       final eliminar = idsSQLite.difference(idsSupabase);
       if (eliminar.isNotEmpty) {
         huboCambios = true;
@@ -218,7 +200,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
         }
       }
 
-      // En Supabase pero NO en SQLite → insertar
       final insertar = idsSupabase.difference(idsSQLite);
       if (insertar.isNotEmpty) {
         huboCambios = true;
@@ -239,9 +220,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
     } catch (e) {
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // PROCESOS
-    // ══════════════════════════════════════════════════════════════════════════
     try {
       final procSupaResponse = await SupaFlow.client
           .from('Processes')
@@ -259,7 +237,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
           .where((id) => id.isNotEmpty)
           .toSet();
 
-      // En SQLite pero NO en Supabase → eliminar
       final eliminar = idsSQLite.difference(idsSupabase);
       if (eliminar.isNotEmpty) {
         huboCambios = true;
@@ -268,7 +245,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
         }
       }
 
-      // En Supabase pero NO en SQLite → insertar
       final insertar = idsSupabase.difference(idsSQLite);
       if (insertar.isNotEmpty) {
         huboCambios = true;
@@ -289,9 +265,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
     } catch (e) {
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // TÍTULOS
-    // ══════════════════════════════════════════════════════════════════════════
     try {
       final titSupaResponse = await SupaFlow.client
           .from('Titles')
@@ -309,7 +282,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
           .where((id) => id.isNotEmpty)
           .toSet();
 
-      // En SQLite pero NO en Supabase → eliminar
       final eliminar = idsSQLite.difference(idsSupabase);
       if (eliminar.isNotEmpty) {
         huboCambios = true;
@@ -318,7 +290,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
         }
       }
 
-      // En Supabase pero NO en SQLite → insertar
       final insertar = idsSupabase.difference(idsSQLite);
       if (insertar.isNotEmpty) {
         huboCambios = true;
@@ -339,9 +310,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
     } catch (e) {
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // PROYECTOS
-    // ══════════════════════════════════════════════════════════════════════════
     try {
       final proySupaResponse = await SupaFlow.client
           .from('Projects')
@@ -359,7 +327,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
           .where((id) => id.isNotEmpty)
           .toSet();
 
-      // En SQLite pero NO en Supabase → subir si fue creado offline, eliminar si vino de Supabase
       final soloEnSQLite = idsSQLite.difference(idsSupabase);
       final List<String> eliminar = [];
 
@@ -368,7 +335,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
         final sincNube = row['sincronizadoNube'] as int? ?? 1;
 
         if (sincNube == 0) {
-          // Creado offline → subir a Supabase
           try {
             await SupaFlow.client.from('Projects').insert({
               'id_project':     id,
@@ -390,7 +356,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
           } catch (e) {
           }
         } else {
-          // Vino de Supabase pero ya no existe allá → marcar para eliminar
           eliminar.add(id);
         }
       }
@@ -402,7 +367,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
         }
       }
 
-      // En Supabase pero NO en SQLite → insertar
       final insertar = idsSupabase.difference(idsSQLite);
       if (insertar.isNotEmpty) {
         huboCambios = true;
@@ -430,11 +394,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
     } catch (e) {
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // MATRICES
-    // Supabase: matrix_id, name, created_at, status
-    // SQLite:   id_matriz,  name, created_at, status
-    // ══════════════════════════════════════════════════════════════════════════
     try {
       final matSupaResponse = await SupaFlow.client
           .from('Matrices')
@@ -452,7 +411,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
           .where((id) => id.isNotEmpty)
           .toSet();
 
-      // En SQLite pero NO en Supabase → eliminar
       final eliminar = idsSQLite.difference(idsSupabase);
       if (eliminar.isNotEmpty) {
         huboCambios = true;
@@ -461,7 +419,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
         }
       }
 
-      // En Supabase pero NO en SQLite → insertar
       final insertar = idsSupabase.difference(idsSQLite);
       if (insertar.isNotEmpty) {
         huboCambios = true;
@@ -481,10 +438,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
     } catch (e) {
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // MAESTROS V19 (RiskLevels, PublicationStatuses, ImpactTypes,
-    //               EcosystemSupports, RiskTypes, RiskTypologies, ObservationScopes)
-    // ══════════════════════════════════════════════════════════════════════════
     final _maestrosConfig = [
       {
         'supaTable': 'RiskLevels',
@@ -545,8 +498,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
       final extraFields = cfg['extraFields'] as List<String>;
 
       try {
-        // Campos a seleccionar de Supabase
-        // ⚠️ 'orden' column was removed from Supabase v19 maestro tables (SQLite migration v20 also dropped it)
         final selectFields = ['$idSupaField, name, status, created_at, updated_at', ...extraFields].join(', ');
         final supaResponse = await SupaFlow.client
             .from(supaTable)
@@ -565,14 +516,12 @@ Future<SyncAdminResult> sincronizarAdmin() async {
             .where((id) => id.isNotEmpty)
             .toSet();
 
-        // En SQLite pero NO en Supabase → eliminar
         final eliminar = idsSQLite.difference(idsSupabase);
         for (final id in eliminar) {
           await db.delete(sqliteTable, where: '$idSqliteField = ?', whereArgs: [id]);
           huboCambios = true;
         }
 
-        // En Supabase pero NO en SQLite → insertar
         final insertar = idsSupabase.difference(idsSQLite);
         for (final row in (supaResponse as List)) {
           final id = row[idSupaField] as String? ?? '';
@@ -588,7 +537,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
             'created_at': row['created_at'] ?? DateTime.now().toIso8601String(),
             'updated_at': row['updated_at'] ?? DateTime.now().toIso8601String(),
           };
-          // Campos extra (ej: risk_type_id en RiskTypologies)
           for (final f in extraFields) {
             record[f] = row[f];
           }
@@ -603,9 +551,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
       }
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // RESPONSIBLE AUDITORS & MANAGERS (offline→nube + descarga)
-    // ══════════════════════════════════════════════════════════════════════════
     final _responsiblesConfig = [
       {
         'supaTable': 'ResponsibleAuditors',
@@ -688,7 +633,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
             .where((id) => id.isNotEmpty)
             .toSet();
 
-        // En SQLite pero NO en Supabase → eliminar (solo si ya estaba sincronizado)
         final eliminar = idsSQLite.difference(idsSupabase);
         for (final id in eliminar) {
           final rowsCheck = await db.query(sqliteTable,
@@ -700,7 +644,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
           huboCambios = true;
         }
 
-        // En Supabase pero NO en SQLite → insertar
         final insertar = idsSupabase.difference(idsSQLite);
         for (final row in (supaResponse as List)) {
           final id = row[idSupaField] as String? ?? '';
@@ -724,17 +667,12 @@ Future<SyncAdminResult> sincronizarAdmin() async {
       }
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // USUARIOS
-    // ══════════════════════════════════════════════════════════════════════════
     try {
       final usrSupaResponse = await SupaFlow.client
           .from('Users')
-          // ✅ Solo columnas que existen en la tabla Users de Supabase
           .select('user_uid, email, display_name, country, role, status, created_at, updated_at')
           .eq('status', true);
 
-      // ✅ FIX: mapear con user_uid
       final idsSupabase = (usrSupaResponse as List)
           .map((r) => r['user_uid'] as String? ?? '')
           .where((id) => id.isNotEmpty)
@@ -761,13 +699,11 @@ Future<SyncAdminResult> sincronizarAdmin() async {
           }
 
           try {
-            // 1) Crear en Supabase Auth
             final authResult = await registerUserSupabaseAuth(email, passwordTemp);
             if (authResult != 'OK') {
               continue;
             }
 
-            // 2) Insertar en tabla Users de Supabase
             await SupaFlow.client.from('Users').insert({
               'user_uid': uid,
               'email': email,
@@ -779,7 +715,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
               'updated_at': DateTime.now().toIso8601String(),
             });
 
-            // 3) Marcar como sincronizado y limpiar password_temp
             await db.update(
               'Users',
               {
@@ -791,7 +726,7 @@ Future<SyncAdminResult> sincronizarAdmin() async {
             );
 
             usuariosSinc++;
-            usuariosSubidos++;    // ✅ contador separado: offline → Supabase
+            usuariosSubidos++;
             idsSupabase.add(uid); // Evitar que se trate como "no existe" luego
           } catch (e) {
           }
@@ -802,7 +737,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
       if (eliminar.isNotEmpty) {
         huboCambios = true;
         for (final id in eliminar) {
-          // ✅ Protección: no borrar usuarios pendientes de subir (sincronizadoNube = 0)
           final rowsCheck = await db.query(
             'Users',
             columns: ['sincronizadoNube'],
@@ -821,7 +755,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
       if (insertar.isNotEmpty) {
         huboCambios = true;
         for (final row in (usrSupaResponse as List)) {
-          // ✅ FIX: usar user_uid
           final id = row['user_uid'] as String? ?? '';
           if (!insertar.contains(id)) continue;
           await db.insert('Users', {
@@ -836,16 +769,13 @@ Future<SyncAdminResult> sincronizarAdmin() async {
             'updated_at': row['updated_at'] ?? DateTime.now().toIso8601String(),
           }, conflictAlgorithm: ConflictAlgorithm.ignore);
           usuariosSinc++;
-          usuariosDescargados++; // ✅ contador separado: Supabase → SQLite
+          usuariosDescargados++;
         }
       }
 
     } catch (e) {
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // ACTUALIZAR APPSTATE
-    // ══════════════════════════════════════════════════════════════════════════
     try {
       final totalMatrices = await DBProyectos.contarProyectos();
       final totalUsuarios = await DBUsuarios.contarUsuarios();
@@ -858,9 +788,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
     } catch (e) {
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // REGISTRAR SYNC LOG
-    // ══════════════════════════════════════════════════════════════════════════
     try {
       final syncId = DateTime.now().millisecondsSinceEpoch.toString();
       final uid = FFAppState().currentUser.uidUsuario.isNotEmpty
@@ -886,9 +813,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
     } catch (e) {
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // RESULTADO FINAL
-    // ══════════════════════════════════════════════════════════════════════════
     String mensaje;
     if (!huboCambios && usuariosSinc == 0) {
       mensaje = 'No hay cambios a subir a la Nube.';
@@ -903,7 +827,6 @@ Future<SyncAdminResult> sincronizarAdmin() async {
       if (maestrosV19Sinc > 0) mensaje += '\n  • Maestros v19: $maestrosV19Sinc';
       if (responsibleAuditorsSinc > 0) mensaje += '\n  • Auditores responsables: $responsibleAuditorsSinc';
       if (responsibleManagersSinc > 0) mensaje += '\n  • Gerentes responsables: $responsibleManagersSinc';
-      // ✅ Separados: subidos (offline→nube) vs descargados (nube→local)
       if (usuariosSubidos > 0) mensaje += '\n  • Usuarios subidos a nube: $usuariosSubidos';
       if (usuariosDescargados > 0) mensaje += '\n  • Usuarios descargados: $usuariosDescargados';
       if (usuariosEliminados > 0) mensaje += '\n  • Usuarios eliminados: $usuariosEliminados';

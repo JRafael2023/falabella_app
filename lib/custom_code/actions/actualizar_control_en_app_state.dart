@@ -17,24 +17,18 @@ import '/custom_code/DBControles.dart';
 import '/custom_code/DBControlAttachments.dart';
 import 'dart:convert';
 
-/// ⚡ Función optimizada que actualiza SOLO un control en FFAppState
-/// En lugar de recargar todos los controles desde SQLite (lento),
-/// esta función solo actualiza el control modificado (rápido)
 Future actualizarControlEnAppState(String idControl) async {
   try {
-    // 1️⃣ Obtener el control COMPLETO desde SQLite
     final controlCompleto = await DBControles.obtenerControlCompleto(idControl);
 
     if (controlCompleto == null) {
       return;
     }
 
-    // 2️⃣ Contar attachments desde la tabla separada (para mostrar contadores)
     final photosCount = await DBControlAttachments.contarPhotos(idControl);
     final archivesCount = await DBControlAttachments.contarArchives(idControl);
     final hasVideo = await DBControlAttachments.tieneVideo(idControl);
 
-    // 3️⃣ Crear versión LIGERA del control para FFAppState (SIN archivos grandes)
     final controlLigero = {
       'id_control': controlCompleto['id_control'],
       'title': controlCompleto['title'],
@@ -49,7 +43,6 @@ Future actualizarControlEnAppState(String idControl) async {
       'completed': controlCompleto['completed'],
       'titulo': controlCompleto['titulo'],
       'nivel_riesgo': controlCompleto['nivel_riesgo'],
-      // ⚡ NO incluir archivos grandes (se cargan bajo demanda)
       'photos': null,
       'video': null,
       'archives': null,
@@ -61,21 +54,18 @@ Future actualizarControlEnAppState(String idControl) async {
       'recomendacion': null,
       'proceso_propuesto': null,
       'control_text': null,
-      // ⚡ Contadores para UI
       'photos_count': photosCount,
       'archives_count': archivesCount,
       'has_video': hasVideo ? 1 : 0,
     };
 
 
-    // 4️⃣ Actualizar el control en FFAppState (reemplazar el existente)
     final indice = FFAppState().jsonControles.indexWhere(
         (control) => getJsonField(control, r'''$.id_control''') == idControl);
 
     if (indice != -1) {
       FFAppState().jsonControles[indice] = controlLigero;
     } else {
-      // Si no existe, agregarlo
       FFAppState().addToJsonControles(controlLigero);
     }
 

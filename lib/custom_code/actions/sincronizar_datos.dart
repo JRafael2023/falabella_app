@@ -23,15 +23,11 @@ import 'package:tottus/custom_code/DBUsuarios.dart';
 Future<bool> sincronizarDatos(bool conectado) async {
   try {
 
-    // ========================================
-    // 📊 CONTAR DATOS DESDE SQLITE
-    // ========================================
 
     int totalMatrices = 0;
     int totalUsuarios = 0;
 
     try {
-      // Contar Matrices (Proyectos)
       List<dynamic> proyectosJson = await DBProyectos.listarProyectos();
       totalMatrices = proyectosJson.length;
     } catch (e) {
@@ -39,15 +35,11 @@ Future<bool> sincronizarDatos(bool conectado) async {
     }
 
     try {
-      // Contar Usuarios
       totalUsuarios = await DBUsuarios.contarUsuarios();
     } catch (e) {
       totalUsuarios = 0;
     }
 
-    // ========================================
-    // 🔄 ACTUALIZAR APP STATE
-    // ========================================
 
     try {
       FFAppState().update(() {
@@ -58,9 +50,6 @@ Future<bool> sincronizarDatos(bool conectado) async {
     } catch (e) {
     }
 
-    // ========================================
-    // 📝 LOG DE INFORMACIÓN
-    // ========================================
 
     String estadoConexion = conectado ? '🌐 Activa' : '📴 Inactiva';
     String mensaje = '✅ Sincronización completada:\n'
@@ -70,13 +59,9 @@ Future<bool> sincronizarDatos(bool conectado) async {
         '🕐 ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())}';
 
 
-    // ========================================
-    // ✅ RETORNAR ESTADO DE CONEXIÓN
-    // ========================================
     return conectado;
   } catch (e, stackTrace) {
 
-    // Intentar al menos establecer valores por defecto
     try {
       FFAppState().update(() {
         FFAppState().matricesCargadas = 0;
@@ -85,7 +70,6 @@ Future<bool> sincronizarDatos(bool conectado) async {
     } catch (e2) {
     }
 
-    // Retornar false porque hubo error
     return false;
   }
 }

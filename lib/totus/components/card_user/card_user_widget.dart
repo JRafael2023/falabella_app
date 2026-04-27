@@ -38,7 +38,6 @@ class CardUserWidget extends StatefulWidget {
   final String? uidUsuario;
   final String? pais;
   final String? contra;
-  // ✅ true = usuario creado offline, pendiente de subir a la nube
   final bool esPendienteSincronizar;
 
   @override
@@ -240,7 +239,6 @@ class _CardUserWidgetState extends State<CardUserWidget>
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Botón de ojo - ver detalle del usuario
                         Padding(
                           padding: EdgeInsetsDirectional.fromSTEB(
                               0.0, 4.0, 4.0, 0.0),
@@ -271,7 +269,6 @@ class _CardUserWidgetState extends State<CardUserWidget>
                             ),
                           ),
                         ),
-                        // Botón de tres puntos - opciones
                         Builder(
                           builder: (context) => Padding(
                             padding: EdgeInsetsDirectional.fromSTEB(
@@ -429,7 +426,6 @@ class _CardUserWidgetState extends State<CardUserWidget>
                 ),
               ),
             ),
-          // ✅ Banner "pendiente de sincronizar" solo para usuarios offline
           if (widget.esPendienteSincronizar)
             Container(
               width: double.infinity,

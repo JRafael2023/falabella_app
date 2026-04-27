@@ -39,7 +39,6 @@ class _LoginWidgetState extends State<LoginWidget> {
     super.initState();
     _model = createModel(context, () => LoginModel());
 
-    // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       await actions.checkInternetConecction();
       if (FFAppState().currentUser.uidUsuario != null &&

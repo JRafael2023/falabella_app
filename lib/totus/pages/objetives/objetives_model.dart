@@ -23,7 +23,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class ObjetivesModel extends FlutterFlowModel<ObjetivesWidget> {
-  ///  Local state fields for this page.
 
   List<dynamic> json = [];
   void addToJson(dynamic item) => json.add(item);
@@ -33,28 +32,17 @@ class ObjetivesModel extends FlutterFlowModel<ObjetivesWidget> {
   void updateJsonAtIndex(int index, Function(dynamic) updateFn) =>
       json[index] = updateFn(json[index]);
 
-  ///  State fields for stateful widgets in this page.
 
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Objetives widget.
   bool? estaconectado;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // Stores action output result for [Backend Call - API (Get Controls Description Highbond)] action in btnControl widget.
   ApiCallResponse? returnAPIControls;
-  // Stores action output result for [Backend Call - API (Get Controls Walkthrough Highbond)] action in btnControl widget.
   ApiCallResponse? returnAPIControlWalk;
-  // Stores action output result for [Custom Action - combineAndSyncControls] action in btnControl widget.
   String? message;
-  // Stores action output result for [Custom Action - sqlLiteListControles] action in btnControl widget.
   List<dynamic>? listControles;
-  // Stores action output result for [Backend Call - Query Rows] action in btnControl widget.
   List<ControlsRow>? qControls;
-  // Stores action output result for [Custom Action - sqlLiteListControles] action in btnControl widget.
   List<dynamic>? listControlesOFF;
-  // Model for loadingListTottus component.
   late LoadingListTottusModel loadingListTottusModel;
 
   @override

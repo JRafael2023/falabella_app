@@ -17,7 +17,6 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 Future<String?> openimagenCopyStorageExternal() async {
-  // Abre el FilePicker para seleccionar un archivo de imagen
   final result = await FilePicker.platform.pickFiles(
     type: FileType.custom,
     allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4'],
@@ -36,7 +35,6 @@ Future<String?> openimagenCopyStorageExternal() async {
     return null;
   }
   String rutafinal = file.name.split(".")[0];
-  // Copiar la imagen a la carpeta externa
   final String? copiedPath =
       await copyImageToExternalFolder(file.bytes!, extension, rutafinal);
 
@@ -50,22 +48,18 @@ Future<String?> openimagenCopyStorageExternal() async {
 
 Future<String?> copyImageToExternalFolder(
     Uint8List fileBytes, String? extension, String? rutafinal) async {
-  // Obtener carpeta externa del sistema (esto es para el almacenamiento externo)
   final directoryExtern = await getExternalStorageDirectory();
 
-  // Crear el directorio /fotos si no existe
   final fotosDir = Directory('${directoryExtern?.path}/fotos');
   if (!fotosDir.existsSync()) {
     fotosDir.createSync(
         recursive: true); // Crear el directorio /fotos si no existe
   }
 
-  // Crear un nombre único para el archivo copiado
   final newFilePath =
       '${fotosDir.path}/${DateTime.now().millisecondsSinceEpoch}-${rutafinal}.$extension';
 
   try {
-    // Escribir los bytes en el nuevo archivo
     final newImage = await File(newFilePath).writeAsBytes(fileBytes);
 
     return newImage.path; // Devolver la nueva ruta de la imagen copiada

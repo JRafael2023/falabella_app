@@ -3,9 +3,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:tottus/custom_code/Usuario.dart';
 
 class DBUsuarios {
-  // ============================================
-  // INSERTAR USUARIO
-  // ============================================
   static Future<String> insertUsuario(Usuario usuario) async {
     try {
       final db = await DBHelper.db;
@@ -23,9 +20,6 @@ class DBUsuarios {
     }
   }
 
-  // ============================================
-  // INSERTAR USUARIOS MASIVOS
-  // ============================================
   static Future<String> insertUsuariosMasivos(List<Usuario> usuarios) async {
     try {
       final db = await DBHelper.db;
@@ -33,7 +27,6 @@ class DBUsuarios {
 
       await db.transaction((txn) async {
         for (final usuario in usuarios) {
-          // Buscar si ya existe por email (más confiable que user_uid que puede duplicarse)
           final existing = await txn.query(
             'Users',
             where: 'email = ?',
@@ -44,7 +37,6 @@ class DBUsuarios {
           final data = usuario.toMap();
 
           if (existing.isNotEmpty) {
-            // Actualizar registro existente por email
             await txn.update(
               'Users',
               data,
@@ -52,7 +44,6 @@ class DBUsuarios {
               whereArgs: [usuario.email],
             );
           } else {
-            // Insertar nuevo, ignorar conflicto de user_uid duplicado
             await txn.insert(
               'Users',
               data,
@@ -68,15 +59,11 @@ class DBUsuarios {
     }
   }
 
-  // ============================================
-  // LISTAR USUARIOS
-  // ============================================
   static Future<List<Usuario>> listarUsuarios() async {
     try {
       final db = await DBHelper.db;
       if (db == null) return [];
 
-      // ✅ Excluir usuarios marcados como pendientes de eliminar
       final maps = await db.query(
         'Users',
         where: 'pendienteEliminar = 0 OR pendienteEliminar IS NULL',
@@ -87,9 +74,6 @@ class DBUsuarios {
     }
   }
 
-  // ============================================
-  // MARCAR USUARIO COMO PENDIENTE DE ELIMINAR (offline)
-  // ============================================
   static Future<String> marcarPendienteEliminar(String userUid) async {
     try {
       final db = await DBHelper.db;
@@ -108,9 +92,6 @@ class DBUsuarios {
     }
   }
 
-  // ============================================
-  // OBTENER USUARIO POR USER_UID
-  // ============================================
   static Future<Usuario?> getUsuarioByUserUid(String userUid) async {
     try {
       final db = await DBHelper.db;
@@ -132,15 +113,11 @@ class DBUsuarios {
     }
   }
 
-  // ============================================
-  // OBTENER USUARIO POR EMAIL
-  // ============================================
   static Future<Usuario?> getUsuarioByEmail(String email) async {
     try {
       final db = await DBHelper.db;
       if (db == null) return null;
 
-      // Buscar por email exacto
       final maps = await db.query(
         'Users',
         where: 'email = ?',
@@ -152,7 +129,6 @@ class DBUsuarios {
         return Usuario.fromMap(maps.first);
       }
 
-      // Si no encontró por email, buscar ignorando mayúsculas/minúsculas
       final mapsLower = await db.query(
         'Users',
         where: 'LOWER(email) = ?',
@@ -164,7 +140,6 @@ class DBUsuarios {
         return Usuario.fromMap(mapsLower.first);
       }
 
-      // Listar todos para debug
       final allUsers = await db.query('Users');
       for (var u in allUsers) {
       }
@@ -175,9 +150,6 @@ class DBUsuarios {
     }
   }
 
-  // ============================================
-  // ACTUALIZAR USUARIO
-  // ============================================
   static Future<String> updateUsuario(Usuario usuario) async {
     try {
       final db = await DBHelper.db;
@@ -196,9 +168,6 @@ class DBUsuarios {
     }
   }
 
-  // ============================================
-  // ELIMINAR USUARIO POR USER_UID
-  // ============================================
   static Future<String> deleteUsuarioByUserUid(String userUid) async {
     try {
       final db = await DBHelper.db;
@@ -216,9 +185,6 @@ class DBUsuarios {
     }
   }
 
-  // ============================================
-  // EXISTE USUARIO
-  // ============================================
   static Future<bool> existeUsuario(String userUid) async {
     try {
       final db = await DBHelper.db;
@@ -237,9 +203,6 @@ class DBUsuarios {
     }
   }
 
-  // ============================================
-  // CONTAR USUARIOS
-  // ============================================
   static Future<int> contarUsuarios() async {
     try {
       final db = await DBHelper.db;
@@ -252,9 +215,6 @@ class DBUsuarios {
     }
   }
 
-  // ============================================
-  // ELIMINAR TODOS LOS USUARIOS
-  // ============================================
   static Future<String> deleteAllUsuarios() async {
     try {
       final db = await DBHelper.db;

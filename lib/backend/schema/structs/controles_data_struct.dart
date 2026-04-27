@@ -1,4 +1,3 @@
-// ignore_for_file: unnecessary_getters_setters
 
 import '/backend/schema/util/schema_util.dart';
 import '/backend/schema/enums/enums.dart';
@@ -19,21 +18,18 @@ class ControlesDataStruct extends BaseStruct {
         _relationships = relationships,
         _links = links;
 
-  // "id" field.
   String? _id;
   String get id => _id ?? '';
   set id(String? val) => _id = val;
 
   bool hasId() => _id != null;
 
-  // "type" field.
   String? _type;
   String get type => _type ?? '';
   set type(String? val) => _type = val;
 
   bool hasType() => _type != null;
 
-  // "attributes" field.
   AttributesStruct? _attributes;
   AttributesStruct get attributes => _attributes ?? AttributesStruct();
   set attributes(AttributesStruct? val) => _attributes = val;
@@ -44,7 +40,6 @@ class ControlesDataStruct extends BaseStruct {
 
   bool hasAttributes() => _attributes != null;
 
-  // "relationships" field.
   RelationshipsStruct? _relationships;
   RelationshipsStruct get relationships =>
       _relationships ?? RelationshipsStruct();
@@ -56,7 +51,6 @@ class ControlesDataStruct extends BaseStruct {
 
   bool hasRelationships() => _relationships != null;
 
-  // "links" field.
   LinksStruct? _links;
   LinksStruct get links => _links ?? LinksStruct();
   set links(LinksStruct? val) => _links = val;

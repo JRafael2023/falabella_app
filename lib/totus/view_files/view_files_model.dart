@@ -12,7 +12,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class ViewFilesModel extends FlutterFlowModel<ViewFilesWidget> {
-  ///  Local state fields for this component.
 
   DateTime? fecha;
 

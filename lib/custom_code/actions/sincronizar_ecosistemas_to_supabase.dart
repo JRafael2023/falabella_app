@@ -18,7 +18,6 @@ Future<String> sincronizarEcosistemasToSupabase() async {
   try {
     final database = await DBHelper.db;
 
-    // Obtener ecosistemas no sincronizados
     final List<Map<String, dynamic>> result = await database.query(
       'Ecosistemas',
       where: 'sincronizadoNube = ? AND sincronizadoLocal = ?',
@@ -36,11 +35,9 @@ Future<String> sincronizarEcosistemasToSupabase() async {
       try {
         final ecosistema = await DBEcosistema.metodoconvertidorEcosistema(map);
 
-        // Insertar en Supabase
         final supabaseId = await insertEcosistemaToSupabase(ecosistema);
 
         if (supabaseId.isNotEmpty) {
-          // Marcar como sincronizado en SQLite
           await database.update(
             'Ecosistemas',
             {

@@ -37,18 +37,17 @@ class Proyecto {
     this.assignUser,
   });
 
-  // Convierte un proyecto a un mapa (para insertarlo en SQLite)
   Map<String, dynamic> toMap() {
     return {
-      'idProyecto': idProject, // ⚠️ Cambio aquí (era 'id_project')
+      'idProyecto': idProject,
       'name': name,
       'description': description,
-      'state_proyecto': projectState, // ⚠️ Cambio aquí
-      'status_proyecto': projectStatus, // ⚠️ Cambio aquí
+      'state_proyecto': projectState,
+      'status_proyecto': projectStatus,
       'opinion': opinion,
       'progress': progress,
-      'tipoMatriz': matrixType, // ⚠️ Cambio aquí
-      'assign_usuario': assignUser, // ⚠️ Cambio aquí
+      'tipoMatriz': matrixType,
+      'assign_usuario': assignUser,
       'sincronizadoNube': sincronizadoNube,
       'sincronizadoLocal': sincronizadoLocal,
       'created_at': createdAt,
@@ -57,28 +56,26 @@ class Proyecto {
     };
   }
 
-  // Crea un proyecto desde un mapa (para leerlo desde SQLite)
   factory Proyecto.fromMap(Map<String, dynamic> map) {
     return Proyecto(
       id: map['id'],
-      idProject: map['idProyecto'], // ⚠️ Cambio aquí
+      idProject: map['idProyecto'],
       name: map['name'],
       description: map['description'],
-      projectState: map['state_proyecto'], // ⚠️ Cambio aquí
-      projectStatus: map['status_proyecto'], // ⚠️ Cambio aquí
+      projectState: map['state_proyecto'],
+      projectStatus: map['status_proyecto'],
       opinion: map['opinion'] ?? '',
-      matrixType: map['tipoMatriz'], // ⚠️ Cambio aquí
+      matrixType: map['tipoMatriz'],
       progress: map['progress'] ?? 0.0,
       sincronizadoNube: map['sincronizadoNube'],
       sincronizadoLocal: map['sincronizadoLocal'],
       createdAt: map['created_at'],
       updatedAt: map['updated_at'],
       status: map['status'] == 1,
-      assignUser: map['assign_usuario'], // ⚠️ Cambio aquí
+      assignUser: map['assign_usuario'],
     );
   }
 
-  // Convierte el proyecto a formato JSON (para Supabase)
   Map<String, dynamic> toJson() {
     return {
       'id_project': idProject,
@@ -106,7 +103,6 @@ class Proyecto {
     return document.body?.text ?? '';
   }
 
-  // Factory para crear desde HighBond API
   factory Proyecto.fromHighBondJson(Map<String, dynamic> json) {
     return Proyecto(
       idProject: json['id'] as String,
@@ -137,7 +133,6 @@ class Proyecto {
     return proyectos;
   }
 
-  // Factory para crear desde Supabase ProjectsRow
 
   factory Proyecto.fromProjectsRow(ProjectsRow row) {
     return Proyecto(
@@ -156,7 +151,6 @@ class Proyecto {
     );
   }
 
-  // Factory para crear desde Map (usado por el método viejo)
 
   factory Proyecto.fromSupabase(Map<String, dynamic> data) {
     return Proyecto(

@@ -237,14 +237,12 @@ class _EditEcosistemaWidgetState extends State<EditEcosistemaWidget> {
                               padding: const EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 10.0),
                               child: FFButtonWidget(
                                 onPressed: () async {
-                                  // Validar nombre vacío
                                   final nombreNuevo = _model.txtnombreTextController.text.trim();
                                   if (nombreNuevo.isEmpty) {
                                     _mostrarError('Ingresa el nombre del ecosistema');
                                     return;
                                   }
 
-                                  // Validar nombre único (ignorando el ecosistema actual)
                                   final nombreDuplicado = FFAppState().listaecosistema.any(
                                     (e) => e.nombre.toLowerCase() == nombreNuevo.toLowerCase() &&
                                         e.idEcosistema != widget!.idEcosistema,

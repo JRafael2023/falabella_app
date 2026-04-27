@@ -19,21 +19,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class PublicationStatusModel extends FlutterFlowModel<PublicationStatusWidget> {
-  ///  Local state fields for this page.
 
   List<PublicationStatus> listPublicationStatus = [];
 
-  ///  State fields for stateful widgets in this page.
 
   final formKey = GlobalKey<FormState>();
   InstantTimer? instantTimer;
   bool? estaconectado;
   bool? conexion;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;

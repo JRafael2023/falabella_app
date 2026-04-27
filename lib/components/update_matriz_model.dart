@@ -12,10 +12,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class UpdateMatrizModel extends FlutterFlowModel<UpdateMatrizWidget> {
-  ///  State fields for stateful widgets in this component.
 
   final formKey = GlobalKey<FormState>();
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
@@ -27,11 +25,8 @@ class UpdateMatrizModel extends FlutterFlowModel<UpdateMatrizWidget> {
     return null;
   }
 
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Button widget.
   bool? conectado;
-  // Stores action output result for [Custom Action - sqlLiteListMatrices] action in Button widget.
   List<dynamic>? listONMatriz;
-  // Stores action output result for [Custom Action - sqlLiteListMatrices] action in Button widget.
   List<dynamic>? listOFFMatriz;
 
   @override

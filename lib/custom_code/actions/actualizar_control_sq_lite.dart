@@ -39,7 +39,6 @@ Future actualizarControlSqLite(
     String? titulo,
     String? nivelRiesgo,
     String? controlText,
-    // ⭐ v19 campos adicionales
     String? riskLevelId,
     String? publicationStatusId,
     String? estadoPublicacion,
@@ -60,23 +59,17 @@ Future actualizarControlSqLite(
     String? riesgoActual,
     String? causaRaiz) async {
   try {
-    // 1️⃣ OBTENER EL CONTROL ACTUAL DE SQLITE
     final todosControles = await DBControles.listarControlesJson(idObjetivo);
 
     if (todosControles.isEmpty) {
       return;
     }
 
-    // 2️⃣ BUSCAR Y ACTUALIZAR EL CONTROL ESPECÍFICO
     for (var map in todosControles) {
       Control control = Control.fromMap(map);
 
-      // Si es el control que queremos actualizar
       if (control.idControl == idControl) {
-        // No actualizamos description aquí porque viene de la API
-        // El control_text se actualiza más abajo con el parámetro controlText
 
-        // 3️⃣ CONVERTIR Y SETEAR FOTOS
         if (photos != null && photos.isNotEmpty) {
           List<String>? photosBase64 =
               convertListUploadFIletoBase64List(photos);
@@ -87,7 +80,6 @@ Future actualizarControlSqLite(
           control.photos = null;
         }
 
-        // 4️⃣ CONVERTIR Y SETEAR VIDEOS
         if (videos != null && videos.isNotEmpty) {
           List<String>? videosBase64 =
               convertListUploadFIletoBase64List(videos);
@@ -98,7 +90,6 @@ Future actualizarControlSqLite(
           control.video = null;
         }
 
-        // 5️⃣ CONVERTIR Y SETEAR ARCHIVOS
         if (archives != null && archives.isNotEmpty) {
           List<String>? archivesBase64 =
               convertListUploadFIletoBase64List(archives);
@@ -109,7 +100,6 @@ Future actualizarControlSqLite(
           control.archives = null;
         }
 
-        // 6️⃣ ACTUALIZAR NUEVOS CAMPOS
         control.observacion = observacion;
         control.gerencia = gerencia;
         control.ecosistema = ecosistema;
@@ -120,7 +110,6 @@ Future actualizarControlSqLite(
         control.titulo = titulo;
         control.nivelRiesgo = nivelRiesgo;
 
-        // ⭐ v19 CAMPOS ADICIONALES
         control.riskLevelId = riskLevelId;
         control.publicationStatusId = publicationStatusId;
         control.estadoPublicacion = estadoPublicacion;
@@ -141,18 +130,13 @@ Future actualizarControlSqLite(
         control.riesgoActual = riesgoActual;
         control.causaRaiz = causaRaiz;
 
-        // 7️⃣ MARCAR COMO COMPLETADO Y ACTUALIZAR FECHA
         control.findingStatus = findingStatus;
         control.completed = true;
         control.updatedAt = DateTime.now().toIso8601String();
         control.controlText = controlText;
 
-        // 8️⃣ ACTUALIZAR EN SQLITE
         String resultado = await DBControles.updateControl(control);
 
-        // 8b️⃣ AUTO-SYNC ONLINE: lanzar en background sin bloquear la UI
-        // No hacemos await → el usuario ve el resultado inmediatamente,
-        // la subida a Highbond/Supabase ocurre en paralelo.
         () async {
           try {
             final bool? esOnline = await checkInternetConecction();
@@ -171,19 +155,12 @@ Future actualizarControlSqLite(
           }
         }();
 
-        // 🔄 ACTUALIZAR TAMBIÉN EN FFAppState
         try {
           final controlIndex = FFAppState().jsonControles.indexWhere(
             (c) => getJsonField(c, r'''$.id_control''').toString() == idControl,
           );
 
           if (controlIndex != -1) {
-            // Crear mapa actualizado del control
-            // ⚠️ NUNCA poner bytes de foto/video/archivo en AppState.
-            // controles_widget hace jsonEncode(photos) lo que corrompe el base64 GZIP
-            // con comillas extra → convertBase64StringToUploadFiles genera imágenes en blanco
-            // → widget.listImages queda con archivos corruptos → se mezclan con los reales.
-            // Usar null + contadores; actualizarControlEnAppState confirma los conteos desde SQLite.
             final controlActualizado = {
               'id_control': control.idControl,
               'title': control.title,
@@ -211,7 +188,6 @@ Future actualizarControlSqLite(
               'titulo': control.titulo,
               'nivel_riesgo': control.nivelRiesgo,
               'control_text': control.controlText,
-              // ⭐ v19
               'titulo_observacion': control.tituloObservacion,
               'risk_level_id': control.riskLevelId,
               'publication_status_id': control.publicationStatusId,
@@ -243,31 +219,24 @@ Future actualizarControlSqLite(
         } catch (e) {
         }
 
-        // Ya no necesitamos releer desde SQLite porque actualizamos FFAppState directamente
 
-        // Contar attachments desde las listas recibidas
         final photosCount = photos?.length ?? 0;
         final videosCount = videos?.length ?? 0;
         final archivesCount = archives?.length ?? 0;
 
 
-        // 9️⃣ ACTUALIZAR PROGRESS DEL PROYECTO (SOLO SQLite - optimizado)
-        // El progress de Supabase se actualiza solo cuando hay conexión al guardar online
         try {
-          // Obtener el objetivo para saber a qué proyecto pertenece
           final objetivo =
               await DBObjetivos.getObjetivoByIdObjetivo(control.objectiveId);
           if (objetivo != null) {
             final projectId = objetivo.projectId;
 
-            // Actualizar progress SOLO en SQLite (más rápido)
             final progressSQLite =
                 await DBProyectos.calcularYActualizarProgressProyecto(
                     projectId);
           } else {
           }
         } catch (e) {
-          // No lanzar error, solo registrar
         }
 
         return;

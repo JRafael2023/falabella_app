@@ -187,7 +187,6 @@ Future<ImportResult> importarHallazgos({
         .toList();
 
 
-    // Columnas obligatorias
     final requiredColumns = ['titulo', 'gerencia', 'ecosistema'];
     for (var col in requiredColumns) {
       if (!headers.contains(col)) {
@@ -198,7 +197,6 @@ Future<ImportResult> importarHallazgos({
       }
     }
 
-    // Columnas opcionales — se procesan solo si existen en el Excel
     final bool tieneNivelRiesgo        = headers.contains('nivel_riesgo');
     final bool tieneEstadoPublicacion  = headers.contains('estado_publicacion');
     final bool tieneTipoImpacto        = headers.contains('tipo_impacto');
@@ -237,7 +235,6 @@ Future<ImportResult> importarHallazgos({
     Set<String> responsibleManagersSet = {};
     Set<String> responsibleAuditorsSet = {};
 
-    // Mapa nombre → ID para RiskTypes (necesario para RiskTypologies)
     final Map<String, String> riskTypeNameToId = {};
 
     final int totalRows = table.rows.length - 1;
@@ -295,12 +292,10 @@ Future<ImportResult> importarHallazgos({
       try {
         var row = table.rows[i];
 
-        // Columnas obligatorias
         String? titulo     = _getCellValue(row, headers, 'titulo');
         String? gerencia   = _getCellValue(row, headers, 'gerencia');
         String? ecosistema = _getCellValue(row, headers, 'ecosistema');
 
-        // Columnas opcionales
         String? nivelRiesgo        = tieneNivelRiesgo        ? _getCellValue(row, headers, 'nivel_riesgo')        : null;
         String? estadoPublicacion  = tieneEstadoPublicacion  ? _getCellValue(row, headers, 'estado_publicacion')  : null;
         String? tipoImpacto        = tieneTipoImpacto        ? _getCellValue(row, headers, 'tipo_impacto')        : null;
@@ -516,7 +511,6 @@ Future<ImportResult> importarHallazgos({
 
         if (tipologiaRiesgo != null && tipologiaRiesgo.isNotEmpty && !riskTypologiesSet.contains(tipologiaRiesgo)) {
           final customId = _generarId();
-          // Obtener risk_type_id del mapa (si se insertó en esta fila o fila anterior)
           final String? riskTypeId = (tipoRiesgo != null) ? riskTypeNameToId[tipoRiesgo] : null;
           try {
             final response = await SupaFlow.client.from('RiskTypologies').insert({
@@ -775,9 +769,7 @@ Future<void> _ejecutarRollback({
   required void Function(String paso, int actual, int total) onProgress,
 }) async {
 
-  // Eliminar en orden inverso: primero los que tienen dependencias
 
-  // Tipologías (dependen de RiskTypes)
   for (final id in riskTypologiesSupabaseIds) {
     try { await SupaFlow.client.from('RiskTypologies').delete().eq('risk_typology_id', id); }
     catch (e) { print('⚠️ Rollback RiskTypology $id: $e'); }
@@ -787,7 +779,6 @@ Future<void> _ejecutarRollback({
     catch (e) { print('⚠️ Rollback RiskTypology local $id: $e'); }
   }
 
-  // Tipos de Riesgo
   for (final id in riskTypesSupabaseIds) {
     try { await SupaFlow.client.from('RiskTypes').delete().eq('risk_type_id', id); }
     catch (e) { print('⚠️ Rollback RiskType $id: $e'); }
@@ -797,7 +788,6 @@ Future<void> _ejecutarRollback({
     catch (e) { print('⚠️ Rollback RiskType local $id: $e'); }
   }
 
-  // Títulos
   for (final id in titulosSupabaseIds) {
     try { await SupaFlow.client.from('Titles').delete().eq('titles_id', id); }
     catch (e) { print('⚠️ Rollback Título $id: $e'); }
@@ -807,7 +797,6 @@ Future<void> _ejecutarRollback({
     catch (e) { print('⚠️ Rollback Título local $id: $e'); }
   }
 
-  // Ecosistemas
   for (final id in ecosistemasSupabaseIds) {
     try { await SupaFlow.client.from('Ecosystems').delete().eq('ecosystem_id', id); }
     catch (e) { print('⚠️ Rollback Ecosistema $id: $e'); }
@@ -817,7 +806,6 @@ Future<void> _ejecutarRollback({
     catch (e) { print('⚠️ Rollback Ecosistema local $id: $e'); }
   }
 
-  // Gerencias
   for (final id in gerenciasSupabaseIds) {
     try { await SupaFlow.client.from('Managements').delete().eq('management_id', id); }
     catch (e) { print('⚠️ Rollback Gerencia $id: $e'); }
@@ -827,7 +815,6 @@ Future<void> _ejecutarRollback({
     catch (e) { print('⚠️ Rollback Gerencia local $id: $e'); }
   }
 
-  // Niveles de Riesgo
   for (final id in riskLevelsSupabaseIds) {
     try { await SupaFlow.client.from('RiskLevels').delete().eq('risk_level_id', id); }
     catch (e) { print('⚠️ Rollback RiskLevel $id: $e'); }
@@ -837,7 +824,6 @@ Future<void> _ejecutarRollback({
     catch (e) { print('⚠️ Rollback RiskLevel local $id: $e'); }
   }
 
-  // Estados de Publicación
   for (final id in publicationStatusesSupabaseIds) {
     try { await SupaFlow.client.from('PublicationStatuses').delete().eq('publication_status_id', id); }
     catch (e) { print('⚠️ Rollback PublicationStatus $id: $e'); }
@@ -847,7 +833,6 @@ Future<void> _ejecutarRollback({
     catch (e) { print('⚠️ Rollback PublicationStatus local $id: $e'); }
   }
 
-  // Tipos de Impacto
   for (final id in impactTypesSupabaseIds) {
     try { await SupaFlow.client.from('ImpactTypes').delete().eq('impact_type_id', id); }
     catch (e) { print('⚠️ Rollback ImpactType $id: $e'); }
@@ -857,7 +842,6 @@ Future<void> _ejecutarRollback({
     catch (e) { print('⚠️ Rollback ImpactType local $id: $e'); }
   }
 
-  // Soportes de Ecosistema
   for (final id in ecosystemSupportsSupabaseIds) {
     try { await SupaFlow.client.from('EcosystemSupports').delete().eq('ecosystem_support_id', id); }
     catch (e) { print('⚠️ Rollback EcosystemSupport $id: $e'); }
@@ -867,7 +851,6 @@ Future<void> _ejecutarRollback({
     catch (e) { print('⚠️ Rollback EcosystemSupport local $id: $e'); }
   }
 
-  // Alcances de Observación
   for (final id in observationScopesSupabaseIds) {
     try { await SupaFlow.client.from('ObservationScopes').delete().eq('observation_scope_id', id); }
     catch (e) { print('⚠️ Rollback ObservationScope $id: $e'); }
@@ -877,7 +860,6 @@ Future<void> _ejecutarRollback({
     catch (e) { print('⚠️ Rollback ObservationScope local $id: $e'); }
   }
 
-  // Gerentes
   for (final id in responsibleManagersSupabaseIds) {
     try { await SupaFlow.client.from('ResponsibleManagers').delete().eq('responsible_manager_id', id); }
     catch (e) { print('⚠️ Rollback ResponsibleManager $id: $e'); }
@@ -887,7 +869,6 @@ Future<void> _ejecutarRollback({
     catch (e) { print('⚠️ Rollback ResponsibleManager local $id: $e'); }
   }
 
-  // Auditores
   for (final id in responsibleAuditorsSupabaseIds) {
     try { await SupaFlow.client.from('ResponsibleAuditors').delete().eq('responsible_auditor_id', id); }
     catch (e) { print('⚠️ Rollback ResponsibleAuditor $id: $e'); }

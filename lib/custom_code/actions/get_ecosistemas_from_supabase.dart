@@ -17,7 +17,6 @@ import '/flutter_flow/custom_functions.dart';
 import 'package:tottus/custom_code/DBEcosistema.dart';
 import 'package:tottus/custom_code/sqlite_helper.dart';
 
-/// Obtener todos los ecosistemas desde Supabase
 Future<List<EcosistemaStruct>> getEcosistemasFromSupabase() async {
   try {
     final response = await SupaFlow.client

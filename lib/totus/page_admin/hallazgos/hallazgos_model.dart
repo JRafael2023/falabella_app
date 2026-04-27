@@ -20,44 +20,25 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class HallazgosModel extends FlutterFlowModel<HallazgosWidget> {
-  ///  State fields for stateful widgets in this page.
 
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Hallazgos widget.
   bool? estaconectado;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // Stores action output result for [Custom Action - sqlLiteListProyectos] action in IconButton widget.
   List<dynamic>? masivodb;
-  // Stores action output result for [Custom Action - sqLiteListUsers] action in IconButton widget.
   List<dynamic>? usersMasivo;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel1;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel2;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel3;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel4;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel5;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel6;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel7;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel8;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel9;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel10;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel11;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel12;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel13;
 
   @override

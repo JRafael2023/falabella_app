@@ -80,7 +80,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
     super.initState();
     _model = createModel(context, () => HomeProyectsModel());
 
-    // Inicializar timer pausable de internet
     initInternetCheck(context, onConnectionChanged: (isConnected) {
       _model.estaconectado = isConnected;
       if (mounted) {
@@ -88,7 +87,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
       }
     });
 
-    // Cargar última sincronización
     _loadUltimaSync();
 
     _model.txtidTextController ??= TextEditingController();
@@ -433,7 +431,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                           )))
                                                     .future,
                                                 builder: (context, snapshot) {
-                                                  // Customize what your widget looks like when it's loading.
                                                   if (!snapshot.hasData) {
                                                     return Center(
                                                       child: SizedBox(
@@ -618,7 +615,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                           )))
                                                     .future,
                                                 builder: (context, snapshot) {
-                                                  // Customize what your widget looks like when it's loading.
                                                   if (!snapshot.hasData) {
                                                     return Center(
                                                       child: SizedBox(
@@ -794,7 +790,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                           )))
                                                     .future,
                                                 builder: (context, snapshot) {
-                                                  // Customize what your widget looks like when it's loading.
                                                   if (!snapshot.hasData) {
                                                     return Center(
                                                       child: SizedBox(
@@ -1028,7 +1023,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                       future:
                                           SupabaseGroup.getMatricesCall.call(),
                                       builder: (context, snapshot) {
-                                        // Customize what your widget looks like when it's loading.
                                         if (!snapshot.hasData) {
                                           return Center(
                                             child: SizedBox(
@@ -1061,7 +1055,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                               limit: 2500,
                                             ),
                                             builder: (context, snapshot) {
-                                              // Customize what your widget looks like when it's loading.
                                               if (!snapshot.hasData) {
                                                 return Center(
                                                   child: SizedBox(
@@ -1515,7 +1508,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                   limit: 2500,
                                                 ),
                                                 builder: (context, snapshot) {
-                                                  // Customize what your widget looks like when it's loading.
                                                   if (!snapshot.hasData) {
                                                     return Center(
                                                       child: SizedBox(
@@ -1754,7 +1746,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                       )))
                                                 .future,
                                             builder: (context, snapshot) {
-                                              // Customize what your widget looks like when it's loading.
                                               if (!snapshot.hasData) {
                                                 return LoadingListTottusWidget(
                                                   texto:
@@ -2545,7 +2536,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                   limit: 2500,
                                                 ),
                                                 builder: (context, snapshot) {
-                                                  // Customize what your widget looks like when it's loading.
                                                   if (!snapshot.hasData) {
                                                     return Center(
                                                       child: SizedBox(
@@ -2775,7 +2765,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                       )))
                                                 .future,
                                             builder: (context, snapshot) {
-                                              // Customize what your widget looks like when it's loading.
                                               if (!snapshot.hasData) {
                                                 return Center(
                                                   child: SizedBox(
@@ -3828,7 +3817,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                   limit: 2500,
                                                 ),
                                                 builder: (context, snapshot) {
-                                                  // Customize what your widget looks like when it's loading.
                                                   if (!snapshot.hasData) {
                                                     return Center(
                                                       child: SizedBox(
@@ -4059,7 +4047,6 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                       )))
                                                 .future,
                                             builder: (context, snapshot) {
-                                              // Customize what your widget looks like when it's loading.
                                               if (!snapshot.hasData) {
                                                 return Center(
                                                   child: SizedBox(

@@ -18,7 +18,6 @@ Future<String> sincronizarTitulosToSupabase() async {
   try {
     final database = await DBHelper.db;
 
-    // Obtener títulos no sincronizados
     final List<Map<String, dynamic>> result = await database.query(
       'Titulos',
       where: 'sincronizadoNube = ? AND sincronizadoLocal = ?',
@@ -36,11 +35,9 @@ Future<String> sincronizarTitulosToSupabase() async {
       try {
         final titulo = DBTitulo.metodoConvertidor(map);
 
-        // Insertar en Supabase
         final supabaseId = await insertTituloToSupabase(titulo);
 
         if (supabaseId.isNotEmpty) {
-          // Marcar como sincronizado en SQLite
           await database.update(
             'Titulos',
             {

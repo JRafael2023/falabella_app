@@ -29,20 +29,15 @@ Future<String> combineAndSyncControls(
     final supabase = SupaFlow.client;
     final startTime = DateTime.now();
 
-    // 🔹 VALIDAR parámetros
     if (objectiveId == null || objectiveId.isEmpty) {
       return 'Error: objectiveId es requerido';
     }
 
-    // Solo bloqueamos si la lista de controles principales está vacía.
-    // La lista de walkthroughs puede ser vacía (el walkthroughMap quedará vacío
-    // y los controles se guardarán sin walkthrough_id, lo cual es válido).
     if (apiResponseDescription.isEmpty) {
       return 'Error: La API de controles no retornó datos';
     }
 
 
-    // 🔹 PASO 1: CREAR mapa de walkthrough_ids (OPTIMIZADO)
     final walkthroughMap = Map<String, String>.fromEntries(
       apiResponseWalkthrough
           .where(
@@ -53,8 +48,6 @@ Future<String> combineAndSyncControls(
               )),
     );
 
-    // 🔹 PASO 2: OBTENER controles existentes en PÁGINAS de 50 (evita respuestas enormes)
-    // ⚡ Cada página tiene retry automático ante errores de red
     const _pageSize = 50;
     List<dynamic> existingControls = [];
     int _pageFrom = 0;
@@ -104,7 +97,7 @@ Future<String> combineAndSyncControls(
             riesgo_actual,
             causa_raiz
           ''').eq('id_objective', objectiveId!).range(_pageFrom, _pageFrom + _pageSize - 1);
-          break; // ✅ página exitosa
+          break;
         } catch (e) {
           final isRetriable = e.toString().contains('57014') ||
               e.toString().contains('statement timeout') ||
@@ -126,9 +119,7 @@ Future<String> combineAndSyncControls(
       }
     }
 
-    // 🔹 PASO 3: resultado ya en existingControls
 
-    // Crear mapa de existentes CON TODOS LOS DATOS ✅
     final existingMap = Map<String, Map<String, dynamic>>.fromEntries(
       existingControls.map((c) => MapEntry(
             c['id_control'] as String,
@@ -137,7 +128,6 @@ Future<String> combineAndSyncControls(
     );
 
 
-    // 🔹 PASO 4: PREPARAR operaciones (UPDATE vs INSERT)
     final toUpdate = <Map<String, dynamic>>[];
     final toInsert = <Map<String, dynamic>>[];
     final combinedControls = <Control>[];
@@ -147,14 +137,9 @@ Future<String> combineAndSyncControls(
       final existing = existingMap[controlId];
 
       if (existing != null) {
-        // ⚡ CRÍTICO: SI YA EXISTE EN SQLITE, PRESERVAR completed/finding_status/photos/etc
-        // Solo actualizar title/description/walkthrough_id de la API
 
-        // 🔒 CARGAR DATOS LOCALES DE SQLITE (fuente de verdad para campos editados offline)
-        // Supabase puede tener datos desactualizados si el usuario modificó offline sin sincronizar
         final localData = await DBControles.obtenerControlCompleto(controlId);
 
-        // Crear Control con TODOS los datos de SQLite, actualizando solo campos de API
         final existingCompleted = existing['completed'] == true || existing['completed'] == 1;
 
         final control = Control(
@@ -163,11 +148,7 @@ Future<String> combineAndSyncControls(
           description: controlData['attributes']?['description']?.toString() ?? existing['description']?.toString() ?? '',
           objectiveId: objectiveId,
           walkthroughId: walkthroughMap[controlId] ?? existing['walkthrough_id']?.toString(),
-          // ⚡ PRESERVAR finding_status SOLO si el control fue completado (evaluado por auditor)
-          // Si completed=false, el control nunca fue evaluado → finding_status debe ser null
           findingStatus: existingCompleted ? existing['finding_status'] : null,
-          // 🔒 ADJUNTOS: local siempre tiene prioridad sobre Supabase.
-          // El auditor puede haber agregado fotos offline; Supabase puede tener versión anterior.
           photos: await _resolveAttachment(() => DBControlAttachments.obtenerPhotos(controlId),
               functions.convertirJSONaFormatoSQLite(existing['photos'])),
           video: await _resolveAttachment(() => DBControlAttachments.obtenerVideos(controlId),
@@ -178,7 +159,6 @@ Future<String> combineAndSyncControls(
           completed: existingCompleted,
           createdAt: existing['created_at']?.toString() ?? DateTime.now().toIso8601String(),
           updatedAt: existing['updated_at']?.toString() ?? DateTime.now().toIso8601String(),
-          // 🔒 CAMPOS DE HALLAZGO: preferir local (puede tener datos offline no sincronizados)
           observacion: _localFirst(localData?['observacion']?.toString(), existing['observacion']),
           gerencia: _localFirst(localData?['gerencia']?.toString(), existing['gerencia']),
           ecosistema: _localFirst(localData?['ecosistema']?.toString(), existing['ecosistema']),
@@ -188,9 +168,7 @@ Future<String> combineAndSyncControls(
           procesoPropuesto: _localFirst(localData?['proceso_propuesto']?.toString(), existing['proceso_propuesto']),
           titulo: _localFirst(localData?['titulo']?.toString(), existing['titulo']),
           nivelRiesgo: _localFirst(localData?['nivel_riesgo']?.toString(), existing['nivel_riesgo']),
-          // 🔒 CONTROL TEXT: preferir local (usuario puede haber escrito offline)
           controlText: _localFirst(localData?['control_text']?.toString(), existing['control_text']),
-          // ⭐ CAMPOS v19 - preservar (preferir local)
           tituloObservacion: _localFirst(localData?['titulo_observacion']?.toString(), existing['titulo_observacion']),
           riskLevelId: _localFirst(localData?['risk_level_id']?.toString(), existing['risk_level_id']),
           publicationStatusId: _localFirst(localData?['publication_status_id']?.toString(), existing['publication_status_id']),
@@ -215,7 +193,6 @@ Future<String> combineAndSyncControls(
 
         combinedControls.add(control);
 
-        // Actualizar en Supabase SOLO title/description/walkthrough_id
         toUpdate.add({
           'id': existing['id'],
           'data': {
@@ -225,7 +202,6 @@ Future<String> combineAndSyncControls(
           },
         });
       } else {
-        // ✅ SI NO EXISTE: Crear con valores NULL explícitos
         final control = Control(
           idControl: controlId,
           title: controlData['attributes']?['title']?.toString() ?? '',
@@ -233,7 +209,6 @@ Future<String> combineAndSyncControls(
               controlData['attributes']?['description']?.toString() ?? '',
           objectiveId: objectiveId,
           walkthroughId: walkthroughMap[controlId],
-          // ✅ NULL para nuevos controles
           findingStatus: null,
           photos: null,
           video: null,
@@ -248,32 +223,28 @@ Future<String> combineAndSyncControls(
 
         combinedControls.add(control);
 
-        // ✅ Crear JSON manualmente para GARANTIZAR nulls
         toInsert.add({
           'id_control': control.idControl,
           'title': control.title,
           'description': control.description,
           'id_objective': control.objectiveId,
           'walkthrough_id': control.walkthroughId,
-          'finding_status': null, // ✅ NULL explícito
-          'photos': null, // ✅ NULL explícito
-          'video': null, // ✅ NULL explícito
-          'archives': null, // ✅ NULL explícito
+          'finding_status': null,
+          'photos': null,
+          'video': null,
+          'archives': null,
           'status': control.status,
           'completed': control.completed,
           'created_at': control.createdAt,
           'updated_at': control.updatedAt,
-          // Todos los demás campos NULL por defecto en Supabase
         });
       }
     }
 
-    // 🔹 PASO 5: GUARDAR EN SUPABASE Y SQLITE EN PARALELO
     final supabaseFuture = Future(() async {
       int updated = 0;
       int inserted = 0;
 
-      // UPDATE en lotes de 50
       for (int i = 0; i < toUpdate.length; i += 50) {
         final batch = toUpdate.skip(i).take(50);
         await Future.wait(batch.map((item) => supabase
@@ -283,7 +254,6 @@ Future<String> combineAndSyncControls(
         updated += batch.length;
       }
 
-      // INSERT en lotes de 100
       for (int i = 0; i < toInsert.length; i += 100) {
         final batch = toInsert.skip(i).take(100).toList();
         await supabase.from('Controls').insert(batch);
@@ -296,7 +266,6 @@ Future<String> combineAndSyncControls(
     final sqliteFuture =
         DBControles.insertControlesMasivos(combinedControls, objectiveId);
 
-    // Esperar ambos en paralelo
     final results = await Future.wait([supabaseFuture, sqliteFuture]);
     final supabaseResult = results[0] as Map<String, int>;
     final sqliteResult = results[1] as String;
@@ -310,7 +279,6 @@ Future<String> combineAndSyncControls(
 
     return message;
   } catch (e, stackTrace) {
-    // Rethrow errores de red/timeout para que el caller pueda reintentar
     final isRetriable = e.toString().contains('57014') ||
         e.toString().contains('statement timeout') ||
         e.toString().contains('canceling statement') ||
@@ -323,30 +291,22 @@ Future<String> combineAndSyncControls(
   }
 }
 
-/// Prefiere valor local si existe, sino usa Supabase como fallback.
-/// Declarada a nivel de archivo para evitar problemas con AOT (release builds).
 String? _localFirst(String? localVal, dynamic supabaseVal) {
   if (localVal != null && localVal.isNotEmpty) return localVal;
   final s = supabaseVal?.toString();
   return (s != null && s.isNotEmpty) ? s : null;
 }
 
-/// Resuelve el valor final de un adjunto con prioridad a datos locales:
-/// - Local tiene datos → usar local (puede tener fotos offline no sincronizadas aún)
-/// - Local vacío + Supabase tiene datos → usar Supabase (primera carga o datos del servidor)
-/// - Ambos vacíos → null
 Future<String?> _resolveAttachment(
   Future<List<String>> Function() loadLocal,
   String? supabaseValue,
 ) async {
-  // 🔒 LOCAL PRIMERO: el auditor pudo agregar fotos offline que Supabase no tiene aún
   try {
     final localList = await loadLocal();
     if (localList.isNotEmpty) {
       return localList.join(Control.separator);
     }
   } catch (_) {}
-  // Local vacío → usar Supabase como fuente (primera carga)
   if (supabaseValue != null && supabaseValue.isNotEmpty) {
     return supabaseValue;
   }

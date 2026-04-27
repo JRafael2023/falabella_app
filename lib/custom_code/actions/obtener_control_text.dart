@@ -13,8 +13,6 @@ import 'package:flutter/material.dart';
 
 import '/custom_code/DBControles.dart';
 
-/// Obtiene el campo control_text de un control específico desde SQLite
-/// Este campo es muy grande y se carga bajo demanda
 Future<String?> obtenerControlText(String idControl) async {
   return await DBControles.obtenerControlText(idControl);
 }

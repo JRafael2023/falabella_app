@@ -1,4 +1,3 @@
-// ignore_for_file: unnecessary_getters_setters
 
 import '/backend/schema/util/schema_util.dart';
 import '/backend/schema/enums/enums.dart';
@@ -23,49 +22,42 @@ class UserStruct extends BaseStruct {
         _rol = rol,
         _createdAt = createdAt;
 
-  // "id" field.
   String? _id;
   String get id => _id ?? '';
   set id(String? val) => _id = val;
 
   bool hasId() => _id != null;
 
-  // "uidUsuario" field.
   String? _uidUsuario;
   String get uidUsuario => _uidUsuario ?? '';
   set uidUsuario(String? val) => _uidUsuario = val;
 
   bool hasUidUsuario() => _uidUsuario != null;
 
-  // "country" field.
   String? _country;
   String get country => _country ?? '';
   set country(String? val) => _country = val;
 
   bool hasCountry() => _country != null;
 
-  // "display_name" field.
   String? _displayName;
   String get displayName => _displayName ?? '';
   set displayName(String? val) => _displayName = val;
 
   bool hasDisplayName() => _displayName != null;
 
-  // "email" field.
   String? _email;
   String get email => _email ?? '';
   set email(String? val) => _email = val;
 
   bool hasEmail() => _email != null;
 
-  // "rol" field.
   String? _rol;
   String get rol => _rol ?? '';
   set rol(String? val) => _rol = val;
 
   bool hasRol() => _rol != null;
 
-  // "created_at" field.
   DateTime? _createdAt;
   DateTime? get createdAt => _createdAt;
   set createdAt(DateTime? val) => _createdAt = val;

@@ -39,7 +39,6 @@ class Hallazgo {
     this.status = true,
   });
 
-  // Convertir a Map para SQLite
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -62,7 +61,6 @@ class Hallazgo {
     };
   }
 
-  // Convertir a JSON para Firebase
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -85,7 +83,6 @@ class Hallazgo {
     };
   }
 
-  // Crear desde Map (SQLite)
   factory Hallazgo.fromMap(Map<String, dynamic> map) {
     return Hallazgo(
       id: map['id'],
@@ -108,7 +105,6 @@ class Hallazgo {
     );
   }
 
-  // Crear desde JSON (Firebase)
   factory Hallazgo.fromJson(Map<String, dynamic> json) {
     return Hallazgo(
       id: json['id'],

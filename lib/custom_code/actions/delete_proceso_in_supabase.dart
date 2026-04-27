@@ -17,17 +17,14 @@ import 'package:sqflite/sqflite.dart';
 
 Future<bool> deleteProcesoInSupabase(String procesoId) async {
   try {
-    // Intentar soft delete en Supabase
     await SupaFlow.client.from('Processes').update({
       'status': false,
       'updated_at': DateTime.now().toIso8601String()
     }).eq('process_id', procesoId);
 
-    // Online: eliminó en Supabase → eliminar también de SQLite
     await DBProceso.deleteProceso(procesoId);
     return true;
   } catch (e) {
-    // Offline: marcar como pendiente de eliminar en SQLite (no borrar todavía)
     try {
       final db = await DBHelper.db;
       await db.update(

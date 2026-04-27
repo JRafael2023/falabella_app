@@ -14,7 +14,6 @@ class Usuario {
   String createdAt;
   String updatedAt;
   bool status;
-  // ✅ Contraseña temporal solo para usuarios creados offline (se borra tras sincronizar)
   String? passwordTemp;
 
   Usuario({
@@ -34,7 +33,6 @@ class Usuario {
     this.passwordTemp,
   });
 
-  // Convertir un objeto Usuario a Map (para SQLite)
   Map<String, dynamic> toMap() {
     return {
       'user_uid': userUid,
@@ -53,7 +51,6 @@ class Usuario {
     };
   }
 
-  // Crear un objeto Usuario desde un Map (SQLite)
   factory Usuario.fromMap(Map<String, dynamic> map) {
     return Usuario(
       id: map['id'],
@@ -73,7 +70,6 @@ class Usuario {
     );
   }
 
-  // Convertir a JSON (para Supabase)
   Map<String, dynamic> toJson() {
     return {
       'user_uid': userUid,
@@ -84,12 +80,10 @@ class Usuario {
       'created_at': createdAt,
       'updated_at': updatedAt,
       'status': status,
-      // ✅ Incluido para que el UI pueda mostrar badge "pendiente de sync"
       'sincronizadoNube': sincronizadoNube,
     };
   }
 
-  // Factory para crear desde UsersRow (Supabase)
   factory Usuario.fromUsersRow(dynamic row) {
     return Usuario(
       userUid: row.userUid ?? '',
@@ -107,7 +101,6 @@ class Usuario {
     );
   }
 
-  // Factory para crear desde Auth (Supabase Auth)
   factory Usuario.fromAuth({
     required String uid,
     String? email,
@@ -126,7 +119,6 @@ class Usuario {
     );
   }
 
-  // Factory para crear desde HighBond API
   factory Usuario.fromHighBondJson(Map<String, dynamic> json) {
     return Usuario(
       userUid: json['id'].toString(), // Usamos el ID de HighBond como userUid
@@ -140,7 +132,6 @@ class Usuario {
     );
   }
 
-  // Método copyWith para crear copias modificadas
   Usuario copyWith({
     int? id,
     String? userUid,

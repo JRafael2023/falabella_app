@@ -17,11 +17,7 @@ import 'package:tottus/custom_code/Control.dart';
 import '../sqlite_helper.dart';
 
 Future<List<dynamic>> sqlLiteListControles(String idObjetivo) async {
-  // Add your function code here!
-  //
-  //final result = await DBHelper.listarProyectosJson();
   final result = await DBControles.listarControlesJson(idObjetivo);
-  //final result = await DBControles.listarControlesJson(idObjetivo);
 
   return result;
 }

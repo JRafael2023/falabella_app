@@ -16,8 +16,6 @@ import '/flutter_flow/custom_functions.dart';
 
 import '/custom_code/sqlite_helper.dart';
 
-/// Limpia las descripciones de títulos que contienen UUIDs Este script se
-/// ejecuta una vez para limpiar datos incorrectos
 Future<String> limpiarDescripcionesTitulos() async {
   try {
 
@@ -26,7 +24,6 @@ Future<String> limpiarDescripcionesTitulos() async {
       return '❌ Error: No se pudo acceder a la base de datos';
     }
 
-    // Actualizar todos los registros de Titulos poniendo description vacío
     final result = await database.update(
       'Titulos',
       {'description': ''},

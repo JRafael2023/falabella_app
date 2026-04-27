@@ -21,7 +21,6 @@ import 'package:tottus/custom_code/Objetivo.dart';
 Future<List<ControlsRow>> obtenerControlesPorUsuario(String userId) async {
   try {
 
-    // 1. Obtener PROYECTOS del usuario desde SUPABASE
     final proyectosSupabase = await ProjectsTable().queryRows(
       queryFn: (q) => q!.eq('assign_user', userId),
     );
@@ -31,7 +30,6 @@ Future<List<ControlsRow>> obtenerControlesPorUsuario(String userId) async {
     }
 
 
-    // 2. Extraer IDs de proyectosa
     final idsProyectos = proyectosSupabase
         .map((p) => p.idProject ?? '')
         .where((id) => id.isNotEmpty)
@@ -41,8 +39,6 @@ Future<List<ControlsRow>> obtenerControlesPorUsuario(String userId) async {
       return [];
     }
 
-    // 3. Obtener OBJETIVOS de esos proyectos desde SQLITE
-    // (porque Objectives NO existe en Supabase)
     List<Objetivo> objetivosSQLite = [];
     for (var idProyecto in idsProyectos) {
       final objetivos =
@@ -55,15 +51,11 @@ Future<List<ControlsRow>> obtenerControlesPorUsuario(String userId) async {
     }
 
 
-    // 4. Extraer IDs de objetivos
     final idsObjetivos = objetivosSQLite
         .map((obj) => obj.idObjetivo)
         .where((id) => id.isNotEmpty)
         .toList();
 
-    // 5. Obtener CONTROLES de esos objetivos desde SUPABASE
-    // ⚡ Una query simple por objetivo en paralelo — cada error se maneja por separado
-    // para que un timeout en un objetivo no cancele los demás
     final resultadosPorObjetivo = await Future.wait(
       idsObjetivos.map((id) async {
         try {

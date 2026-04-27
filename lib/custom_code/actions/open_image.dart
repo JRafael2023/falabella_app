@@ -35,10 +35,8 @@ Future<FFUploadedFile?> openImage() async {
     return null;
   }
 
-  // Declarar height y width como double?
   double? width, height;
 
-  // Obtener las dimensiones de la imagen si es posible
   if (filePath != null) {
     try {
       final image = img.decodeImage(File(filePath).readAsBytesSync());
@@ -50,7 +48,6 @@ Future<FFUploadedFile?> openImage() async {
     }
   }
 
-  // Crear FFUploadedFile con double? para height y width
   final ffFile = FFUploadedFile(
     name: file.name,
     bytes: file.bytes,

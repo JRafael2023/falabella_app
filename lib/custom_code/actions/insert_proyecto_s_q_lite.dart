@@ -27,7 +27,6 @@ Future<String> insertProyectoSQLite(
   try {
     final db = await DBHelper.db;
 
-    // Preparar los datos del proyecto
     final Map<String, dynamic> projectData = {
       'idProyecto': idProject,
       'name': name,
@@ -45,7 +44,6 @@ Future<String> insertProyectoSQLite(
       'status': 1, // 1 = true, 0 = false
     };
 
-    // Insertar el proyecto en la tabla Proyectos
     await db.insert(
       'Proyectos',
       projectData,

@@ -22,7 +22,6 @@ Future<List<dynamic>> sqLiteListUsers() async {
     final usuarios = await DBUsuarios.listarUsuarios();
 
 
-    // Convertir los objetos Usuario a JSON/Map
     final usuariosJson = usuarios.map((usuario) => usuario.toJson()).toList();
 
     if (usuariosJson.isNotEmpty) {

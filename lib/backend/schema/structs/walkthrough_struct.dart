@@ -1,4 +1,3 @@
-// ignore_for_file: unnecessary_getters_setters
 
 import '/backend/schema/util/schema_util.dart';
 import '/backend/schema/enums/enums.dart';
@@ -11,7 +10,6 @@ class WalkthroughStruct extends BaseStruct {
     DataStruct? data,
   }) : _data = data;
 
-  // "data" field.
   DataStruct? _data;
   DataStruct get data => _data ?? DataStruct();
   set data(DataStruct? val) => _data = val;

@@ -17,23 +17,13 @@ import '/custom_code/DBControles.dart';
 import '/custom_code/Objetivo.dart';
 import '/backend/api_requests/api_calls.dart' as api_calls;
 
-/// Carga TODOS los datos del usuario de una sola vez:
-/// 1. Obtiene user_uid desde tabla Users por userId (UUID)
-/// 2. Obtiene proyectos desde Supabase por assign_user = user_uid
-/// 3. Para cada proyecto → objetivos desde SQLite
-/// 4. Para cada objetivo → controles desde SQLite
 Future cargarTodosLosDatosUsuario(String userId) async {
   try {
 
-    // ============================================
-    // 1️⃣ OBTENER USER_UID DEL USUARIO
-    // ============================================
 
-    // Usar uidUsuario de FFAppState directamente (evita query con userId nulo)
     String userUid = FFAppState().currentUser.uidUsuario ?? '';
 
     if (userUid.isEmpty || userUid == 'null') {
-      // Fallback: consultar Supabase solo si userId es un UUID válido
       if (userId.isNotEmpty && userId != 'null') {
         try {
           final usuarioSupabase = await UsersTable().queryRows(
@@ -54,9 +44,6 @@ Future cargarTodosLosDatosUsuario(String userId) async {
     }
 
 
-    // ============================================
-    // 2️⃣ OBTENER PROYECTOS DEL USUARIO DESDE SUPABASE
-    // ============================================
     final proyectosSupabase = await ProjectsTable().queryRows(
       queryFn: (q) => q!.eq('assign_user', userUid),
     );
@@ -68,25 +55,19 @@ Future cargarTodosLosDatosUsuario(String userId) async {
     }
 
 
-    // Extraer IDs de proyectos
     final idsProyectos = proyectosSupabase
         .map((p) => p.idProject ?? '')
         .where((id) => id.isNotEmpty)
         .toList();
 
 
-    // ============================================
-    // 3️⃣ CARGAR OBJETIVOS - VALIDAR CON API PRIMERO
-    // ============================================
 
     List<dynamic> todosObjetivosJSON = [];
     List<String> proyectosConObjetivos = [];
     int totalObjetivos = 0;
 
-    // ⚡ Cache de controles por objetivo: evita doble consulta SQLite en paso 4
     final Map<String, List<Map<String, dynamic>>> controlesCache = {};
 
-    // ⚡ OPTIMIZACIÓN: Procesar proyectos en PARALELO (máximo 5 a la vez)
     final batchSize = 5;
     for (var i = 0; i < idsProyectos.length; i += batchSize) {
       final batch = idsProyectos.skip(i).take(batchSize).toList();
@@ -94,30 +75,24 @@ Future cargarTodosLosDatosUsuario(String userId) async {
       await Future.wait(batch.map((idProyecto) async {
         try {
 
-          // Llamar API de objetivos
           final apiObjetivos = await api_calls.SupabaseFunctionsGroup
               .getObjetivesHighbondCall
               .call(idProject: idProyecto);
 
           if (apiObjetivos?.succeeded ?? false) {
 
-            // Guardar objetivos en SQLite
             await sqLiteSaveObjetivosMasivo(
               getJsonField(apiObjetivos?.jsonBody ?? '', r'''$.data.data'''),
             );
 
-            // Leer objetivos desde SQLite
             final objetivosSQLite =
                 await DBObjetivos.listarObjetivosPorProyecto(idProyecto);
 
             if (objetivosSQLite.isNotEmpty) {
               proyectosConObjetivos.add(idProyecto);
 
-              // Convertir a JSON y calcular progress real desde SQLite
               final objetivosJSON = await Future.wait(objetivosSQLite.map((obj) async {
-                // Calcular progress desde controles en SQLite
                 final controles = await DBControles.listarControlesJson(obj.idObjetivo);
-                // ⚡ Guardar en cache para reusar en paso 4 (evita segunda consulta)
                 controlesCache[obj.idObjetivo] = controles;
                 final totalControles = controles.length;
                 final completados = controles.where((c) => c['completed'] == 1 || c['completed'] == true).length;
@@ -139,7 +114,6 @@ Future cargarTodosLosDatosUsuario(String userId) async {
               totalObjetivos += objetivosJSON.length;
             }
           } else {
-            // ⚡ API falló (offline o error) → cargar desde SQLite directamente
             final objetivosSQLite =
                 await DBObjetivos.listarObjetivosPorProyecto(idProyecto);
             if (objetivosSQLite.isNotEmpty) {
@@ -170,17 +144,12 @@ Future cargarTodosLosDatosUsuario(String userId) async {
     }
 
 
-    // Guardar en FFAppState
     FFAppState().jsonObjetivos = todosObjetivosJSON;
 
-    // ============================================
-    // 4️⃣ CARGAR CONTROLES - REUSAR CACHE DEL PASO 3
-    // ============================================
 
     List<dynamic> todosControlesJSON = [];
     int totalControles = 0;
 
-    // Extraer IDs de objetivos
     final idsObjetivos = todosObjetivosJSON
         .map((obj) => obj['id_objective']?.toString() ?? '')
         .where((id) => id.isNotEmpty)
@@ -191,32 +160,24 @@ Future cargarTodosLosDatosUsuario(String userId) async {
       return;
     }
 
-    // Procesar controles en lotes de 2 para evitar timeout de Supabase
-    // (corrían 10 en paralelo → 4 queries simultáneas → statement timeout en Supabase)
-    // Con batch=2 se reduce la carga y se agrega retry automático en timeout.
     final batchSizeControles = 2;
     for (var i = 0; i < idsObjetivos.length; i += batchSizeControles) {
       final batch = idsObjetivos.skip(i).take(batchSizeControles).toList();
 
       final resultados = await Future.wait(batch.map((idObjetivo) async {
-        // Helper interno con retry (máx 2 intentos)
         Future<List<dynamic>> cargarControlesConRetry(int intento) async {
           try {
-            // ⚡ Usar cache del paso 3 si está disponible (evita segunda consulta SQLite)
             final controlesCached = controlesCache[idObjetivo];
             if (controlesCached != null && controlesCached.isNotEmpty) {
               return controlesCached;
             }
 
-            // 1️⃣ Verificar si ya existen controles en SQLite
             final controlesSQLite =
                 await DBControles.listarControlesJson(idObjetivo);
 
             if (controlesSQLite.isNotEmpty) {
-              // ✅ YA HAY DATOS EN SQLITE - Usarlos directamente (NO llamar API)
               return controlesSQLite;
             } else {
-              // ⚠️ SQLite VACÍO - Primera vez, llamar API
               final results = await Future.wait([
                 api_calls.SupabaseFunctionsGroup.getControlsDescriptionHighbondCall
                     .call(idObjective: idObjetivo),
@@ -228,7 +189,6 @@ Future cargarTodosLosDatosUsuario(String userId) async {
               final apiControlWalk = results[1];
 
               if (apiControls?.succeeded ?? false) {
-                // Combinar y sincronizar controles (primera vez)
                 await combineAndSyncControls(
                   getJsonField(apiControls?.jsonBody ?? '', r'''$.data.data''', true)!,
                   getJsonField(
@@ -236,7 +196,6 @@ Future cargarTodosLosDatosUsuario(String userId) async {
                   idObjetivo,
                 );
 
-                // Leer controles guardados desde SQLite
                 final controlesNuevos =
                     await DBControles.listarControlesJson(idObjetivo);
 
@@ -262,7 +221,6 @@ Future cargarTodosLosDatosUsuario(String userId) async {
         return cargarControlesConRetry(1);
       }));
 
-      // Agregar todos los resultados del batch
       for (var controles in resultados) {
         todosControlesJSON.addAll(controles);
         totalControles += controles.length;
@@ -270,13 +228,9 @@ Future cargarTodosLosDatosUsuario(String userId) async {
     }
 
 
-    // Guardar en FFAppState
     FFAppState().jsonControles = todosControlesJSON;
     FFAppState().update(() {});
 
-    // ============================================
-    // RESUMEN FINAL
-    // ============================================
   } catch (e, stackTrace) {
     FFAppState().jsonObjetivos = [];
     FFAppState().jsonControles = [];

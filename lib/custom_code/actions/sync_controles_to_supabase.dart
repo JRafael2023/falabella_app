@@ -26,14 +26,12 @@ Future<String> syncControlesToSupabase(
   List<ControlsRow> listSupabaseControles,
 ) async {
   try {
-    // 1️⃣ VERIFICAR CONEXIÓN A INTERNET
     bool? conectado = await checkInternetConecction();
 
     if (conectado == null || !conectado) {
       return "❌ Sin conexión a internet. Conéctate para sincronizar.";
     }
 
-    // 2️⃣ VALIDAR PARÁMETROS
     if (listSQLiteControles.isEmpty) {
       return "ℹ️ No hay controles en la base de datos local";
     }
@@ -43,7 +41,6 @@ Future<String> syncControlesToSupabase(
     }
 
 
-    // 3️⃣ CONVERTIR CONTROLES DE SQLITE (JSON) A OBJETOS CONTROL
     List<Control> controlesSQLite = [];
     for (var jsonControl in listSQLiteControles) {
       if (jsonControl is Map<String, dynamic>) {
@@ -51,7 +48,6 @@ Future<String> syncControlesToSupabase(
       }
     }
 
-    // 4️⃣ CREAR MAPA DE CONTROLES SUPABASE PARA COMPARACIÓN RÁPIDA
     final Map<String, dynamic> mapaSupabase = {};
     for (var control in listSupabaseControles) {
       mapaSupabase[control.idControl ?? ''] = {
@@ -61,7 +57,6 @@ Future<String> syncControlesToSupabase(
         'photos': control.photos,
         'video': control.video,
         'archives': control.archives,
-        // ⭐ NUEVOS CAMPOS NULLABLE
         'observacion': control.observacion,
         'gerencia': control.gerencia,
         'ecosistema': control.ecosistema,
@@ -72,8 +67,6 @@ Future<String> syncControlesToSupabase(
         'titulo': control.titulo,
         'nivel_riesgo': control.nivelRiesgo,
         'control_text': control.controlText,
-        // ⭐ v19 — estos campos no vienen en ControlsRow,
-        // se tratan como null para que siempre se sincronicen si el local tiene valor
         'titulo_observacion': null,
         'risk_level_id': null,
         'publication_status_id': null,
@@ -97,7 +90,6 @@ Future<String> syncControlesToSupabase(
       };
     }
 
-    // 5️⃣ RESOLVER NOMBRE DEL PROYECTO DESDE SQLITE (fallback robusto)
     String projectName = FFAppState().projectName;
     if (projectName.isEmpty) {
       final proyecto = await DBProyectos.getProyectoByIdProject(FFAppState().idproyect);
@@ -106,16 +98,13 @@ Future<String> syncControlesToSupabase(
       }
     }
 
-    // 6️⃣ COMPARAR Y PREPARAR TAREAS (sin I/O) — luego ejecutar en paralelo
     int sincronizados = 0;
     int omitidos = 0;
     int errores = 0;
     List<String> erroresDetalle = [];
-    // ⚡ Supabase updates se acumulan y corren en paralelo al final
     final List<Future> supabasePendientes = [];
     bool highbondFallo = false;
 
-    // Cada tarea incluye: control + dataToUpdate + flag needsHighbond
     final List<Map<String, dynamic>> _tareas = [];
 
     for (var controlLocal in controlesSQLite) {
@@ -129,7 +118,6 @@ Future<String> syncControlesToSupabase(
 
         final controlRemoto = mapaSupabase[idControl];
 
-        // COMPARAR CAMPOS
         bool completedDiferente =
             controlLocal.completed != controlRemoto['completed'];
         bool descriptionDiferente =
@@ -137,9 +125,6 @@ Future<String> syncControlesToSupabase(
         bool findingDiferente =
             controlLocal.findingStatus != controlRemoto['finding_status'];
 
-        // ⚡ Comparar attachments por CANTIDAD (no por contenido).
-        // GZIP no es determinístico: re-comprimir el mismo dato produce bytes distintos,
-        // por lo que comparar el string GZIP:base64 siempre falla aunque el contenido sea igual.
         int _countVal(dynamic val) {
           if (val == null) return 0;
           if (val is List) return val.length;
@@ -161,7 +146,6 @@ Future<String> syncControlesToSupabase(
         bool videoDiferente    = localVideosCount   != supaVideosCount;
         bool archivesDiferente = localArchivesCount != supaArchivesCount;
 
-        // ⭐ COMPARAR NUEVOS CAMPOS NULLABLE
         bool observacionDiferente =
             controlLocal.observacion != controlRemoto['observacion'];
         bool gerenciaDiferente =
@@ -182,7 +166,6 @@ Future<String> syncControlesToSupabase(
         bool controlTextDiferente =
             controlLocal.controlText != controlRemoto['control_text'];
 
-        // ⭐ v19 — COMPARAR CAMPOS ADICIONALES
         bool tituloObservacionDiferente = controlLocal.tituloObservacion != controlRemoto['titulo_observacion'];
         bool riskLevelIdDiferente = controlLocal.riskLevelId != controlRemoto['risk_level_id'];
         bool publicationStatusIdDiferente = controlLocal.publicationStatusId != controlRemoto['publication_status_id'];
@@ -204,8 +187,6 @@ Future<String> syncControlesToSupabase(
         bool riesgoActualDiferente = controlLocal.riesgoActual != controlRemoto['riesgo_actual'];
         bool causaRaizDiferente = controlLocal.causaRaiz != controlRemoto['causa_raiz'];
 
-        // ⚡ SIEMPRE sincronizar — los controles ya vienen pre-filtrados por pendiente_sync=1.
-        // La comparación ya no decide si sincronizar, solo qué campos incluir en dataToUpdate.
         bool necesitaSincronizacion = true;
 
         if (necesitaSincronizacion) {
@@ -216,7 +197,6 @@ Future<String> syncControlesToSupabase(
               controlLocal.walkthroughId!.isNotEmpty &&
               projectIdValido;
 
-          // Construir dataToUpdate (sin I/O — puro en memoria)
           Map<String, dynamic> dataToUpdate = {
             'completed': controlLocal.completed,
             'updated_at': DateTime.now().toIso8601String(),
@@ -228,9 +208,6 @@ Future<String> syncControlesToSupabase(
           if (controlLocal.completed && controlLocal.findingStatus != null) {
             dataToUpdate['finding_status'] = controlLocal.findingStatus;
           }
-          // 🔥 Photos, video, archives: siempre sincronizar el estado actual.
-          // Si local tiene datos → subir. Si local está vacío → limpiar en Supabase (null).
-          // Esto cubre el caso de borrar un archivo: SQLite ya lo borró, Supabase debe quedar igual.
           dataToUpdate['photos'] = (controlLocal.photos != null && controlLocal.photos!.isNotEmpty)
               ? functions.convertirFormatoSQLiteAJSON(controlLocal.photos)
               : null;
@@ -277,7 +254,6 @@ Future<String> syncControlesToSupabase(
             'dataToUpdate': dataToUpdate,
           });
         } else {
-          // ✅ SIN DIFERENCIAS → OMITIR
           omitidos++;
         }
       } catch (e) {
@@ -304,8 +280,6 @@ Future<String> syncControlesToSupabase(
     if (_tareasSoloSupa.isNotEmpty) {
     }
 
-    // 8 simultáneos: ~3x más rápido que el batch de 3 anterior.
-    // Límite para no saturar la API de HighBond ni causar timeouts con adjuntos grandes.
     const int _hbBatch = 8;
     for (int _bi = 0; _bi < _tareasHighbond.length; _bi += _hbBatch) {
       final _lote = _tareasHighbond.skip(_bi).take(_hbBatch).toList();
@@ -313,7 +287,6 @@ Future<String> syncControlesToSupabase(
         final controlLocal = tarea['control'] as Control;
         final idControl = controlLocal.idControl;
 
-        // PASO 1: API HighBond
         if (tarea['needsHighbond'] as bool) {
           try {
             final photosList = controlLocal.getPhotosList();
@@ -323,7 +296,6 @@ Future<String> syncControlesToSupabase(
                 (videosList != null && videosList.isNotEmpty) ||
                 (archivosList != null && archivosList.isNotEmpty);
 
-            // ⭐ NUEVA API: crear observación en Highbond solo para inefectivo
             if (controlLocal.findingStatus == 0) {
               final createIssueResponse = await SupabaseFunctionsGroup
                   .createIssueHighbondCall
@@ -381,7 +353,6 @@ Future<String> syncControlesToSupabase(
               }
             }
 
-            // Luego API principal (tanto para Efectivo como Inefectivo)
             final apiResponse =
                 await SupabaseFunctionsGroup.updateControlHighbondCall.call(
               idWalkthrough: controlLocal.walkthroughId,
@@ -398,7 +369,6 @@ Future<String> syncControlesToSupabase(
           }
         }
 
-        // PASO 2: Encolar update de Supabase para ejecución paralela al final
         final capturedData = Map<String, dynamic>.from(tarea['dataToUpdate'] as Map<String, dynamic>);
         final capturedId = idControl;
         supabasePendientes.add(ControlsTable().update(
@@ -410,12 +380,10 @@ Future<String> syncControlesToSupabase(
       }));
     }
 
-    // ⚡ Ejecutar todos los updates de Supabase en paralelo
     if (supabasePendientes.isNotEmpty) {
       await Future.wait(supabasePendientes);
     }
 
-    // Reset pendiente_sync para controles solo-Supabase
     if (_tareasSoloSupa.isNotEmpty) {
       await Future.wait(_tareasSoloSupa.map((t) {
         final ctrl = t['control'] as Control;
@@ -423,7 +391,6 @@ Future<String> syncControlesToSupabase(
       }));
     }
 
-    // 6️⃣ RETORNAR RESULTADO
     String resultado = '';
 
     if (sincronizados > 0) {
@@ -446,7 +413,6 @@ Future<String> syncControlesToSupabase(
       }
     }
 
-    // Mensajes específicos
     if (sincronizados > 0 && errores == 0) {
       resultado =
           '✅ ¡Perfecto! Se sincronizaron $sincronizados controles a la nube.';
@@ -460,7 +426,6 @@ Future<String> syncControlesToSupabase(
     }
 
 
-    // 7️⃣ ACTUALIZAR PROGRESS DEL PROYECTO EN SUPABASE
     try {
       if (controlesSQLite.isNotEmpty) {
         final primerControl = controlesSQLite.first;

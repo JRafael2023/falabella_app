@@ -21,7 +21,6 @@ Future<List<dynamic>> convertDinamicControles(
 
   return json.map((item) {
     return {
-      // 📋 Datos originales del API
       'idControl': item['id']?.toString() ?? '',
       'titulo': item['attributes']?['title'] ?? '',
       'description': item['attributes']?['description'] ?? '',
@@ -32,7 +31,6 @@ Future<List<dynamic>> convertDinamicControles(
       'createdAt': fecha,
       'updatedAt': fecha,
 
-      // 🎯 NUEVOS CAMPOS PARA TRACKING
       'estadoControl': '', // "efectivo" | "inefectivo" | ""
       'notasObservaciones': '', // Texto del textarea
       'completado': false, // true cuando se guarda exitosamente

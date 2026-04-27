@@ -17,7 +17,6 @@ import '/flutter_flow/custom_functions.dart';
 import 'package:tottus/custom_code/DBGerencia.dart';
 import 'package:tottus/custom_code/sqlite_helper.dart';
 
-/// Obtener todas las gerencias desde Supabase
 Future<List<GerenciaStruct>> getGerenciasFromSupabase() async {
   try {
     final response = await SupaFlow.client

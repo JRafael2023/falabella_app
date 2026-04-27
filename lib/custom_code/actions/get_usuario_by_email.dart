@@ -23,7 +23,6 @@ Future<dynamic> getUsuarioByEmail(String email) async {
     }
 
 
-    // 1️⃣ Primero buscar en jsonUsers del AppState (funciona offline sin BD)
     final jsonUsers = FFAppState().jsonUsers;
     if (jsonUsers.isNotEmpty) {
       final emailLower = email.toLowerCase();
@@ -39,7 +38,6 @@ Future<dynamic> getUsuarioByEmail(String email) async {
       }
     }
 
-    // 2️⃣ Fallback: buscar en SQLite
     final usuario = await DBUsuarios.getUsuarioByEmail(email);
 
     if (usuario != null) {

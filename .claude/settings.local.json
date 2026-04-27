@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -rn \"//.*[⭐⚡1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣8️⃣9️⃣🔄✅⚠️❌📥📂📊📋🔴🟡🟢💡🚀]\" \"C:\\\\Users\\\\USER\\\\Downloads\\\\falabella\\\\lib\")",
+      "Bash(grep -rn \"^\\\\s*//\" \"C:\\\\Users\\\\USER\\\\Downloads\\\\falabella\\\\lib\")",
+      "Bash(grep -n \"^[[:space:]]*//\" \"C:/Users/USER/Downloads/falabella/lib/actions/actions.dart\")",
+      "Bash(python clean_comments.py)"
+    ]
+  }
+}

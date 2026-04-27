@@ -65,7 +65,6 @@ class _ModalUpdateUserWidgetState extends State<ModalUpdateUserWidget> {
     super.initState();
     _model = createModel(context, () => ModalUpdateUserModel());
 
-    // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       _model.instantTimer = InstantTimer.periodic(
         duration: Duration(milliseconds: 500),

@@ -9,7 +9,6 @@ import 'index.dart'; // Imports other custom widgets
 import '/custom_code/actions/index.dart'; // Imports custom actions
 import '/flutter_flow/custom_functions.dart'; // Imports custom functions
 import 'package:flutter/material.dart';
-// Begin custom widget code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'dart:io';
@@ -50,7 +49,6 @@ class _GetvideoCustomWidgetRutaLocalState
         widget.videoPath); // Cargar el video desde la ruta proporcionada
   }
 
-  // Función para cargar el video desde una ruta de archivo
   Future<void> _loadVideoFromFile(String path) async {
     try {
       _controller = VideoPlayerController.file(File(path))
@@ -59,22 +57,13 @@ class _GetvideoCustomWidgetRutaLocalState
             _loading = false;
             _controller!.setLooping(true); // Looping activado
 
-            // --- INICIO DE CAMBIO: HACER QUE EL VIDEO INICIE EN PAUSA ---
-            // Este cambio asegura que el video se inicie en pausa en lugar de reproducirse automáticamente
             _controller!.pause(); // Inicia en pausa, no automáticamente en play
-            // --- FIN DE CAMBIO ---
 
-            // --- INICIO DE CAMBIO: COMENTARIOS SOBRE AVANZAR 10 SEGUNDOS ---
-            // Acciones de avanzar 10 segundos
-            // _seekForward(); // Comentado por defecto. Puedes descomentar esta línea para probarlo.
 
-            // --- FIN DE CAMBIO ---
 
-            // _controller!.play(); // Reemplazado para que no inicie automáticamente
           });
         });
 
-      // Listener para actualizar la posición y duración del video
       _controller!.addListener(() {
         final position = _controller!.value.position.inMilliseconds.toDouble();
         final duration = _controller!.value.duration.inMilliseconds.toDouble();
@@ -90,7 +79,6 @@ class _GetvideoCustomWidgetRutaLocalState
     }
   }
 
-  // Función para pausar/reproducir el video
   void _togglePlayPause() {
     setState(() {
       if (_controller!.value.isPlaying) {
@@ -103,7 +91,6 @@ class _GetvideoCustomWidgetRutaLocalState
     });
   }
 
-  // Función para avanzar el video (10 segundos)
   void _seekForward() {
     final currentPosition = _controller!.value.position.inMilliseconds;
     final duration = _controller!.value.duration.inMilliseconds;
@@ -112,7 +99,6 @@ class _GetvideoCustomWidgetRutaLocalState
     _controller!.seekTo(Duration(milliseconds: newPosition));
   }
 
-  // Función para retroceder el video (10 segundos)
   void _seekBackward() {
     final currentPosition = _controller!.value.position.inMilliseconds;
     final newPosition = (currentPosition - 10000)
@@ -120,7 +106,6 @@ class _GetvideoCustomWidgetRutaLocalState
     _controller!.seekTo(Duration(milliseconds: newPosition));
   }
 
-  // Función para cambiar el volumen
   void _toggleMute() {
     setState(() {
       if (_isMuted) {
@@ -133,7 +118,6 @@ class _GetvideoCustomWidgetRutaLocalState
     });
   }
 
-  // Detectamos cuando la aplicación cambia de estado
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused ||
@@ -163,7 +147,6 @@ class _GetvideoCustomWidgetRutaLocalState
           : _controller != null && _controller!.value.isInitialized
               ? Column(
                   children: [
-                    // Video player
                     Expanded(
                       child: FittedBox(
                         fit: BoxFit.cover,
@@ -175,7 +158,6 @@ class _GetvideoCustomWidgetRutaLocalState
                         ),
                       ),
                     ),
-                    // Controles de video
                     VideoControls(
                       controller: _controller!,
                       isPlaying: _isPlaying,
@@ -227,18 +209,15 @@ class VideoControls extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Barra de progreso
         Slider(
           value: currentPosition,
           min: 0,
           max: videoDuration,
           onChanged: (value) {
-            // Buscamos a la nueva posición
             final newPosition = value.toInt();
             controller.seekTo(Duration(milliseconds: newPosition));
           },
         ),
-        // Botones de control (Reproducir/Pausar, Adelantar, Retroceder, Silenciar)
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

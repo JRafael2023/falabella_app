@@ -276,7 +276,6 @@ class _MatricesWidgetState extends State<MatricesWidget> with WidgetsBindingObse
                                                 'La matriz "$nombreIngresado" ya existe');
                                             return;
                                           }
-                                          // Validar duplicado contra Supabase si hay conexión
                                           if (_model.estaconectado ?? false) {
                                             final existenteSupabase = await MatricesTable().queryRows(
                                               queryFn: (q) => q.ilike('name', nombreIngresado),

@@ -18,17 +18,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:io';
 import 'dart:async';
 
-/// Inicia sesión con Supabase Auth usando email y contraseña
-///
-/// @param email: Correo electrónico del usuario
-/// @param password: Contraseña del usuario
-/// @return String: "OK" si el login es exitoso, o mensaje de error si falla
 Future<String> loginWithSupabaseAuth(
   String email,
   String password,
 ) async {
   try {
-    // Validar que los campos no estén vacíos
     if (email.trim().isEmpty) {
       return 'El correo electrónico es requerido';
     }
@@ -47,7 +41,6 @@ Future<String> loginWithSupabaseAuth(
     }
 
 
-    // Intentar iniciar sesión con Supabase Auth
     final response = await SupaFlow.client.auth.signInWithPassword(
       email: email.trim(),
       password: password,
@@ -58,7 +51,6 @@ Future<String> loginWithSupabaseAuth(
     }
 
 
-    // Buscar el usuario en la tabla Users
     final userRows = await UsersTable().queryRows(
       queryFn: (q) => q.eqOrNull('email', email.trim()),
     );

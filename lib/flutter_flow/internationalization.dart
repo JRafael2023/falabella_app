@@ -76,7 +76,6 @@ class FFLocalizations {
   };
 }
 
-/// Used if the locale is not supported by GlobalMaterialLocalizations.
 class FallbackMaterialLocalizationDelegate
     extends LocalizationsDelegate<MaterialLocalizations> {
   const FallbackMaterialLocalizationDelegate();
@@ -94,7 +93,6 @@ class FallbackMaterialLocalizationDelegate
   bool shouldReload(FallbackMaterialLocalizationDelegate old) => false;
 }
 
-/// Used if the locale is not supported by GlobalCupertinoLocalizations.
 class FallbackCupertinoLocalizationDelegate
     extends LocalizationsDelegate<CupertinoLocalizations> {
   const FallbackCupertinoLocalizationDelegate();

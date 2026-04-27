@@ -295,14 +295,10 @@ extension _WithoutColorExtension on TextStyle {
         debugLabel: debugLabel,
         fontFamily: fontFamily,
         fontFamilyFallback: fontFamilyFallback,
-        // The _package field is private so unfortunately we can't set it here,
-        // but it's almost always unset anyway.
-        // package: _package,
         overflow: overflow,
       );
 }
 
-// Slightly hacky method of getting the layout width of the provided text.
 double? _getTextWidth(String? text, TextStyle? style, int maxLines) =>
     text != null
         ? (TextPainter(
@@ -377,10 +373,8 @@ class _FFFocusIndicatorState extends State<FFFocusIndicator> {
 
     Widget childWidget;
     if (widget.builder != null) {
-      // Builder mode: pass focus node to builder
       childWidget = widget.builder!(_focusNode);
     } else if (hasInteractions) {
-      // Child mode with interactions: wrap in InkWell
       childWidget = InkWell(
         splashColor: Colors.transparent,
         hoverColor: Colors.transparent,
@@ -392,7 +386,6 @@ class _FFFocusIndicatorState extends State<FFFocusIndicator> {
         child: widget.child!,
       );
     } else {
-      // Child mode without interactions: just use child
       childWidget = widget.child!;
     }
 

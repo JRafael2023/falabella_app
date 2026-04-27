@@ -9,7 +9,6 @@ import 'index.dart'; // Imports other custom widgets
 import '/custom_code/actions/index.dart'; // Imports custom actions
 import '/flutter_flow/custom_functions.dart'; // Imports custom functions
 import 'package:flutter/material.dart';
-// Begin custom widget code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'dart:io';
@@ -52,10 +51,8 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
     }
   }
 
-  // Función para cargar el video desde los bytes
   Future<void> _loadVideoFromMemory(Uint8List bytes) async {
     try {
-      // Generar nombre único para evitar conflictos entre múltiples videos
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final ruta = '${Directory.systemTemp.path}/temp_video_$timestamp.mp4';
       final videoFile = File(ruta);
@@ -69,28 +66,18 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
             _loading = false;
             _controller!.setLooping(true); // Looping activado
 
-            // --- INICIO DE CAMBIO: HACER QUE EL VIDEO INICIE EN PAUSA ---
-            // Este cambio asegura que el video se inicie en pausa en lugar de reproducirse automáticamente
             _controller!.pause(); // Inicia en pausa
-            // --- FIN DE CAMBIO ---
 
-            // --- INICIO DE CAMBIO: COMENTARIOS SOBRE AVANZAR 10 SEGUNDOS ---
-            // Acciones de avanzar 10 segundos
-            // _seekForward(); // Comentado por defecto. Puedes descomentar esta línea para probarlo.
 
-            // --- FIN DE CAMBIO ---
           });
         });
 
-      // Listener para actualizar la posición y duración del video
-      // Optimizado: solo actualizar cada 500ms para reducir rebuilds
       _controller!.addListener(() {
         if (!mounted) return; // Evitar actualizar si el widget ya no existe
 
         final position = _controller!.value.position.inMilliseconds.toDouble();
         final duration = _controller!.value.duration.inMilliseconds.toDouble();
 
-        // Solo actualizar si cambió significativamente (reducir rebuilds innecesarios)
         if ((position - _currentPosition).abs() > 500 || duration != _videoDuration) {
           if (mounted) {
             setState(() {
@@ -107,7 +94,6 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
     }
   }
 
-  // Función para pausar/reproducir el video
   void _togglePlayPause() {
     setState(() {
       if (_controller!.value.isPlaying) {
@@ -120,7 +106,6 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
     });
   }
 
-  // Función para avanzar el video (10 segundos)
   void _seekForward() {
     final currentPosition = _controller!.value.position.inMilliseconds;
     final duration = _controller!.value.duration.inMilliseconds;
@@ -129,7 +114,6 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
     _controller!.seekTo(Duration(milliseconds: newPosition));
   }
 
-  // Función para retroceder el video (10 segundos)
   void _seekBackward() {
     final currentPosition = _controller!.value.position.inMilliseconds;
     final newPosition = (currentPosition - 10000)
@@ -137,7 +121,6 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
     _controller!.seekTo(Duration(milliseconds: newPosition));
   }
 
-  // Función para cambiar el volumen
   void _toggleMute() {
     setState(() {
       if (_isMuted) {
@@ -150,7 +133,6 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
     });
   }
 
-  // Detectamos cuando la aplicación cambia de estado
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused ||
@@ -167,7 +149,6 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
     WidgetsBinding.instance
         .removeObserver(this); // Eliminamos el observador del ciclo de vida
 
-    // Limpiar archivo temporal
     _tempVideoFile?.delete().catchError((e) {
     });
 
@@ -185,7 +166,6 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
           : _controller != null && _controller!.value.isInitialized
               ? Column(
                   children: [
-                    // Video player
                     Expanded(
                       child: Center(
                         child: AspectRatio(
@@ -194,7 +174,6 @@ class _GetvideoCustomWidgetState extends State<GetvideoCustomWidget>
                         ),
                       ),
                     ),
-                    // Controles de video
                     VideoControls(
                       controller: _controller!,
                       isPlaying: _isPlaying,
@@ -246,18 +225,15 @@ class VideoControls extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Barra de progreso
         Slider(
           value: currentPosition,
           min: 0,
           max: videoDuration,
           onChanged: (value) {
-            // Buscamos a la nueva posición
             final newPosition = value.toInt();
             controller.seekTo(Duration(milliseconds: newPosition));
           },
         ),
-        // Botones de control (Reproducir/Pausar, Adelantar, Retroceder, Silenciar)
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

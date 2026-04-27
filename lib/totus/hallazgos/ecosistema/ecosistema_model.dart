@@ -21,7 +21,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class EcosistemaModel extends FlutterFlowModel<EcosistemaWidget> {
-  ///  Local state fields for this page.
 
   List<EcosistemaStruct> listEcosistema = [];
   void addToListEcosistema(EcosistemaStruct item) => listEcosistema.add(item);
@@ -35,23 +34,15 @@ class EcosistemaModel extends FlutterFlowModel<EcosistemaWidget> {
           int index, Function(EcosistemaStruct) updateFn) =>
       listEcosistema[index] = updateFn(listEcosistema[index]);
 
-  ///  State fields for stateful widgets in this page.
 
   final formKey = GlobalKey<FormState>();
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Ecosistema widget.
   bool? estaconectado;
-  // Stores action output result for [Custom Action - getEcosistemasFromSupabase] action in Ecosistema widget.
   List<EcosistemaStruct>? qSupabaseEcosistema;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Ecosistema widget.
   bool? conexion;
-  // Stores action output result for [Custom Action - getEcosistemasFromSQLite] action in Ecosistema widget.
   List<EcosistemaStruct>? getEcosistemas;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
@@ -63,13 +54,9 @@ class EcosistemaModel extends FlutterFlowModel<EcosistemaWidget> {
     return null;
   }
 
-  // Stores action output result for [Custom Action - getEcosistemasFromSupabase] action in Button widget.
   List<EcosistemaStruct>? returnEcosistemas;
-  // Stores action output result for [Custom Class Method - DBEcosistema.getAllEcosistemas] action in Button widget.
   List<EcosistemaStruct>? ecosistemasoffline;
-  // Stores action output result for [Custom Action - getEcosistemasFromSupabase] action in IconDeleteOn widget.
   List<EcosistemaStruct>? qSupabaseEcositemasOn;
-  // Stores action output result for [Custom Action - getEcosistemasFromSQLite] action in IconDeleteOff widget.
   List<EcosistemaStruct>? getEcosistemaoff;
 
   @override

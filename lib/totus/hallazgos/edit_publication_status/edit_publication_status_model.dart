@@ -13,11 +13,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class EditPublicationStatusModel extends FlutterFlowModel<EditPublicationStatusWidget> {
-  ///  Local state fields for this component.
 
   List<PublicationStatus> listPublicationStatus = [];
 
-  ///  State fields for stateful widgets in this component.
 
   final formKey = GlobalKey<FormState>();
   FocusNode? txtnombreFocusNode;

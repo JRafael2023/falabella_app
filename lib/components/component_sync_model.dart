@@ -12,9 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class ComponentSyncModel extends FlutterFlowModel<ComponentSyncWidget> {
-  ///  State fields for stateful widgets in this component.
 
-  // Stores action output result for [Custom Action - syncControlesToSupabase] action in Button widget.
   String? syncSuccess;
 
   @override

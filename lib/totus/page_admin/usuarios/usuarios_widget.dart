@@ -41,10 +41,8 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // Mensaje de error visible dentro del formulario
   String? _errorMsg;
 
-  /// Genera un ID numérico aleatorio de 4-6 dígitos único contra los usuarios existentes.
   String _generarIdUnico() {
     final rng = Random();
     final existentes = FFAppState().jsonUsers
@@ -190,8 +188,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
         );
   }
 
-  // rootContext = contexto del Scaffold principal, para mostrar SnackBars correctamente
-  // refresh = setState del widget padre para refrescar dropdowns correctamente
   Widget _buildFormUsuario(BuildContext context, BuildContext rootContext, {VoidCallback? refresh}) {
     return Container(
       width: double.infinity,
@@ -535,7 +531,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                                         return;
                                       }
 
-                                      // Validar duplicado de ID en SQLite local
                                       final idIngresado = _model.txtidTextController.text.trim();
                                       final existeLocal = await DBUsuarios.existeUsuario(idIngresado);
                                       if (existeLocal) {
@@ -584,7 +579,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                                             ),
                                           );
                                         } else {
-                                          // ❌ Error al crear en Supabase Auth → mostrar mensaje
                                           _mostrarError(
                                             _model.validAuth != null && _model.validAuth!.isNotEmpty
                                                 ? _model.validAuth!
@@ -594,7 +588,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                                           return;
                                         }
                                       } else {
-                                        // ✅ Offline: guardamos contraseña temporal para sincronizar luego
                                         await actions.insertUsuarioSQLite(
                                           _model.txtcorreoTextController.text,
                                           _model.txtnombreTextController.text,
@@ -787,9 +780,7 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                       ),
                       ElevatedButton.icon(
                         onPressed: () {
-                          // Guardamos el context del Scaffold ANTES de abrir el modal
                           final rootContext = context;
-                          // Auto-generar ID único al abrir el formulario
                           _model.txtidTextController?.text = _generarIdUnico();
                           showModalBottomSheet(
                             context: rootContext,
@@ -948,7 +939,6 @@ class _UsuariosWidgetState extends State<UsuariosWidget> with WidgetsBindingObse
                                           r'''$.country''',
                                         ).toString(),
                                         contra: null,
-                                        // ✅ Badge si sincronizadoNube == 0
                                         esPendienteSincronizar: (getJsonField(
                                               arraySQLiteUsersItem,
                                               r'''$.sincronizadoNube''',

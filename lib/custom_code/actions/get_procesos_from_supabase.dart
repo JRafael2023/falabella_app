@@ -17,7 +17,6 @@ import '/flutter_flow/custom_functions.dart';
 import 'package:tottus/custom_code/DBProceso.dart';
 import 'package:tottus/custom_code/sqlite_helper.dart';
 
-/// Obtener todos los procesos desde Supabase
 Future<List<ProcesoStruct>> getProcesosFromSupabase() async {
   try {
     final response = await SupaFlow.client

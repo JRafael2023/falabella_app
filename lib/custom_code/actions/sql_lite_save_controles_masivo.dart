@@ -19,8 +19,6 @@ import '../sqlite_helper.dart';
 
 Future<String> sqlLiteSaveControlesMasivo(
     List<dynamic> appstateJson, String objectiveId) async {
-  // Add your function code here!
-  //
 
   List<Control> control = appstateJson.map<Control>((item) {
     return Control.fromMap(item);

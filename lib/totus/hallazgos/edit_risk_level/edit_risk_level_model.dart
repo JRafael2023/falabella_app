@@ -13,14 +13,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class EditRiskLevelModel extends FlutterFlowModel<EditRiskLevelWidget> {
-  ///  Local state fields for this component.
 
   List<RiskLevel> listRiskLevel = [];
 
-  ///  State fields for stateful widgets in this component.
 
   final formKey = GlobalKey<FormState>();
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
@@ -31,7 +28,6 @@ class EditRiskLevelModel extends FlutterFlowModel<EditRiskLevelWidget> {
     return null;
   }
 
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Button widget.
   bool? estaconectado;
 
   @override

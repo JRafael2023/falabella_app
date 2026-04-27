@@ -31,8 +31,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Permitir descarga de fuentes en runtime: descarga Inter la primera vez y usa caché offline.
-  // Con false + sin archivos bundled → excepción no manejada en cada widget con Inter.
   GoogleFonts.config.allowRuntimeFetching = true;
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
@@ -41,17 +39,14 @@ void main() async {
 
   final appState = FFAppState(); // Initialize FFAppState
   await appState.initializePersistedState();
-  // Start initial custom actions code
   await DBHelper.db;
 
   bool estado = await actions.checkInternetConecction();
   if (estado) {
   } else {
-    //FFAppState().jsonProyectos = await actions.sqlLiteListProyectos();
   }
   FFAppState().jsonProyectos = await actions.sqlLiteListProyectos();
 
-  // End initial custom actions code
 
   runApp(ChangeNotifierProvider(
     create: (context) => appState,
@@ -60,7 +55,6 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  // This widget is the root of your application.
   @override
   State<MyApp> createState() => _MyAppState();
 

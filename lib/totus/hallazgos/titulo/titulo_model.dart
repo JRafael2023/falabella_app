@@ -24,7 +24,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class TituloModel extends FlutterFlowModel<TituloWidget> {
-  ///  Local state fields for this page.
 
   List<TituloStruct> listTitulos = [];
   void addToListTitulos(TituloStruct item) => listTitulos.add(item);
@@ -50,27 +49,17 @@ class TituloModel extends FlutterFlowModel<TituloWidget> {
 
   DBProceso? proceso;
 
-  ///  State fields for stateful widgets in this page.
 
   final formKey = GlobalKey<FormState>();
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Titulo widget.
   bool? estaconectado;
-  // Stores action output result for [Custom Action - getProcesosFromSupabase] action in Titulo widget.
   List<ProcesoStruct>? qSupabaseProceso;
-  // Stores action output result for [Custom Action - getTitulosFromSupabase] action in Titulo widget.
   List<TituloStruct>? qSupabaseTitulos;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Titulo widget.
   bool? conexion;
-  // Stores action output result for [Custom Action - getProcesosFromSQLite] action in Titulo widget.
   List<ProcesoStruct>? getprocesos;
-  // Stores action output result for [Custom Action - getTitulosFromSQLite] action in Titulo widget.
   List<TituloStruct>? getTitulos;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
@@ -82,18 +71,12 @@ class TituloModel extends FlutterFlowModel<TituloWidget> {
     return null;
   }
 
-  // State field(s) for cboproceso widget.
   String? cboprocesoValue;
   FormFieldController<String>? cboprocesoValueController;
-  // Stores action output result for [Custom Action - sincronizarTitulosFromSupabase] action in Button widget.
   String? sincronizado;
-  // Stores action output result for [Custom Action - getTitulosFromSupabase] action in Button widget.
   List<TituloStruct>? returnTituls;
-  // Stores action output result for [Custom Class Method - DBTitulo.getAllTitulos] action in Button widget.
   List<TituloStruct>? titulosoffline;
-  // Stores action output result for [Custom Action - getTitulosFromSupabase] action in IconDeleteOn widget.
   List<TituloStruct>? qSupabaseTitulosOn;
-  // Stores action output result for [Custom Action - getTitulosFromSQLite] action in IconDeleteOff widget.
   List<TituloStruct>? getTitulosoff;
 
   @override

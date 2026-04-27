@@ -1,4 +1,3 @@
-// ignore_for_file: unnecessary_getters_setters
 
 import '/backend/schema/util/schema_util.dart';
 import '/backend/schema/enums/enums.dart';
@@ -31,49 +30,42 @@ class ProyectoStruct extends BaseStruct {
         _status = status,
         _idProject = idProject;
 
-  // "id" field.
   String? _id;
   String get id => _id ?? '';
   set id(String? val) => _id = val;
 
   bool hasId() => _id != null;
 
-  // "name" field.
   String? _name;
   String get name => _name ?? '';
   set name(String? val) => _name = val;
 
   bool hasName() => _name != null;
 
-  // "description" field.
   String? _description;
   String get description => _description ?? '';
   set description(String? val) => _description = val;
 
   bool hasDescription() => _description != null;
 
-  // "project_state" field.
   String? _projectState;
   String get projectState => _projectState ?? '';
   set projectState(String? val) => _projectState = val;
 
   bool hasProjectState() => _projectState != null;
 
-  // "project_status" field.
   String? _projectStatus;
   String get projectStatus => _projectStatus ?? '';
   set projectStatus(String? val) => _projectStatus = val;
 
   bool hasProjectStatus() => _projectStatus != null;
 
-  // "opinion" field.
   String? _opinion;
   String get opinion => _opinion ?? '';
   set opinion(String? val) => _opinion = val;
 
   bool hasOpinion() => _opinion != null;
 
-  // "progress" field.
   double? _progress;
   double get progress => _progress ?? 0.0;
   set progress(double? val) => _progress = val;
@@ -82,28 +74,24 @@ class ProyectoStruct extends BaseStruct {
 
   bool hasProgress() => _progress != null;
 
-  // "matrix_type" field.
   String? _matrixType;
   String get matrixType => _matrixType ?? '';
   set matrixType(String? val) => _matrixType = val;
 
   bool hasMatrixType() => _matrixType != null;
 
-  // "assign_user" field.
   String? _assignUser;
   String get assignUser => _assignUser ?? '';
   set assignUser(String? val) => _assignUser = val;
 
   bool hasAssignUser() => _assignUser != null;
 
-  // "status" field.
   bool? _status;
   bool get status => _status ?? false;
   set status(bool? val) => _status = val;
 
   bool hasStatus() => _status != null;
 
-  // "id_project" field.
   String? _idProject;
   String get idProject => _idProject ?? '';
   set idProject(String? val) => _idProject = val;

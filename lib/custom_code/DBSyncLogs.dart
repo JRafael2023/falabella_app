@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'sqlite_helper.dart';
 
 class DBSyncLogs {
-  /// Crear un nuevo registro de sync log
   static Future<String> insertSyncLog({
     required String syncId,
     required String userUid,
@@ -36,7 +35,6 @@ class DBSyncLogs {
     }
   }
 
-  /// Actualizar sync log cuando termina (completado o fallido)
   static Future<void> updateSyncLog({
     required String syncId,
     required String syncStatus,
@@ -65,7 +63,6 @@ class DBSyncLogs {
     }
   }
 
-  /// Obtener todos los sync logs (ordenados por fecha desc)
   static Future<List<Map<String, dynamic>>> listarSyncLogs({
     String? userUid,
     int limit = 50,
@@ -95,7 +92,6 @@ class DBSyncLogs {
     }
   }
 
-  /// Obtener logs pendientes de subir a Supabase
   static Future<List<Map<String, dynamic>>> listarLogsPendientesSubir() async {
     try {
       final database = await DBHelper.db;
@@ -113,7 +109,6 @@ class DBSyncLogs {
     }
   }
 
-  /// Marcar log como subido a Supabase
   static Future<void> marcarComoSubido(String syncId) async {
     try {
       final database = await DBHelper.db;
@@ -129,7 +124,6 @@ class DBSyncLogs {
     }
   }
 
-  /// Obtener el último sync log
   static Future<Map<String, dynamic>?> getUltimoSync({
     String? userUid,
   }) async {

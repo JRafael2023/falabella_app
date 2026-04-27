@@ -18,12 +18,10 @@ List<TituloStruct> getSubCategorias(
   String idproceso,
   List<TituloStruct> data,
 ) {
-  // process_id ya no existe en Titles → mostrar todos los títulos sin filtrar por proceso
   return data;
 }
 
 List<dynamic> getnuevodata(List<dynamic> json) {
-  // Filtrar los proyectos con 'status' = 'active'
   List<dynamic> activeProjects = json.where((project) {
     return project['attributes']['status'] == 'active';
   }).toList();
@@ -172,7 +170,6 @@ List<dynamic> getProyectosSearchCodigoNombre(
   query = query?.toUpperCase();
 
   List<dynamic> filteredProjects = json.where((project) {
-    // 1️⃣ Filtro por query (código o nombre)
     bool matchesQuery = true;
 
     if (query != null && query.isNotEmpty) {
@@ -187,23 +184,18 @@ List<dynamic> getProyectosSearchCodigoNombre(
           (projectName?.toUpperCase().contains(query) == true);
     }
 
-    // 2️⃣ Filtro por assignUsuario
     bool matchesAssign = true;
 
-    // Solo filtrar si assignUser tiene valor
     if (assignUser != null && assignUser.isNotEmpty) {
       String? projectAssign = project['assign_user']?.toString();
 
-      // Si projectAssign es null o vacío, NO coincide con el filtro
       if (projectAssign == null || projectAssign.isEmpty) {
         matchesAssign = false;
       } else {
         matchesAssign = (projectAssign == assignUser);
       }
     }
-    // Si assignUser es null/vacío, matchesAssign queda en TRUE (no filtra)
 
-    // ✅ Debe cumplir AMBOS filtros
     return matchesQuery && matchesAssign;
   }).toList();
 
@@ -221,7 +213,6 @@ List<dynamic> getObjetivosSearchTitulo(
       return true;
     }
 
-    // Verificamos que los campos sean de tipo String antes de buscar.
     String? projectId = project['idObjetivo']?.toString();
     String? projectTitle = project['title']?.toString();
 
@@ -240,7 +231,6 @@ List<dynamic> getControlesSearchNombres(
     return json;
   }
 
-  // Función para quitar acentos/tildes
   String removeAccents(String text) {
     const accents = 'ÀÁÂÃÄÅàáâãäåÈÉÊËèéêëÌÍÎÏìíîïÒÓÔÕÖØòóôõöøÙÚÛÜùúûüÑñÇç';
     const noAccents = 'AAAAAAaaaaaaEEEEeeeeIIIIiiiiOOOOOOooooooUUUUuuuuNnCc';
@@ -250,7 +240,6 @@ List<dynamic> getControlesSearchNombres(
     return text;
   }
 
-  // Función para limpiar texto: quitar caracteres especiales, acentos y normalizar
   String cleanText(String text) {
     return removeAccents(text)
         .toUpperCase()
@@ -283,7 +272,6 @@ dynamic getTipoMatrizes(
   int completaListo = 0;
 
   for (final project in json) {
-    // Filtrar por assign_usuario si currentUserUid existe
     if (currentUserUid != null &&
         currentUserUid.isNotEmpty &&
         project['assign_user'] != currentUserUid) {
@@ -342,7 +330,6 @@ DateTime convertStringtoDate(String text) {
 }
 
 List<String> getAllCountryListv() {
-  // Gets all countries names in Spanish
   return [
     "Chile",
     "Perú",
@@ -358,18 +345,15 @@ String removeAccents(String? str) {
     return '';
   }
 
-  // Mapeo de caracteres con tildes a sin tildes
   const withAccents = 'áàäâãåéèëêíìïîóòöôõúùüûñçÁÀÄÂÃÅÉÈËÊÍÌÏÎÓÒÖÔÕÚÙÜÛÑÇ';
   const withoutAccents = 'aaaaaaeeeeiiiiooooouuuuncAAAAAAEEEEIIIIOOOOOUUUUNC';
 
   String result = str;
 
-  // Reemplazar cada carácter con tilde por su equivalente sin tilde
   for (int i = 0; i < withAccents.length; i++) {
     result = result.replaceAll(withAccents[i], withoutAccents[i]);
   }
 
-  // Remover cualquier otro carácter especial que no sea letra, número, espacio o guión
   result = result.replaceAll(RegExp(r'[^a-zA-Z0-9\s-]'), '');
 
   return result;
@@ -379,31 +363,25 @@ int validateIndexItemControlers(
   List<dynamic> jsonControladores,
   String? idControl,
 ) {
-  // Si la lista está vacía, retornar -1
   if (jsonControladores.isEmpty) {
     return -1;
   }
 
-  // Si no hay idControl (primera vez), retornar 0 (primer elemento)
   if (idControl == null || idControl.isEmpty) {
     return 0;
   }
 
-  // Buscar el índice del control actual por su idControl
   int currentIndex = jsonControladores.indexWhere((control) {
-    // Verificar si es un Map y tiene la clave 'idControl'
     if (control is Map<String, dynamic>) {
       return control['idControl'] == idControl;
     }
     return false;
   });
 
-  // Si no se encuentra, retornar 0 (volver al principio)
   if (currentIndex == -1) {
     return 0;
   }
 
-  // Retornar el índice encontrado
   return currentIndex;
 }
 
@@ -411,17 +389,14 @@ int getNextControlIndex(
   List<dynamic> jsonControladores,
   int currentIndex,
 ) {
-// Si la lista está vacía
   if (jsonControladores.isEmpty) {
     return -1;
   }
 
-  // Si estamos en el último elemento, volver al primero (loop)
   if (currentIndex >= jsonControladores.length - 1) {
     return 0; // O return -1 si no quieres loop
   }
 
-  // Retornar el siguiente índice
   return currentIndex + 1;
 }
 
@@ -433,12 +408,10 @@ int getPreviousControlIndex(
     return -1;
   }
 
-  // Si estamos en el primer elemento, ir al último (loop)
   if (currentIndex <= 0) {
     return jsonControladores.length - 1; // O return -1 si no quieres loop
   }
 
-  // Retornar el índice anterior
   return currentIndex - 1;
 }
 
@@ -466,10 +439,8 @@ bool canGoNext(
 ) {
   if (controladores.isEmpty) return false;
 
-  // Validar que currentIndex no sea null
   if (currentIndex == null) return false;
 
-  // Verificar si puede avanzar al siguiente
   return currentIndex < controladores.length - 1;
 }
 
@@ -482,18 +453,14 @@ double progressBarFunction(List<dynamic>? jsonListControladores) {
     return 0.0;
   }
 
-  // Contar cuántos controles están completados
   int completados = jsonListControladores.where((control) {
     if (control is! Map<String, dynamic>) return false;
-    // Soportar tanto bool (true/false) como int (1/0)
     final completedValue = control['completed'];
     return completedValue == true || completedValue == 1;
   }).length;
 
-  // Calcular el progreso
   double progress = completados / jsonListControladores.length;
 
-  // Asegurar que esté entre 0.0 y 1.0
   return progress.clamp(0.0, 1.0);
 }
 
@@ -536,19 +503,15 @@ dynamic filterAPI(
   dynamic jsonProyectsAPI,
 ) {
 
-  // Validar que los parámetros no sean nulos
   if (id == null || jsonProyectsAPI == null) {
     return null;
   }
 
-  // Detectar la estructura y extraer el array de proyectos
-  // Soporta: {"success":…,"data":{"data":[…]}}  |  {"data":[…]}  |  […]
   List<dynamic> projectsList;
 
   if (jsonProyectsAPI is Map<String, dynamic>) {
     final level1 = jsonProyectsAPI['data'];
     if (level1 is Map<String, dynamic>) {
-      // Estructura completa: {"success":…, "data": {"data": [...]}}
       final level2 = level1['data'];
       if (level2 is List<dynamic>) {
         projectsList = level2;
@@ -556,7 +519,6 @@ dynamic filterAPI(
         return null;
       }
     } else if (level1 is List<dynamic>) {
-      // Estructura: {"data": [...]}
       projectsList = level1;
     } else {
       return null;
@@ -574,7 +536,6 @@ dynamic filterAPI(
 
   try {
 
-    // Buscar el primer proyecto que coincida con el ID
     final project = projectsList.firstWhere(
       (project) {
         bool isMap = project is Map<String, dynamic>;
@@ -588,13 +549,11 @@ dynamic filterAPI(
     );
 
 
-    // Si no se encuentra, retornar null
     if (project == null || project is! Map<String, dynamic>) {
       return null;
     }
 
 
-    // Extraer solo los campos necesarios
     final result = {
       'id': project['id'],
       'description': project['attributes']?['description'] ?? project['description'],
@@ -604,7 +563,7 @@ dynamic filterAPI(
 
 
 
-    return result; // 👈 Retorna el objeto directamente, NO en lista
+    return result;
   } catch (e) {
     return null;
   }
@@ -615,13 +574,11 @@ String? getIdWalkthrough(
   dynamic jsonControls,
 ) {
 
-  // Validar que los parámetros no sean nulos
   if (idControler == null || jsonControls == null) {
     return null;
   }
 
   try {
-    // Extraer el array 'data' del JSON
     List<dynamic> controls;
 
     if (jsonControls is Map<String, dynamic>) {
@@ -637,7 +594,6 @@ String? getIdWalkthrough(
     }
 
 
-    // Buscar el control que coincida con el ID
     final control = controls.firstWhere(
       (item) {
         if (item is! Map<String, dynamic>) return false;
@@ -657,7 +613,6 @@ String? getIdWalkthrough(
       return null;
     }
 
-    // Extraer el walkthrough_id
     final walkthroughId =
         control['relationships']?['walkthrough']?['data']?['id']?.toString();
 
@@ -677,14 +632,11 @@ int calcularPorcentaje(List<dynamic>? jsonControles) {
   }
 
   try {
-    // Contar cuántos están completados
     int completados = jsonControles.where((control) {
-      // Validar que sea un Map y tenga la propiedad 'completado'
       if (control is! Map<String, dynamic>) return false;
       return control['completed'] == true;
     }).length;
 
-    // Calcular porcentaje
     double porcentaje = (completados / jsonControles.length) * 100;
 
     return porcentaje.round();
@@ -697,7 +649,6 @@ String textoContadorControl(List<dynamic> controles) {
   if (controles.isEmpty) return '0 de 0 completados';
 
   int completados = controles.where((control) {
-    // Soportar tanto bool (true/false) como int (1/0)
     final completedValue = control['completed'];
     return completedValue == true || completedValue == 1;
   }).length;
@@ -708,7 +659,6 @@ String textoContadorControl(List<dynamic> controles) {
 bool? convertStringtoBoolean(String str) {
   String lowerStr = str.toLowerCase().trim();
 
-  // Casos que retornan true
   if (lowerStr == 'true' ||
       lowerStr == '1' ||
       lowerStr == 'yes' ||
@@ -717,12 +667,10 @@ bool? convertStringtoBoolean(String str) {
     return true;
   }
 
-  // Casos que retornan false
   if (lowerStr == 'false' || lowerStr == '0' || lowerStr == 'no') {
     return false;
   }
 
-  // Si no coincide con ningún caso conocido, retornar null
   return null;
 }
 
@@ -773,7 +721,6 @@ int getListDinamicMatrixProject(
 List<ProyectoStruct>? convertJsontoDataProyecto(List<dynamic>? jsonProyectos) {
   if (jsonProyectos == null) return [];
 
-  // Verificar que sea una lista
   if (jsonProyectos is! List<dynamic>) {
     return [];
   }
@@ -807,7 +754,6 @@ List<ProyectoStruct>? convertJsontoDataProyecto(List<dynamic>? jsonProyectos) {
 List<MatricesStruct>? convertJsontoDataMatriz(List<dynamic>? jsonMatriz) {
   if (jsonMatriz == null) return [];
 
-  // Verificar que sea una lista
   if (jsonMatriz is! List<dynamic>) {
     return [];
   }
@@ -905,14 +851,11 @@ String? clearTextControlHTML(String? str) {
     return str;
   }
 
-  // Reemplazar <br> y <br/> con saltos de línea
   String cleanedStr =
       str.replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n');
 
-  // Eliminar todas las demás etiquetas HTML
   cleanedStr = cleanedStr.replaceAll(RegExp(r'<[^>]*>'), '');
 
-  // Decodificar entidades HTML comunes
   cleanedStr = cleanedStr
       .replaceAll('&nbsp;', ' ')
       .replaceAll('&amp;', '&')
@@ -922,7 +865,6 @@ String? clearTextControlHTML(String? str) {
       .replaceAll('&#39;', "'")
       .replaceAll('&apos;', "'");
 
-  // Limpiar espacios en blanco excesivos
   cleanedStr = cleanedStr.replaceAll(RegExp(r'\n\s*\n\s*\n'), '\n\n');
   cleanedStr = cleanedStr.trim();
 
@@ -930,12 +872,10 @@ String? clearTextControlHTML(String? str) {
 }
 
 List<String>? convertListUploadFIletoBase64List(List<FFUploadedFile> uploads) {
-  // Si la lista es null o está vacía, retornar null o lista vacía
   if (uploads == null || uploads.isEmpty) {
     return null;
   }
 
-  // Convertir cada archivo a base64 COMPRIMIDO
   List<String> base64List = [];
 
   for (var upload in uploads) {
@@ -951,18 +891,13 @@ List<String>? convertListUploadFIletoBase64List(List<FFUploadedFile> uploads) {
             fileName.endsWith('.png') ||
             fileName.endsWith('.gif');
 
-        // ⚡ OPTIMIZACIÓN: NO comprimir videos (ya están comprimidos)
-        // Videos MP4 ya usan H.264/H.265 que son muy eficientes
-        // Comprimir videos con GZIP puede tardar 10-30 segundos y NO reduce mucho el tamaño
         if (isVideo) {
-          // Videos: Solo convertir a base64 SIN comprimir
           String base64String = base64Encode(upload.bytes!);
           double sizeMB = upload.bytes!.length / 1024 / 1024;
 
 
           base64List.add(base64String);
         } else {
-          // Imágenes y otros archivos: Comprimir con GZIP
           List<int> compressedBytes = gzip.encode(upload.bytes!);
           String compressedBase64 = base64Encode(compressedBytes);
           String finalString = 'GZIP:$compressedBase64';
@@ -976,14 +911,12 @@ List<String>? convertListUploadFIletoBase64List(List<FFUploadedFile> uploads) {
           base64List.add(finalString);
         }
       } catch (e) {
-        // Si falla, guardar sin comprimir
         String base64String = base64Encode(upload.bytes!);
         base64List.add(base64String);
       }
     }
   }
 
-  // Si no se pudo convertir ningún archivo, retornar null
   if (base64List.isEmpty) {
     return null;
   }
@@ -991,10 +924,7 @@ List<String>? convertListUploadFIletoBase64List(List<FFUploadedFile> uploads) {
   return base64List;
 }
 
-/// 🔓 Descomprimir lista de base64 GZIP para enviar a APIs externas (HighBond)
-/// Convierte imágenes comprimidas con GZIP a base64 puro
 List<String>? decompressGzipBase64List(List<String>? compressedList) {
-  // Si la lista es null o está vacía, retornar null
   if (compressedList == null || compressedList.isEmpty) {
     return null;
   }
@@ -1003,28 +933,21 @@ List<String>? decompressGzipBase64List(List<String>? compressedList) {
 
   for (var item in compressedList) {
     try {
-      // 1. Verificar si tiene el prefijo GZIP:
       if (item.startsWith('GZIP:')) {
-        // 2. Remover el prefijo 'GZIP:'
         String compressedBase64 = item.substring(5);
 
-        // 3. Decodificar de base64 a bytes comprimidos
         List<int> compressedBytes = base64Decode(compressedBase64);
 
-        // 4. Descomprimir con GZIP
         List<int> decompressedBytes = gzip.decode(compressedBytes);
 
-        // 5. Convertir bytes descomprimidos a base64 puro
         String decompressedBase64 = base64Encode(decompressedBytes);
 
         decompressedList.add(decompressedBase64);
       } else {
-        // Ya está en base64 puro (videos, etc.), agregar tal cual
         final sizeMB = (item.length * 0.75) / 1024 / 1024; // Estimado de base64
         decompressedList.add(item);
       }
     } catch (e) {
-      // Si falla, intentar usar el original
       decompressedList.add(item);
     }
   }
@@ -1037,7 +960,6 @@ List<FFUploadedFile> convertUploadtoList(FFUploadedFile? upload) {
     return [];
   }
 
-  // Retornar una lista con el archivo
   return [upload];
 }
 
@@ -1046,15 +968,12 @@ dynamic convertUploadsListtoJSON(List<FFUploadedFile> uploads) {
     return null;
   }
 
-  // Crear lista de objetos JSON con información de cada archivo
   List<Map<String, dynamic>> jsonList = [];
 
   for (var upload in uploads) {
     if (upload.bytes != null && upload.bytes!.isNotEmpty) {
-      // Convertir bytes a base64
       String base64String = base64Encode(upload.bytes!);
 
-      // Obtener MIME type inline
       String getMimeType(String name) {
         final extension = name.toLowerCase().split('.').last;
 
@@ -1089,7 +1008,6 @@ dynamic convertUploadsListtoJSON(List<FFUploadedFile> uploads) {
         }
       }
 
-      // Crear objeto JSON con información del archivo
       Map<String, dynamic> fileJson = {
         'name': upload.name ?? 'archivo_sin_nombre',
         'base64': base64String,
@@ -1112,14 +1030,11 @@ List<dynamic> getControlforObjetive(
   String idObjetive,
   List<dynamic>? controles,
 ) {
-  // Si la lista de controles es null o está vacía, retornar lista vacía
   if (controles == null || controles.isEmpty) {
     return [];
   }
 
-  // Filtrar los controles que coincidan con el objective_id
   List<dynamic> controlesFiltrados = controles.where((control) {
-    // Verificar que el control sea un Map y tenga el campo objective_id
     if (control is Map<String, dynamic>) {
       String? objectiveId = control['objective_id']?.toString();
       return objectiveId == idObjetive;
@@ -1139,7 +1054,6 @@ int calcularPorcentajePorObjetivo(
   }
 
   try {
-    // Filtrar controles que pertenecen a este objetivo
     final controlesFiltrados = jsonControles.where((control) {
       if (control is! Map<String, dynamic>) return false;
       return control['objective_id'] == idObjetivo ||
@@ -1150,14 +1064,11 @@ int calcularPorcentajePorObjetivo(
       return 0;
     }
 
-    // Contar cuántos están completados (puede ser bool o int)
     int completados = controlesFiltrados.where((control) {
       final completedValue = control['completed'];
-      // Soportar tanto booleano como entero
       return completedValue == true || completedValue == 1;
     }).length;
 
-    // Calcular porcentaje
     double porcentaje = (completados / controlesFiltrados.length) * 100;
 
     return porcentaje.round();
@@ -1175,12 +1086,10 @@ int countAuditoriasPendientes(
   var filtrados =
       proyectos.where((p) => p['progress'] != null && p['progress'] < 100);
 
-  // Si hay auditor seleccionado, filtrar
   if (auditorId != null && auditorId.isNotEmpty) {
     filtrados = filtrados.where((p) => p['assign_user'] == auditorId);
   }
 
-  // Si hay país seleccionado, filtrar
   if (pais != null && pais.isNotEmpty) {
     filtrados = filtrados.where((p) {
       var usuario = usuarios.firstWhere(
@@ -1232,16 +1141,13 @@ List<dynamic> filterProyectos(
   String? pais,
   List<dynamic> jsonUsers,
 ) {
-  // Filtrar proyectos pendientes (progress < 100)
   var filtrados = proyectos.where(
       (proyecto) => proyecto['progress'] != null && proyecto['progress'] < 100);
 
-  // Filtrar por auditor seleccionado
   if (auditorId != null && auditorId.isNotEmpty) {
     filtrados = filtrados.where((p) => p['assign_user'] == auditorId);
   }
 
-  // Filtrar por país del auditor
   if (pais != null && pais.isNotEmpty) {
     filtrados = filtrados.where((p) {
       var usuario = jsonUsers.firstWhere(
@@ -1277,7 +1183,6 @@ List<String> getAuditoresUserIds(List<dynamic> jsonUsers) {
         try {
           if (user is! Map<String, dynamic>) return false;
 
-          // El rol es un string directo, no un objeto
           String? rol = user['role']?.toString();
 
 
@@ -1304,7 +1209,6 @@ List<String> getAuditoresDisplayNames(List<dynamic> jsonUsers) {
     try {
       if (user is! Map<String, dynamic>) return false;
 
-      // El rol es un string directo
       String? rol = user['role']?.toString();
 
       return rol == 'usuario';
@@ -1330,55 +1234,39 @@ List<FFUploadedFile>? addValuesUploadListExist(
   List<FFUploadedFile>? uploads,
   List<FFUploadedFile>? uploadsBD,
 ) {
-// Caso 1: uploads está vacío o es null
   if (uploads == null || uploads.isEmpty) {
-    // Retornar uploadsBD (puede ser null, vacío, o con items)
     return uploadsBD;
   }
 
-  // Caso 2: uploads tiene items pero uploadsBD está vacío o es null
   if (uploadsBD == null || uploadsBD.isEmpty) {
-    // Retornar solo uploads
     return uploads;
   }
 
-  // Caso 3: Ambos tienen items - fusionarlos
-  // Crear una nueva lista con los items de uploadsBD primero
   List<FFUploadedFile> result = List.from(uploadsBD);
 
-  // Agregar los items de uploads
   result.addAll(uploads);
 
   return result;
 }
 
-// Helper: Descomprimir base64 si tiene prefijo GZIP
 Uint8List _decodeBase64WithDecompression(String base64Data) {
   try {
-    // 🧹 LIMPIAR el base64: eliminar texto extra como ", mimeType: image/jpeg"
     String cleanBase64 = base64Data.trim();
 
-    // ⚠️ Si el string está vacío o solo tiene comillas, retornar vacío
     if (cleanBase64.isEmpty || cleanBase64 == '""' || cleanBase64 == "''") {
       return Uint8List(0);
     }
 
-    // Eliminar cualquier texto después de una coma (formato corrupto)
     if (cleanBase64.contains(',')) {
       final parts = cleanBase64.split(',');
-      // Tomar solo la primera parte (el base64 real)
       cleanBase64 = parts[0].trim();
     }
 
-    // Eliminar espacios en blanco y saltos de línea
     cleanBase64 = cleanBase64.replaceAll(RegExp(r'\s+'), '');
 
-    // Verificar si está comprimido (tiene prefijo GZIP:)
     if (cleanBase64.startsWith('GZIP:')) {
-      // Remover prefijo
       String compressedBase64 = cleanBase64.substring(5);
 
-      // 🔥 Solo limpiar padding si es inválido (más de 2 '=' al final)
       if (compressedBase64.endsWith('====') || compressedBase64.endsWith('===')) {
         compressedBase64 = compressedBase64.replaceAll('=', '');
         while (compressedBase64.length % 4 != 0) {
@@ -1386,17 +1274,13 @@ Uint8List _decodeBase64WithDecompression(String base64Data) {
         }
       }
 
-      // Decodificar base64 a bytes comprimidos
       Uint8List compressedBytes = base64Decode(compressedBase64);
 
-      // Descomprimir con GZIP y convertir a Uint8List
       List<int> decompressedBytes = gzip.decode(compressedBytes);
       Uint8List result = Uint8List.fromList(decompressedBytes);
 
       return result;
     } else {
-      // No está comprimido, decodificar normalmente
-      // 🔥 Solo limpiar padding si es inválido (más de 2 '=' al final)
       if (cleanBase64.endsWith('====') || cleanBase64.endsWith('===')) {
         cleanBase64 = cleanBase64.replaceAll('=', '');
         while (cleanBase64.length % 4 != 0) {
@@ -1407,7 +1291,6 @@ Uint8List _decodeBase64WithDecompression(String base64Data) {
       return base64Decode(cleanBase64);
     }
   } catch (e) {
-    // Si falla completamente, retornar un array vacío en lugar de crashear
     return Uint8List(0);
   }
 }
@@ -1416,31 +1299,24 @@ List<FFUploadedFile>? convertBase64StringToUploadFiles(
   String? base64String,
   String fileType,
 ) {
-  // ✅ Si no hay base64, retornar null
   if (base64String == null || base64String.isEmpty || base64String == 'null')
     return null;
 
   List<FFUploadedFile> uploadFiles = [];
 
-  // Detectar formato tipo array: [{name: ..., size: ..., base64: ...}]
   if (base64String.trim().startsWith('[{')) {
     try {
-      // 🔥 PARSER MANUAL más robusto (sin regex complejo)
-      // Dividir por "}, {" para separar items
       String content = base64String.substring(1, base64String.length - 1); // Quitar [ y ]
       List<String> items = content.split('}, {');
 
       for (int i = 0; i < items.length; i++) {
         try {
           String item = items[i];
-          // Limpiar { y } del inicio/fin si existen
           item = item.replaceAll(RegExp(r'^\{|\}$'), '');
 
-          // Extraer campos manualmente
           String? fileName;
           String? base64Data;
 
-          // Buscar "name: " y extraer hasta la siguiente coma
           int nameIndex = item.indexOf('name:');
           if (nameIndex != -1) {
             int nameStart = nameIndex + 5; // Saltar "name:"
@@ -1450,7 +1326,6 @@ List<FFUploadedFile>? convertBase64StringToUploadFiles(
             }
           }
 
-          // Buscar "base64: " y extraer el resto
           int base64Index = item.indexOf('base64:');
           if (base64Index != -1) {
             int base64Start = base64Index + 7; // Saltar "base64:"
@@ -1473,7 +1348,6 @@ List<FFUploadedFile>? convertBase64StringToUploadFiles(
     }
   }
 
-  // Intentar parsear como JSON válido (formato: [{"name":..., "size":..., "base64":...}])
   try {
     if (base64String.trim().startsWith('[')) {
       final List<dynamic> jsonList = jsonDecode(base64String);
@@ -1500,16 +1374,13 @@ List<FFUploadedFile>? convertBase64StringToUploadFiles(
   } catch (e) {
   }
 
-  // Formato legacy: base64|||base64|||base64
   List<String> base64List =
       base64String.split('|||').where((s) => s.isNotEmpty).toList();
 
-  // ✅ Si la lista está vacía después del split, retornar null
   if (base64List.isEmpty) return null;
 
   for (int i = 0; i < base64List.length; i++) {
     try {
-      // Decodificar y descomprimir si es necesario
       var bytes = _decodeBase64WithDecompression(base64List[i]);
 
       String ext;
@@ -1596,23 +1467,19 @@ List<FFUploadedFile>? convertBase64StringToUploadFiles(
     }
   }
 
-  // ✅ Si no se pudo procesar ningún archivo, retornar null
   return uploadFiles.isEmpty ? null : uploadFiles;
 }
 
 String formatDate(String date) {
   DateTime dateTime = DateTime.parse(date);
 
-  // Formato de fecha: DD/MM/YYYY
   String formattedDate = '${dateTime.day.toString().padLeft(2, '0')}/'
       '${dateTime.month.toString().padLeft(2, '0')}/'
       '${dateTime.year}';
 
-  // Formato de hora: HH:MM AM/PM
   int hour = dateTime.hour;
   String period = hour >= 12 ? 'PM' : 'AM';
 
-  // Convertir a formato 12 horas
   if (hour > 12) {
     hour = hour - 12;
   } else if (hour == 0) {
@@ -1625,17 +1492,12 @@ String formatDate(String date) {
   return '$formattedDate $formattedTime';
 }
 
-/// Convierte formato JSON de Supabase a formato SQLite (GZIP comprimido)
-/// Entrada: [{"name": "foto.jpg", "base64": "ABC123", ...}]
-/// Salida: "GZIP:COMPRESSED_DATA|||GZIP:MORE_DATA"
 String? convertirJSONaFormatoSQLite(dynamic jsonData) {
   if (jsonData == null) return null;
 
   try {
-    // Si ya es string (formato SQLite), retornar tal cual
     if (jsonData is String) return jsonData;
 
-    // Si es lista JSON
     if (jsonData is List) {
       if (jsonData.isEmpty) return null;
 
@@ -1645,16 +1507,12 @@ String? convertirJSONaFormatoSQLite(dynamic jsonData) {
         if (item is Map<String, dynamic>) {
           String base64Data = item['base64'] ?? '';
           if (base64Data.isNotEmpty) {
-            // Decodificar base64 a bytes
             List<int> bytes = base64Decode(base64Data);
 
-            // Comprimir con GZIP
             List<int> compressedBytes = gzip.encode(bytes);
 
-            // Convertir a base64
             String compressedBase64 = base64Encode(compressedBytes);
 
-            // Agregar prefijo GZIP:
             compressedList.add('GZIP:$compressedBase64');
           }
         }
@@ -1662,7 +1520,6 @@ String? convertirJSONaFormatoSQLite(dynamic jsonData) {
 
       if (compressedList.isEmpty) return null;
 
-      // Unir con |||
       return compressedList.join('|||');
     }
 
@@ -1672,25 +1529,19 @@ String? convertirJSONaFormatoSQLite(dynamic jsonData) {
   }
 }
 
-/// Convierte formato SQLite (GZIP comprimido) a formato JSON de Supabase
-/// Entrada: "GZIP:COMPRESSED_DATA|||GZIP:MORE_DATA"
-/// Salida: [{"name": "archivo_1.jpg", "base64": "ABC123", ...}]
 dynamic convertirFormatoSQLiteAJSON(String? sqliteData) {
   if (sqliteData == null || sqliteData.isEmpty || sqliteData == 'null') {
     return null;
   }
 
   try {
-    // Si parece JSON, parsearlo y retornar
     if (sqliteData.trim().startsWith('[')) {
       try {
         return jsonDecode(sqliteData);
       } catch (e) {
-        // Si falla, continuar con el proceso normal
       }
     }
 
-    // Formato SQLite: separar por |||
     List<String> items = sqliteData.split('|||').where((s) => s.isNotEmpty).toList();
 
     if (items.isEmpty) return null;
@@ -1702,45 +1553,35 @@ dynamic convertirFormatoSQLiteAJSON(String? sqliteData) {
       try {
         String base64Data;
 
-        // Si tiene prefijo GZIP:, descomprimir
         if (item.startsWith('GZIP:')) {
           String compressedBase64 = item.substring(5);
 
-          // Decodificar base64 a bytes comprimidos
           List<int> compressedBytes = base64Decode(compressedBase64);
 
-          // Descomprimir con GZIP
           List<int> decompressedBytes = gzip.decode(compressedBytes);
 
-          // Convertir a base64 sin comprimir
           base64Data = base64Encode(decompressedBytes);
         } else {
-          // Ya está en base64 sin comprimir
           base64Data = item;
         }
 
-        // Detectar tipo de archivo por los primeros bytes
         List<int> bytes = base64Decode(base64Data);
         String extension = 'jpg'; // Default
         String mimeType = 'image/jpeg';
 
         if (bytes.length >= 4) {
-          // JPG/JPEG
           if (bytes[0] == 0xFF && bytes[1] == 0xD8) {
             extension = 'jpg';
             mimeType = 'image/jpeg';
           }
-          // PNG
           else if (bytes[0] == 0x89 && bytes[1] == 0x50) {
             extension = 'png';
             mimeType = 'image/png';
           }
-          // MP4
           else if (bytes.length >= 8 && bytes[4] == 0x66 && bytes[5] == 0x74 && bytes[6] == 0x79 && bytes[7] == 0x70) {
             extension = 'mp4';
             mimeType = 'video/mp4';
           }
-          // PDF
           else if (bytes[0] == 0x25 && bytes[1] == 0x50) {
             extension = 'pdf';
             mimeType = 'application/pdf';

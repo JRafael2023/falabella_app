@@ -19,7 +19,6 @@ import '/custom_code/DBControles.dart';
 Future<double> actualizarProgressProyectoSupabase(String idProject) async {
   try {
 
-    // PASO 1: Obtener objetivos desde SQLite (rápido, local)
     final objetivosResponse =
         await DBObjetivos.listarObjetivosPorProyecto(idProject);
 
@@ -27,7 +26,6 @@ Future<double> actualizarProgressProyectoSupabase(String idProject) async {
       return 0.0;
     }
 
-    // PASO 2: Contar controles desde SQLite (sin tocar Supabase)
     int totalControles = 0;
     int controlesCompletados = 0;
 
@@ -44,14 +42,12 @@ Future<double> actualizarProgressProyectoSupabase(String idProject) async {
     }
 
 
-    // PASO 5: Calcular progress
     double progress = 0.0;
     if (totalControles > 0) {
       progress = (controlesCompletados / totalControles) * 100.0;
     }
 
 
-    // PASO 6: Actualizar en Supabase (tabla Projects)
     await ProjectsTable().update(
       data: {'progress': progress},
       matchingRows: (rows) => rows!.eq('id_project', idProject),

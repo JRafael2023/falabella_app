@@ -53,7 +53,6 @@ class _ComponenteEstadoWidgetState extends State<ComponenteEstadoWidget> {
     super.initState();
     _model = createModel(context, () => ComponenteEstadoModel());
 
-    // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       _model.color = valueOrDefault<Color>(
         widget!.estadoAuditoria

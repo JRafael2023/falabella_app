@@ -17,8 +17,6 @@ import 'package:tottus/custom_code/DBProyectos.dart';
 import '../sqlite_helper.dart';
 
 Future<String> sqlLiteEliminarProyectos(String idProyecto) async {
-  // Add your function code here!
-  //
 
   var result = await DBProyectos.deleteProyectoByIdProject(idProyecto);
 

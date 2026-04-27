@@ -9,14 +9,11 @@ import 'index.dart'; // Imports other custom widgets
 import '/custom_code/actions/index.dart'; // Imports custom actions
 import '/flutter_flow/custom_functions.dart'; // Imports custom functions
 import 'package:flutter/material.dart';
-// Begin custom widget code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 import 'package:visibility_detector/visibility_detector.dart';
 import 'getvideo_custom_widget.dart';
 
-/// Widget optimizado que solo carga el video cuando es visible en pantalla
-/// Esto reduce el uso de memoria al no cargar todos los videos simultáneamente
 class LazyVideoWidget extends StatefulWidget {
   const LazyVideoWidget({
     super.key,
@@ -46,7 +43,6 @@ class _LazyVideoWidgetState extends State<LazyVideoWidget> {
       onVisibilityChanged: (visibilityInfo) {
         final visiblePercentage = visibilityInfo.visibleFraction * 100;
 
-        // Solo cargar el video si es visible al menos en un 30%
         if (visiblePercentage > 30 && !_hasBeenLoaded) {
           setState(() {
             _isVisible = true;

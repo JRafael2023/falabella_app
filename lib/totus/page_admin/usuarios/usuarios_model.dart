@@ -23,25 +23,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class UsuariosModel extends FlutterFlowModel<UsuariosWidget> {
-  ///  Local state fields for this page.
 
   Usuario? usuario;
 
-  ///  State fields for stateful widgets in this page.
 
   final formKey = GlobalKey<FormState>();
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Usuarios widget.
   bool? estaconectado;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
-  // State field(s) for txtcorreo widget.
   FocusNode? txtcorreoFocusNode;
   TextEditingController? txtcorreoTextController;
   String? Function(BuildContext, String?)? txtcorreoTextControllerValidator;
@@ -53,7 +46,6 @@ class UsuariosModel extends FlutterFlowModel<UsuariosWidget> {
     return null;
   }
 
-  // State field(s) for txtid widget.
   FocusNode? txtidFocusNode;
   TextEditingController? txtidTextController;
   String? Function(BuildContext, String?)? txtidTextControllerValidator;
@@ -65,7 +57,6 @@ class UsuariosModel extends FlutterFlowModel<UsuariosWidget> {
     return null;
   }
 
-  // State field(s) for txtcontra widget.
   FocusNode? txtcontraFocusNode;
   TextEditingController? txtcontraTextController;
   late bool txtcontraVisibility;
@@ -78,21 +69,14 @@ class UsuariosModel extends FlutterFlowModel<UsuariosWidget> {
     return null;
   }
 
-  // State field(s) for cbopais widget.
   String? cbopaisValue;
   FormFieldController<String>? cbopaisValueController;
-  // State field(s) for cborol widget.
   String? cborolValue;
   FormFieldController<String>? cborolValueController;
-  // Stores action output result for [Custom Action - registerUserSupabaseAuth] action in Button widget.
   String? validAuth;
-  // Stores action output result for [Custom Action - sqLiteListUsers] action in Button widget.
   List<dynamic>? sqlLiteUsersListON;
-  // Stores action output result for [Custom Action - sqLiteListUsers] action in Button widget.
   List<dynamic>? sqlLiteUsersListOFF;
-  // Models for cardUser dynamic component.
   late FlutterFlowDynamicModels<CardUserModel> cardUserModels1;
-  // Models for cardUser dynamic component.
   late FlutterFlowDynamicModels<CardUserModel> cardUserModels2;
 
   @override

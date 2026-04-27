@@ -272,14 +272,12 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
                                   padding: const EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 10.0),
                                   child: FFButtonWidget(
                                     onPressed: () async {
-                                      // Validar nombre vacío
                                       final nombreIngresado = _model.txtnombreTextController.text.trim();
                                       if (nombreIngresado.isEmpty) {
                                         mostrarError('Ingresa el nombre de la gerencia');
                                         return;
                                       }
 
-                                      // Validar duplicado local
                                       final duplicadoLocal = _model.listGerenciaPageState.any(
                                         (g) => g.nombre.toLowerCase() == nombreIngresado.toLowerCase(),
                                       );
@@ -288,7 +286,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
                                         return;
                                       }
 
-                                      // Validar duplicado contra Supabase si hay conexión
                                       if (_model.estaconectado ?? false) {
                                         final existenteSupabase = await ManagementsTable().queryRows(
                                           queryFn: (q) => q.ilike('name', nombreIngresado),
@@ -624,7 +621,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
                                           Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
-                                              // Botón editar online
                                               Align(
                                                 alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: Builder(
@@ -683,7 +679,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
                                                   ),
                                                 ),
                                               ),
-                                              // Botón eliminar online
                                               Align(
                                                 alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: InkWell(
@@ -870,7 +865,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
                                           Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
-                                              // Botón editar offline
                                               Align(
                                                 alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: Builder(
@@ -929,7 +923,6 @@ class _GerenciaWidgetState extends State<GerenciaWidget> with WidgetsBindingObse
                                                   ),
                                                 ),
                                               ),
-                                              // Botón eliminar offline
                                               Align(
                                                 alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: InkWell(

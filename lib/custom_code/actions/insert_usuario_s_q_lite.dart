@@ -22,12 +22,9 @@ Future<String> insertUsuarioSQLite(
   String userUid,
   String? country,
   String? role, {
-  // ✅ Contraseña temporal para sincronizar usuarios creados offline
   String? passwordTemp,
 }) async {
   try {
-    // ✅ Si se pasa passwordTemp → el usuario fue creado OFFLINE → sincronizadoNube = 0
-    // Si no hay password → fue creado online con Auth exitoso → sincronizadoNube = 1
     final int sincronizado = (passwordTemp != null && passwordTemp.isNotEmpty) ? 0 : 1;
 
     final usuario = Usuario(

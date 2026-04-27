@@ -14,32 +14,19 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '/backend/api_requests/api_calls.dart' as api_calls;
 
-/// Carga inteligente de datos con caché:
-/// 1. Si es primera vez o caché expirado (8 horas) → Sincronización COMPLETA (APIs + Supabase)
-/// 2. Si tiene datos → Cargar SQLite + Sincronizar SOLO con Supabase (rápido)
-///
-/// forceFullSync: true para forzar sincronización completa (botón manual)
 Future cargarDatosConCacheInteligente(
   String userId, {
   bool forceFullSync = false,
 }) async {
   try {
 
-    // ============================================
-    // VERIFICAR CONECTIVIDAD ANTES DE LLAMAR SUPABASE
-    // ============================================
     final estaConectado = await checkInternetConecction();
     if (!estaConectado) {
       return;
     }
 
-    // ============================================
-    // VERIFICAR ROL DEL USUARIO
-    // ============================================
-    // Usar el rol ya disponible en FFAppState (evita query con userId nulo)
     final userRole = FFAppState().currentUser.rol;
     if (userRole.isEmpty) {
-      // Fallback: intentar obtener de Supabase solo si userId es válido
       if (userId.isEmpty || userId == 'null') {
         return;
       }
@@ -55,11 +42,9 @@ Future cargarDatosConCacheInteligente(
       }
     }
 
-    // SOLO usuarios con role = 'usuario' pueden hacer sync completa con APIs
     final puedeUsarAPIs = userRole.toLowerCase() == 'usuario';
 
     if (!puedeUsarAPIs) {
-      // Cargar solo desde cache/Supabase
       await _cargarRapidoDesdeCache(userId);
       return;
     }
@@ -69,20 +54,10 @@ Future cargarDatosConCacheInteligente(
     final lastSyncTimestamp = prefs.getInt(cacheKey) ?? 0;
     final ahora = DateTime.now().millisecondsSinceEpoch;
 
-    // ============================================
-    // VERIFICAR SI TIENE DATOS EN SQLITE
-    // ============================================
     final tieneControles = FFAppState().jsonControles.isNotEmpty;
     final tieneObjetivos = FFAppState().jsonObjetivos.isNotEmpty;
     final tieneDatos = tieneControles && tieneObjetivos;
 
-    // ============================================
-    // DECIDIR QUÉ TIPO DE SINCRONIZACIÓN HACER
-    // ============================================
-    // Sync completa si:
-    // 1. Es primera vez (no tiene datos)
-    // 2. El caché expiró (más de 8 horas desde la última sync completa)
-    // 3. Usuario presiona botón "Sincronizar" (forceFullSync = true)
     final horasDesdeUltimaSync = lastSyncTimestamp == 0
         ? double.infinity
         : (ahora - lastSyncTimestamp) / (1000 * 60 * 60);
@@ -91,9 +66,6 @@ Future cargarDatosConCacheInteligente(
     if (cacheExpirado) {
     }
 
-    // Detectar proyectos asignados que no tienen objetivos en FFAppState.
-    // jsonProyectos ya está cargado y fresco desde Supabase/SQLite (home_widget).
-    // Si hay algún proyecto sin objetivos → forzar full sync.
     bool hayProyectosNuevos = false;
     if (tieneDatos && !cacheExpirado && !forceFullSync) {
       final idsConObjetivos = FFAppState()
@@ -112,7 +84,6 @@ Future cargarDatosConCacheInteligente(
       }
     }
 
-    // Detectar objetivos que no tienen controles en cache (carga incompleta previa)
     bool hayObjetivosSinControles = false;
     if (tieneDatos && !cacheExpirado && !forceFullSync && !hayProyectosNuevos) {
       final idsConControles = FFAppState()
@@ -135,10 +106,8 @@ Future cargarDatosConCacheInteligente(
 
     if (necesitaSyncCompleta) {
 
-      // Llamar a la función completa existente
       await cargarTodosLosDatosUsuario(userId);
 
-      // Guardar timestamp de sync completa
       await prefs.setInt(cacheKey, ahora);
 
     } else {
@@ -147,16 +116,11 @@ Future cargarDatosConCacheInteligente(
 
 
   } catch (e) {
-    // No relanzar el error para no bloquear el flujo offline
   }
 }
 
-/// Carga rápida desde SQLite + notifica UI.
-/// Solo llega aquí si el usuario ya tiene TODOS sus proyectos en SQLite
-/// (proyectos nuevos son detectados antes y disparan un full sync).
 Future _cargarRapidoDesdeCache(String userId) async {
   try {
-    // Actualizar AppState con los datos que ya están en SQLite/FFAppState
     FFAppState().update(() {});
   } catch (e) {
   }

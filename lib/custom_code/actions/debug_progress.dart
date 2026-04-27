@@ -13,13 +13,11 @@ import 'package:flutter/material.dart';
 
 import '/custom_code/sqlite_helper.dart';
 
-/// Debug: Muestra el estado de los controles en la base de datos
 Future<String> debugProgress(String idObjetivo) async {
   try {
     final db = await DBHelper.db;
     if (db == null) return '❌ DB no disponible';
 
-    // Obtener todos los controles del objetivo
     final controles = await db.query(
       'Controles',
       where: 'objective_id = ?',

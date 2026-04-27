@@ -3,11 +3,6 @@ import 'sqlite_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBTitulo {
-  /// INSERT
-  /// [fromSupabase] = true cuando el registro viene bajando de Supabase
-  /// (ya está en la nube, no necesita subirse → sincronizadoNube=1)
-  /// [fromSupabase] = false (default) cuando es creación offline local
-  /// (necesita subirse → sincronizadoNube=0)
   static Future<String> insertTitulo(TituloStruct titulo,
       {bool fromSupabase = false}) async {
     try {
@@ -42,7 +37,6 @@ class DBTitulo {
     }
   }
 
-  /// UPDATE
   static Future<String> updateTitulo(TituloStruct titulo) async {
     try {
       final database = await DBHelper.db;
@@ -76,7 +70,6 @@ class DBTitulo {
     }
   }
 
-  /// DELETE
   static Future<String> deleteTitulo(String idTitulo) async {
     try {
       final database = await DBHelper.db;
@@ -101,7 +94,6 @@ class DBTitulo {
     }
   }
 
-  /// GET BY ID
   static Future<TituloStruct?> getTituloById(String idTitulo) async {
     try {
       final database = await DBHelper.db;
@@ -123,7 +115,6 @@ class DBTitulo {
     }
   }
 
-  /// CONVERTIDOR (SQLite → TituloStruct) ✅ CORRECTO FLUTTERFLOW
   static TituloStruct metodoConvertidor(Map<String, dynamic> data) {
     return TituloStruct.fromMap({
       'id': data['id']?.toString(),
@@ -139,7 +130,6 @@ class DBTitulo {
     });
   }
 
-  /// GET ALL
   static Future<List<TituloStruct>> getAllTitulos() async {
     try {
       final database = await DBHelper.db;
@@ -156,7 +146,6 @@ class DBTitulo {
     }
   }
 
-  /// ✅ Convertir datos de Supabase "Titles" a TituloStruct (CORRECTO)
   static List<TituloStruct> convertFromSupabase(List<dynamic> jsonList) {
     return jsonList.map((json) {
       return TituloStruct.fromMap({
@@ -174,7 +163,6 @@ class DBTitulo {
     }).toList();
   }
 
-  /// ✅ NUEVO: Insertar batch desde Supabase a SQLite
   static Future<String> insertBatchFromSupabase(
       List<dynamic> supabaseData) async {
     try {
@@ -199,7 +187,6 @@ class DBTitulo {
     }
   }
 
-  /// ✅ NUEVO: Convertir TituloStruct a Map para Supabase
   static Map<String, dynamic> toSupabaseMap(TituloStruct titulo) {
     return {
       'id': titulo.id,

@@ -32,7 +32,6 @@ Future<String> insertEcosistemaToSupabase(EcosistemaStruct ecosistema) async {
       final insertedId = insertedRow['id'] as String;
       final ecosystemId = insertedRow['ecosystem_id'] as String? ?? '';
 
-      // También insertar en SQLite con el ecosystem_id correcto
       if (ecosystemId.isNotEmpty) {
         await DBEcosistema.insertEcosistema(
           EcosistemaStruct(

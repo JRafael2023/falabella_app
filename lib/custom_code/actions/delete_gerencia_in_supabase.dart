@@ -17,17 +17,14 @@ import 'package:sqflite/sqflite.dart';
 
 Future<bool> deleteGerenciaInSupabase(String gerenciaId) async {
   try {
-    // Intentar soft delete en Supabase
     await SupaFlow.client.from('Managements').update({
       'status': false,
       'updated_at': DateTime.now().toIso8601String()
     }).eq('management_id', gerenciaId);
 
-    // Online: eliminó en Supabase → eliminar también de SQLite
     await DBGerencia.deleteGerencia(gerenciaId);
     return true;
   } catch (e) {
-    // Offline: marcar como pendiente de eliminar en SQLite
     try {
       final db = await DBHelper.db;
       await db.update(

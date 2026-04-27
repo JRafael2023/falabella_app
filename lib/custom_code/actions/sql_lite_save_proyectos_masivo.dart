@@ -27,7 +27,6 @@ Future<String> sqlLiteSaveProyectosMasivo(
     final countLocal = await DBProyectos.contarProyectos();
 
 
-    // Convertir ProjectsRow directamente a Proyecto usando fromProjectsRow
 
     List<Proyecto> proyectos = rowsSupabase.map<Proyecto>((row) {
       return Proyecto.fromProjectsRow(row);

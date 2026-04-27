@@ -17,7 +17,6 @@ class DBHelper {
     return _db!;
   }
 
-  // ⚠️ SOLO DESARROLLO
   static Future<void> deleteDatabase() async {
     final path = join(await getDatabasesPath(), 'Tottus_O_O.db');
     await databaseFactory.deleteDatabase(path);
@@ -33,9 +32,6 @@ class DBHelper {
       onCreate: (db, version) async {
         await db.execute('PRAGMA foreign_keys = OFF;');
 
-        // =========================
-        // PROYECTOS
-        // =========================
         await db.execute('''
           CREATE TABLE Proyectos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,9 +53,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // OBJETIVOS
-        // =========================
         await db.execute('''
           CREATE TABLE Objetivos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -84,9 +77,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // CONTROLES
-        // =========================
         await db.execute('''
   CREATE TABLE Controles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -140,9 +130,6 @@ class DBHelper {
   )
 ''');
 
-        // =========================
-        // MATRICES
-        // =========================
         await db.execute('''
           CREATE TABLE Matrices (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -153,9 +140,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // USERS
-        // =========================
         await db.execute('''
           CREATE TABLE Users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -176,9 +160,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // TITULOS
-        // =========================
         await db.execute('''
           CREATE TABLE Titulos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -194,9 +175,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // PROCESOS
-        // =========================
         await db.execute('''
           CREATE TABLE Procesos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -212,9 +190,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // GERENCIAS (MANAGEMENTS)
-        // =========================
         await db.execute('''
           CREATE TABLE Gerencias (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -229,9 +204,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // ECOSISTEMAS (ECOSYSTEMS)
-        // =========================
         await db.execute('''
           CREATE TABLE Ecosistemas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -246,9 +218,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // SYNC LOGS
-        // =========================
         await db.execute('''
           CREATE TABLE SyncLogs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -269,9 +238,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // CONTROL ATTACHMENTS (v15)
-        // =========================
         await db.execute('''
           CREATE TABLE ControlAttachments (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -284,9 +250,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // RISK LEVELS
-        // =========================
         await db.execute('''
           CREATE TABLE RiskLevels (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -301,9 +264,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // PUBLICATION STATUSES
-        // =========================
         await db.execute('''
           CREATE TABLE PublicationStatuses (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -318,9 +278,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // IMPACT TYPES
-        // =========================
         await db.execute('''
           CREATE TABLE ImpactTypes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -335,9 +292,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // ECOSYSTEM SUPPORTS
-        // =========================
         await db.execute('''
           CREATE TABLE EcosystemSupports (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -352,9 +306,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // RISK TYPES
-        // =========================
         await db.execute('''
           CREATE TABLE RiskTypes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -369,9 +320,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // RISK TYPOLOGIES
-        // =========================
         await db.execute('''
           CREATE TABLE RiskTypologies (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -388,9 +336,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // OBSERVATION SCOPES
-        // =========================
         await db.execute('''
           CREATE TABLE ObservationScopes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -405,9 +350,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // RESPONSIBLE AUDITORS
-        // =========================
         await db.execute('''
           CREATE TABLE ResponsibleAuditors (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -422,9 +364,6 @@ class DBHelper {
           )
         ''');
 
-        // =========================
-        // RESPONSIBLE MANAGERS
-        // =========================
         await db.execute('''
           CREATE TABLE ResponsibleManagers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -443,7 +382,6 @@ class DBHelper {
       onUpgrade: (db, oldVersion, newVersion) async {
 
         if (oldVersion < 6) {
-          // Migrar tabla Users: renombrar columnas
           await db.execute('''
             CREATE TABLE Users_new (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -462,7 +400,6 @@ class DBHelper {
             )
           ''');
 
-          // Copiar datos si existen
           await db.execute('''
             INSERT OR IGNORE INTO Users_new
             (user_uid, email, display_name, photo_url, phone_number, country, role,
@@ -480,7 +417,6 @@ class DBHelper {
         }
 
         if (oldVersion < 7) {
-          // ⭐ MIGRACIÓN v7: Agregar columna 'archives' a la tabla Controles
           try {
             await db.execute('''
               ALTER TABLE Controles ADD COLUMN archives TEXT DEFAULT ''
@@ -490,7 +426,6 @@ class DBHelper {
         }
 
         if (oldVersion < 8) {
-          // ⭐ MIGRACIÓN v8: Agregar 9 columnas nuevas a la tabla Controles
           try {
             await db.execute('''
               ALTER TABLE Controles ADD COLUMN observacion TEXT
@@ -524,7 +459,6 @@ class DBHelper {
         }
 
         if (oldVersion < 9) {
-          // ⭐ MIGRACIÓN v9: Agregar columna control_text a la tabla Controles
           try {
             await db.execute('''
               ALTER TABLE Controles ADD COLUMN control_text TEXT
@@ -534,7 +468,6 @@ class DBHelper {
         }
 
         if (oldVersion < 10) {
-          // ⭐ MIGRACIÓN v10: Crear tabla Titulos para migración a Supabase
           try {
             await db.execute('''
               CREATE TABLE IF NOT EXISTS Titulos (
@@ -555,14 +488,11 @@ class DBHelper {
         }
 
         if (oldVersion < 11) {
-          // ⭐ MIGRACIÓN v11: Actualizar tabla Procesos para Supabase
           try {
-            // Primero verificar si la tabla existe
             final tables = await db.rawQuery(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name='Procesos'");
 
             if (tables.isEmpty) {
-              // Crear la tabla si no existe
               await db.execute('''
                 CREATE TABLE Procesos (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -578,7 +508,6 @@ class DBHelper {
                 )
               ''');
             } else {
-              // Migrar datos si la tabla ya existe con estructura antigua
               await db
                   .execute('ALTER TABLE Procesos ADD COLUMN description TEXT');
               await db.execute(
@@ -587,7 +516,6 @@ class DBHelper {
                   'ALTER TABLE Procesos ADD COLUMN sincronizadoLocal INTEGER DEFAULT 0');
               await db.execute(
                   'ALTER TABLE Procesos ADD COLUMN status INTEGER DEFAULT 1');
-              // Renombrar columnas si es necesario
               await db
                   .execute('ALTER TABLE Procesos RENAME COLUMN nombre TO name');
               await db.execute(
@@ -597,14 +525,12 @@ class DBHelper {
           }
         }
 
-        // ⭐ MIGRACIÓN v12: Crear/actualizar tabla Gerencias para Supabase
         if (oldVersion < 12) {
           try {
             final tables = await db.rawQuery(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name='Gerencias'");
 
             if (tables.isEmpty) {
-              // Crear tabla Gerencias desde cero
               await db.execute('''
                 CREATE TABLE Gerencias (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -618,14 +544,12 @@ class DBHelper {
                 )
               ''');
             } else {
-              // Migrar datos si la tabla ya existe con estructura antigua
               await db.execute(
                   'ALTER TABLE Gerencias ADD COLUMN sincronizadoNube INTEGER DEFAULT 1');
               await db.execute(
                   'ALTER TABLE Gerencias ADD COLUMN sincronizadoLocal INTEGER DEFAULT 0');
               await db.execute(
                   'ALTER TABLE Gerencias ADD COLUMN status INTEGER DEFAULT 1');
-              // Renombrar columna si es necesario
               await db.execute(
                   'ALTER TABLE Gerencias RENAME COLUMN nombre TO name');
             }
@@ -633,14 +557,12 @@ class DBHelper {
           }
         }
 
-        // ⭐ MIGRACIÓN v13: Crear/actualizar tabla Ecosistemas para Supabase
         if (oldVersion < 13) {
           try {
             final tables = await db.rawQuery(
                 "SELECT name FROM sqlite_master WHERE type='table' AND name='Ecosistemas'");
 
             if (tables.isEmpty) {
-              // Crear tabla Ecosistemas desde cero
               await db.execute('''
                 CREATE TABLE Ecosistemas (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -654,14 +576,12 @@ class DBHelper {
                 )
               ''');
             } else {
-              // Migrar datos si la tabla ya existe con estructura antigua
               await db.execute(
                   'ALTER TABLE Ecosistemas ADD COLUMN sincronizadoNube INTEGER DEFAULT 1');
               await db.execute(
                   'ALTER TABLE Ecosistemas ADD COLUMN sincronizadoLocal INTEGER DEFAULT 0');
               await db.execute(
                   'ALTER TABLE Ecosistemas ADD COLUMN status INTEGER DEFAULT 1');
-              // Renombrar columna si es necesario
               await db.execute(
                   'ALTER TABLE Ecosistemas RENAME COLUMN nombre TO name');
             }
@@ -669,7 +589,6 @@ class DBHelper {
           }
         }
 
-        // ⭐ MIGRACIÓN v14: Crear tabla SyncLogs
         if (oldVersion < 14) {
           try {
             await db.execute('''
@@ -695,7 +614,6 @@ class DBHelper {
           }
         }
 
-        // ⭐ MIGRACIÓN v16: Agregar columna pendienteEliminar a las 6 tablas
         if (oldVersion < 16) {
           final tablas = {
             'Gerencias': 'idGerencia',
@@ -714,8 +632,6 @@ class DBHelper {
           }
         }
 
-        // ⭐ MIGRACIÓN v17: Agregar columna password_temp a Users
-        // Permite guardar contraseña temporal de usuarios creados offline para sincronizarlos luego
         if (oldVersion < 17) {
           try {
             await db.execute(
@@ -724,10 +640,8 @@ class DBHelper {
           }
         }
 
-        // ⭐ MIGRACIÓN v18: Eliminar process_id de Titulos y abbreviation de Procesos
         if (oldVersion < 18) {
 
-          // Recrear tabla Titulos sin process_id
           try {
             await db.execute('''
               CREATE TABLE Titulos_new (
@@ -755,7 +669,6 @@ class DBHelper {
           } catch (e) {
           }
 
-          // Recrear tabla Procesos sin abbreviation
           try {
             await db.execute('''
               CREATE TABLE Procesos_new (
@@ -784,10 +697,8 @@ class DBHelper {
           }
         }
 
-        // ⭐ MIGRACIÓN v19: Nuevas tablas maestros hallazgo + columnas en Controles
         if (oldVersion < 19) {
 
-          // Nuevas columnas en Controles
           final nuevasColumnasControles = [
             'titulo_observacion TEXT',
             'publication_status_id TEXT',
@@ -817,7 +728,6 @@ class DBHelper {
             }
           }
 
-          // Crear tabla RiskLevels
           try {
             await db.execute('''
               CREATE TABLE IF NOT EXISTS RiskLevels (
@@ -834,7 +744,6 @@ class DBHelper {
             ''');
           } catch (e) { print('⚠️ RiskLevels: $e'); }
 
-          // Crear tabla PublicationStatuses
           try {
             await db.execute('''
               CREATE TABLE IF NOT EXISTS PublicationStatuses (
@@ -851,7 +760,6 @@ class DBHelper {
             ''');
           } catch (e) { print('⚠️ PublicationStatuses: $e'); }
 
-          // Crear tabla ImpactTypes
           try {
             await db.execute('''
               CREATE TABLE IF NOT EXISTS ImpactTypes (
@@ -868,7 +776,6 @@ class DBHelper {
             ''');
           } catch (e) { print('⚠️ ImpactTypes: $e'); }
 
-          // Crear tabla EcosystemSupports
           try {
             await db.execute('''
               CREATE TABLE IF NOT EXISTS EcosystemSupports (
@@ -885,7 +792,6 @@ class DBHelper {
             ''');
           } catch (e) { print('⚠️ EcosystemSupports: $e'); }
 
-          // Crear tabla RiskTypes
           try {
             await db.execute('''
               CREATE TABLE IF NOT EXISTS RiskTypes (
@@ -902,7 +808,6 @@ class DBHelper {
             ''');
           } catch (e) { print('⚠️ RiskTypes: $e'); }
 
-          // Crear tabla RiskTypologies
           try {
             await db.execute('''
               CREATE TABLE IF NOT EXISTS RiskTypologies (
@@ -921,7 +826,6 @@ class DBHelper {
             ''');
           } catch (e) { print('⚠️ RiskTypologies: $e'); }
 
-          // Crear tabla ObservationScopes
           try {
             await db.execute('''
               CREATE TABLE IF NOT EXISTS ObservationScopes (
@@ -940,10 +844,8 @@ class DBHelper {
 
         }
 
-        // ⭐ MIGRACIÓN v20: Quitar columna 'orden' de las 7 tablas maestro v19
         if (oldVersion < 20) {
 
-          // Helper: recrea tabla sin columna orden copiando datos
           Future<void> _recrearSinOrden(String tabla, String idCol, String extraCols, String extraColsInsert) async {
             try {
               await db.execute('ALTER TABLE $tabla RENAME TO ${tabla}_old');
@@ -980,7 +882,6 @@ class DBHelper {
 
         }
 
-        // ⭐ MIGRACIÓN v21: Agregar columna pendiente_sync a Controles
         if (oldVersion < 21) {
           try {
             await db.execute('ALTER TABLE Controles ADD COLUMN pendiente_sync INTEGER DEFAULT 0');
@@ -988,7 +889,6 @@ class DBHelper {
           }
         }
 
-        // ⭐ MIGRACIÓN v22: Crear tablas ResponsibleAuditors y ResponsibleManagers
         if (oldVersion < 22) {
           try {
             await db.execute('''
@@ -1022,10 +922,8 @@ class DBHelper {
           } catch (e) { print('⚠️ ResponsibleManagers: $e'); }
         }
 
-        // ⭐ MIGRACIÓN v15: Crear tabla ControlAttachments y migrar datos
         if (oldVersion < 15) {
           try {
-            // Crear tabla de attachments
             await db.execute('''
               CREATE TABLE IF NOT EXISTS ControlAttachments (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -1038,7 +936,6 @@ class DBHelper {
               )
             ''');
 
-            // Migrar datos existentes de la tabla Controles
             final controles = await db.query('Controles');
             int totalMigrados = 0;
 
@@ -1046,7 +943,6 @@ class DBHelper {
               final idControl = control['id_control'] as String;
               final createdAt = control['created_at'] as String?;
 
-              // Migrar photos
               final photos = control['photos'] as String?;
               if (photos != null && photos.isNotEmpty && photos != '[]') {
                 try {
@@ -1067,7 +963,6 @@ class DBHelper {
                 }
               }
 
-              // Migrar video
               final video = control['video'] as String?;
               if (video != null && video.isNotEmpty) {
                 try {
@@ -1083,7 +978,6 @@ class DBHelper {
                 }
               }
 
-              // Migrar archives
               final archives = control['archives'] as String?;
               if (archives != null && archives.isNotEmpty && archives != '[]') {
                 try {
@@ -1106,7 +1000,6 @@ class DBHelper {
             }
 
 
-            // Limpiar campos de attachments en tabla Controles
             await db.execute('''
               UPDATE Controles
               SET photos = '', video = '', archives = ''

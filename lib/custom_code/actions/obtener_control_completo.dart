@@ -13,9 +13,6 @@ import 'package:flutter/material.dart';
 
 import '/custom_code/DBControles.dart';
 
-/// Obtiene un control completo con todos sus campos desde SQLite
-/// Incluye archivos grandes (photos, video, archives, control_text, etc.)
-/// Usar solo cuando se abre/edita un control específico
 Future<dynamic> obtenerControlCompleto(String idControl) async {
   final resultado = await DBControles.obtenerControlCompleto(idControl);
   return resultado;

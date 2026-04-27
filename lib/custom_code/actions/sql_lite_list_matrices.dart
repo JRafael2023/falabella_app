@@ -19,7 +19,6 @@ Future<List<dynamic>> sqlLiteListMatrices() async {
   final result = await DBMatrices.getAllMatrices();
 
 
-  // Convertir a JSON
   final jsonList = result.map((matriz) => matriz.toJson()).toList();
 
 

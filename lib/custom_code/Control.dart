@@ -3,10 +3,10 @@ class Control {
   String idControl;
   String title;
   String description;
-  String? photos; // ✅ Múltiples fotos separadas por ||| (NULLABLE)
-  String? video; // ✅ Múltiples videos separados por ||| (NULLABLE)
-  String? archives; // ✅ Múltiples archivos separados por ||| (NULLABLE)
-  int? findingStatus; // ✅ NULLABLE
+  String? photos;
+  String? video;
+  String? archives;
+  int? findingStatus;
   String objectiveId;
   String? titleId;
   String? walkthroughId;
@@ -17,7 +17,6 @@ class Control {
   bool status;
   bool completed;
 
-  // ⭐ NUEVOS CAMPOS (NULLABLE)
   String? observacion;
   String? gerencia;
   String? ecosistema;
@@ -29,7 +28,6 @@ class Control {
   String? nivelRiesgo;
   String? controlText;
 
-  // ⭐ CAMPOS v19 - Highbond completo
   String? tituloObservacion;
   String? riskLevelId;
   String? publicationStatusId;
@@ -51,7 +49,6 @@ class Control {
   String? riesgoActual;
   String? causaRaiz;
 
-  // Separador para múltiples archivos
   static const String separator = '|||';
 
   Control({
@@ -59,10 +56,10 @@ class Control {
     required this.idControl,
     required this.title,
     this.description = "",
-    this.photos, // ✅ null por defecto
-    this.video, // ✅ null por defecto
-    this.archives, // ✅ null por defecto
-    this.findingStatus, // ✅ null por defecto
+    this.photos,
+    this.video,
+    this.archives,
+    this.findingStatus,
     required this.objectiveId,
     this.titleId,
     this.walkthroughId,
@@ -72,7 +69,6 @@ class Control {
     this.updatedAt = "",
     this.status = true,
     this.completed = false,
-    // ⭐ NUEVOS CAMPOS (NULLABLE)
     this.observacion,
     this.gerencia,
     this.ecosistema,
@@ -83,7 +79,6 @@ class Control {
     this.titulo,
     this.nivelRiesgo,
     this.controlText,
-    // ⭐ CAMPOS v19
     this.tituloObservacion,
     this.riskLevelId,
     this.publicationStatusId,
@@ -106,45 +101,35 @@ class Control {
     this.causaRaiz,
   });
 
-  // ========================================
-  // MÉTODOS HELPER PARA MÚLTIPLES ARCHIVOS
-  // ========================================
 
-  /// Obtiene la lista de fotos (Base64)
   List<String> getPhotosList() {
     return (photos ?? '').split(separator).where((s) => s.isNotEmpty).toList();
   }
 
-  /// Establece la lista de fotos
   void setPhotosList(List<String> list) {
     photos = list.isEmpty ? null : list.join(separator);
   }
 
-  /// Agrega una foto a la lista
   void addPhoto(String photoBase64) {
     List<String> list = getPhotosList();
     list.add(photoBase64);
     setPhotosList(list);
   }
 
-  /// Obtiene la lista de videos (Base64)
   List<String> getVideosList() {
     return (video ?? '').split(separator).where((s) => s.isNotEmpty).toList();
   }
 
-  /// Establece la lista de videos
   void setVideosList(List<String> list) {
     video = list.isEmpty ? null : list.join(separator);
   }
 
-  /// Agrega un video a la lista
   void addVideo(String videoBase64) {
     List<String> list = getVideosList();
     list.add(videoBase64);
     setVideosList(list);
   }
 
-  /// Obtiene la lista de archivos (Base64)
   List<String> getArchivesList() {
     return (archives ?? '')
         .split(separator)
@@ -152,23 +137,17 @@ class Control {
         .toList();
   }
 
-  /// Establece la lista de archivos
   void setArchivesList(List<String> list) {
     archives = list.isEmpty ? null : list.join(separator);
   }
 
-  /// Agrega un archivo a la lista
   void addArchive(String archiveBase64) {
     List<String> list = getArchivesList();
     list.add(archiveBase64);
     setArchivesList(list);
   }
 
-  // ========================================
-  // MÉTODOS DE CONVERSIÓN
-  // ========================================
 
-  // ✅ PARA SQLITE - Guarda en la base de datos local
   Map<String, dynamic> toMap() {
     return {
       'id_control': idControl,
@@ -177,7 +156,7 @@ class Control {
       'photos': (photos?.isNotEmpty ?? false) ? photos : null,
       'video': (video?.isNotEmpty ?? false) ? video : null,
       'archives': (archives?.isNotEmpty ?? false) ? archives : null,
-      'finding_status': findingStatus, // ✅ Ya es nullable
+      'finding_status': findingStatus,
       'objective_id': objectiveId,
       'title_id': titleId,
       'walkthrough_id': walkthroughId,
@@ -187,7 +166,6 @@ class Control {
       'updated_at': updatedAt,
       'status': status ? 1 : 0,
       'completed': completed ? 1 : 0,
-      // ⭐ NUEVOS CAMPOS
       'observacion': (observacion?.isNotEmpty ?? false) ? observacion : null,
       'gerencia': (gerencia?.isNotEmpty ?? false) ? gerencia : null,
       'ecosistema': (ecosistema?.isNotEmpty ?? false) ? ecosistema : null,
@@ -202,7 +180,6 @@ class Control {
       'titulo': (titulo?.isNotEmpty ?? false) ? titulo : null,
       'nivel_riesgo': (nivelRiesgo?.isNotEmpty ?? false) ? nivelRiesgo : null,
       'control_text': (controlText?.isNotEmpty ?? false) ? controlText : null,
-      // ⭐ CAMPOS v19
       'titulo_observacion': (tituloObservacion?.isNotEmpty ?? false) ? tituloObservacion : null,
       'risk_level_id': (riskLevelId?.isNotEmpty ?? false) ? riskLevelId : null,
       'publication_status_id': (publicationStatusId?.isNotEmpty ?? false) ? publicationStatusId : null,
@@ -226,9 +203,7 @@ class Control {
     };
   }
 
-  // ✅ DESDE SQLITE
   factory Control.fromMap(Map<String, dynamic> map) {
-    // 🔥 Función auxiliar para limpiar "null" como texto
     String? _limpiarNull(dynamic valor) {
       if (valor == null || valor == 'null' || (valor is String && valor.trim().isEmpty)) {
         return null;
@@ -241,10 +216,10 @@ class Control {
       idControl: map['id_control'],
       title: map['title'],
       description: map['description'] ?? '',
-      photos: _limpiarNull(map['photos']), // ✅ Limpia "null" como texto
-      video: _limpiarNull(map['video']), // ✅ Limpia "null" como texto
-      archives: _limpiarNull(map['archives']), // ✅ Limpia "null" como texto
-      findingStatus: map['finding_status'], // ✅ Puede ser null
+      photos: _limpiarNull(map['photos']),
+      video: _limpiarNull(map['video']),
+      archives: _limpiarNull(map['archives']),
+      findingStatus: map['finding_status'],
       objectiveId: map['objective_id'],
       titleId: map['title_id'],
       walkthroughId: map['walkthrough_id'],
@@ -254,7 +229,6 @@ class Control {
       updatedAt: map['updated_at'] ?? '',
       status: map['status'] == 1,
       completed: map['completed'] == 1,
-      // ⭐ NUEVOS CAMPOS NULLABLE - Limpia "null" como texto
       observacion: _limpiarNull(map['observacion']),
       gerencia: _limpiarNull(map['gerencia']),
       ecosistema: _limpiarNull(map['ecosistema']),
@@ -265,7 +239,6 @@ class Control {
       titulo: _limpiarNull(map['titulo']),
       nivelRiesgo: _limpiarNull(map['nivel_riesgo']),
       controlText: _limpiarNull(map['control_text']),
-      // ⭐ CAMPOS v19
       tituloObservacion: _limpiarNull(map['titulo_observacion']),
       riskLevelId: _limpiarNull(map['risk_level_id']),
       publicationStatusId: _limpiarNull(map['publication_status_id']),
@@ -289,7 +262,6 @@ class Control {
     );
   }
 
-  // ✅ PARA SUPABASE - Mapea a los nombres correctos de columnas
   Map<String, dynamic> toJson() {
     return {
       'id_control': idControl,
@@ -298,14 +270,13 @@ class Control {
       'photos': (photos?.isNotEmpty ?? false) ? photos : null,
       'video': (video?.isNotEmpty ?? false) ? video : null,
       'archives': (archives?.isNotEmpty ?? false) ? archives : null,
-      'finding_status': findingStatus, // ✅ Ya es nullable
+      'finding_status': findingStatus,
       'id_objective': objectiveId,
       'walkthrough_id': walkthroughId,
       'created_at': createdAt,
       'updated_at': updatedAt,
       'status': status,
       'completed': completed,
-      // ⭐ NUEVOS CAMPOS
       'observacion': (observacion?.isNotEmpty ?? false) ? observacion : null,
       'gerencia': (gerencia?.isNotEmpty ?? false) ? gerencia : null,
       'ecosistema': (ecosistema?.isNotEmpty ?? false) ? ecosistema : null,
@@ -320,7 +291,6 @@ class Control {
       'titulo': (titulo?.isNotEmpty ?? false) ? titulo : null,
       'nivel_riesgo': (nivelRiesgo?.isNotEmpty ?? false) ? nivelRiesgo : null,
       'control_text': (controlText?.isNotEmpty ?? false) ? controlText : null,
-      // ⭐ CAMPOS v19
       'titulo_observacion': (tituloObservacion?.isNotEmpty ?? false) ? tituloObservacion : null,
       'risk_level_id': (riskLevelId?.isNotEmpty ?? false) ? riskLevelId : null,
       'publication_status_id': (publicationStatusId?.isNotEmpty ?? false) ? publicationStatusId : null,
@@ -344,7 +314,6 @@ class Control {
     };
   }
 
-  // ✅ DESDE API HIGHBOND
   factory Control.fromHighBondJson(Map<String, dynamic> json) {
     final fecha = DateTime.now().toIso8601String();
 
@@ -363,10 +332,10 @@ class Control {
       idControl: json['id']?.toString() ?? '',
       title: json['attributes']?['title'] ?? '',
       description: json['attributes']?['description'] ?? '',
-      photos: null, // ✅ null por defecto
-      video: null, // ✅ null por defecto
-      archives: null, // ✅ null por defecto
-      findingStatus: null, // ✅ null por defecto
+      photos: null,
+      video: null,
+      archives: null,
+      findingStatus: null,
       objectiveId: objectiveId,
       titleId: null,
       walkthroughId: walkthroughId,
@@ -376,7 +345,6 @@ class Control {
       updatedAt: json['attributes']?['updated_at'] ?? fecha,
       status: true,
       completed: false,
-      // ⭐ NUEVOS CAMPOS (null por defecto desde API)
       observacion: null,
       gerencia: null,
       ecosistema: null,
@@ -387,20 +355,18 @@ class Control {
       titulo: null,
       nivelRiesgo: null,
       controlText: null,
-      // v19 fields default null from HighBond
     );
   }
 
-  // ✅ DESDE SUPABASE
   factory Control.fromSupabase(Map<String, dynamic> data) {
     return Control(
       idControl: data['id_control'],
       title: data['title'] ?? '',
       description: data['description'] ?? '',
-      photos: data['photos']?.toString(), // ✅ Puede ser null
-      video: data['video']?.toString(), // ✅ Puede ser null
-      archives: data['archives']?.toString(), // ✅ Puede ser null
-      findingStatus: data['finding_status'], // ✅ Puede ser null
+      photos: data['photos']?.toString(),
+      video: data['video']?.toString(),
+      archives: data['archives']?.toString(),
+      findingStatus: data['finding_status'],
       objectiveId: data['id_objective'],
       titleId: null,
       walkthroughId: data['walkthrough_id'],
@@ -408,7 +374,6 @@ class Control {
       updatedAt: data['updated_at'] ?? '',
       status: data['status'] ?? true,
       completed: data['completed'] ?? false,
-      // ⭐ NUEVOS CAMPOS NULLABLE
       observacion: data['observacion'],
       gerencia: data['gerencia'],
       ecosistema: data['ecosistema'],
@@ -419,7 +384,6 @@ class Control {
       titulo: data['titulo'],
       nivelRiesgo: data['nivel_riesgo'],
       controlText: data['control_text'],
-      // ⭐ CAMPOS v19
       tituloObservacion: data['titulo_observacion'],
       riskLevelId: data['risk_level_id'],
       publicationStatusId: data['publication_status_id'],
@@ -443,7 +407,6 @@ class Control {
     );
   }
 
-  // ✅ HELPER: Convertir lista desde HighBond
   static List<Control> convercionListControles(List<dynamic> data) {
     return data.map<Control>((item) {
       return Control.fromHighBondJson(item);

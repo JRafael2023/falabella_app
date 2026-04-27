@@ -21,7 +21,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class ProcesosModel extends FlutterFlowModel<ProcesosWidget> {
-  ///  Local state fields for this page.
 
   List<ProcesoStruct> listProcesosPageState = [];
   void addToListProcesosPageState(ProcesoStruct item) =>
@@ -36,23 +35,15 @@ class ProcesosModel extends FlutterFlowModel<ProcesosWidget> {
           int index, Function(ProcesoStruct) updateFn) =>
       listProcesosPageState[index] = updateFn(listProcesosPageState[index]);
 
-  ///  State fields for stateful widgets in this page.
 
   final formKey = GlobalKey<FormState>();
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Procesos widget.
   bool? estaconectado;
-  // Stores action output result for [Custom Action - getProcesosFromSupabase] action in Procesos widget.
   List<ProcesoStruct>? qSupabaseProcesos;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Procesos widget.
   bool? conexion;
-  // Stores action output result for [Custom Action - getProcesosFromSQLite] action in Procesos widget.
   List<ProcesoStruct>? getProcesos;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
@@ -64,7 +55,6 @@ class ProcesosModel extends FlutterFlowModel<ProcesosWidget> {
     return null;
   }
 
-  // State field(s) for txtabrev widget.
   FocusNode? txtabrevFocusNode;
   TextEditingController? txtabrevTextController;
   String? Function(BuildContext, String?)? txtabrevTextControllerValidator;
@@ -76,13 +66,9 @@ class ProcesosModel extends FlutterFlowModel<ProcesosWidget> {
     return null;
   }
 
-  // Stores action output result for [Custom Action - getProcesosFromSupabase] action in Button widget.
   List<ProcesoStruct>? returnProcesos;
-  // Stores action output result for [Custom Class Method - DBProceso.getAllProcesos] action in Button widget.
   List<ProcesoStruct>? procesosoffline;
-  // Stores action output result for [Custom Action - getProcesosFromSupabase] action in IconDeleteOn widget.
   List<ProcesoStruct>? qSupabaseProcesosOn;
-  // Stores action output result for [Custom Action - getProcesosFromSQLite] action in IconDeleteOff widget.
   List<ProcesoStruct>? getProcesosOff;
 
   @override

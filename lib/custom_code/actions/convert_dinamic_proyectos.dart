@@ -14,8 +14,6 @@ import 'package:flutter/material.dart';
 import 'index.dart'; // Imports other custom actions
 
 Future<List<dynamic>> convertDinamicProyectos(List<dynamic> json) async {
-  // Add your function code here!
-  //
   return json.map((item) {
     return {
       'idProyecto': item['id']?.toString() ?? '',

@@ -1,4 +1,3 @@
-// Export pages
 export '/totus/auth/create_account/create_account_widget.dart'
     show CreateAccountWidget;
 export '/totus/pages/home/home_widget.dart' show HomeWidget;

@@ -241,7 +241,6 @@ class _FlutterFlowDropDownState<T> extends State<FlutterFlowDropDown<T>> {
         (item) => DropdownMenuItem<T>(
           key: widget.optionsHasValueKeys ? _getItemKey(item) : null,
           value: item,
-          // Disable default onTap to avoid closing menu when selecting an item
           enabled: false,
           child: StatefulBuilder(
             builder: (context, menuSetState) {
@@ -254,9 +253,7 @@ class _FlutterFlowDropDownState<T> extends State<FlutterFlowDropDown<T>> {
                         ? multiSelectController.value!.remove(item)
                         : multiSelectController.value!.add(item);
                     multiSelectController.update();
-                    // This rebuilds the StatefulWidget to update the button's text.
                     setState(() {});
-                    // This rebuilds the dropdownMenu Widget to update the check mark.
                     menuSetState(() {});
                   },
                   child: Container(
@@ -356,7 +353,6 @@ class _FlutterFlowDropDownState<T> extends State<FlutterFlowDropDown<T>> {
                   onChanged: (query) {
                     widget.onSearchChanged?.call(query);
                     if (widget.searchMatchFn != null) {
-                      // Filtrar desde todos los options usando searchMatchFn
                       setState(() {
                         _displayedOptions = query.isEmpty
                             ? widget.options.take(100).toList()
@@ -390,7 +386,6 @@ class _FlutterFlowDropDownState<T> extends State<FlutterFlowDropDown<T>> {
               },
             )
           : null,
-      // This is to clear the search value when you close the menu
       onMenuStateChange: widget.isSearchable
           ? (isOpen) {
               if (!isOpen) {

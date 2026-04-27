@@ -15,7 +15,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class EditTituloModel extends FlutterFlowModel<EditTituloWidget> {
-  ///  Local state fields for this component.
 
   List<TituloStruct> listTitulos = [];
   void addToListTitulos(TituloStruct item) => listTitulos.add(item);
@@ -26,10 +25,8 @@ class EditTituloModel extends FlutterFlowModel<EditTituloWidget> {
   void updateListTitulosAtIndex(int index, Function(TituloStruct) updateFn) =>
       listTitulos[index] = updateFn(listTitulos[index]);
 
-  ///  State fields for stateful widgets in this component.
 
   final formKey = GlobalKey<FormState>();
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
@@ -41,12 +38,9 @@ class EditTituloModel extends FlutterFlowModel<EditTituloWidget> {
     return null;
   }
 
-  // State field(s) for cboproceso widget.
   String? cboprocesoValue;
   FormFieldController<String>? cboprocesoValueController;
-  // Stores action output result for [Custom Action - getTitulosFromSupabase] action in Button widget.
   List<TituloStruct>? returnTituls;
-  // Stores action output result for [Custom Class Method - DBTitulo.getAllTitulos] action in Button widget.
   List<TituloStruct>? titulosoffline;
 
   @override

@@ -15,7 +15,6 @@ class Matrices {
     this.status = true,
   });
 
-  // Convierte una matriz a un mapa (para SQLite)
   Map<String, dynamic> toMap() {
     return {
       'id_matriz': idMatriz,
@@ -25,7 +24,6 @@ class Matrices {
     };
   }
 
-  // Crea una matriz desde un mapa (SQLite)
   factory Matrices.fromMap(Map<String, dynamic> map) {
     return Matrices(
       id: map['id'],
@@ -36,7 +34,6 @@ class Matrices {
     );
   }
 
-  // Convierte la matriz a formato JSON (para Supabase)
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -47,7 +44,6 @@ class Matrices {
     };
   }
 
-  // Crea una matriz desde JSON
   factory Matrices.fromJson(Map<String, dynamic> json) {
     return Matrices(
       idMatriz: json['id_matriz'] as String? ?? json['idMatriz'] as String,
@@ -57,7 +53,6 @@ class Matrices {
     );
   }
 
-  // Factory para crear desde Supabase
   factory Matrices.fromSupabase(Map<String, dynamic> data) {
     return Matrices(
       idMatriz: data['id_matriz'] ?? data['id'].toString(),
@@ -67,7 +62,6 @@ class Matrices {
     );
   }
 
-  // Factory para crear desde MatricesRow (FlutterFlow)
   factory Matrices.fromMatricesRow(dynamic row) {
     return Matrices(
       idMatriz: row.matrixId ?? row.id?.toString() ?? '',

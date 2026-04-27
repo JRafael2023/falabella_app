@@ -201,10 +201,8 @@ class _ModalUserOptionsWidgetState extends State<ModalUserOptionsWidget> {
                 hoverColor: Colors.transparent,
                 highlightColor: Colors.transparent,
                 onTap: () async {
-                  // Cerrar el menú de opciones primero
                   Navigator.pop(context);
 
-                  // Mostrar modal de confirmación
                   final confirmar = await showDialog<bool>(
                     context: context,
                     barrierDismissible: false,
@@ -333,11 +331,9 @@ class _ModalUserOptionsWidgetState extends State<ModalUserOptionsWidget> {
 
                   if (confirmar != true) return;
 
-                  // Verificar conexión
                   final conectado = await actions.checkInternetConecction();
 
                   if (conectado == true) {
-                    // ✅ Online: eliminar en Supabase + borrar de SQLite
                     await UsersTable().delete(
                       matchingRows: (rows) => rows.eqOrNull(
                         'user_uid',
@@ -348,13 +344,10 @@ class _ModalUserOptionsWidgetState extends State<ModalUserOptionsWidget> {
                       widget!.uidUsuario!,
                     );
                   } else {
-                    // ✅ Offline: marcar pendienteEliminar = 1 para sincronizar después
-                    // No borramos la fila para que el sync pueda eliminarla en Supabase luego
                     await DBUsuarios.marcarPendienteEliminar(widget!.uidUsuario!);
                     _model.dataUser = "Marcado para eliminar";
                   }
 
-                  // Refrescar lista desde SQLite
                   _model.returnListUserSInConexion =
                       await actions.sqLiteListUsers();
                   FFAppState().jsonUsers = _model.returnListUserSInConexion!

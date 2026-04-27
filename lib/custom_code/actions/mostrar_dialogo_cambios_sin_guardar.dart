@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 Future<bool> mostrarDialogoCambiosSinGuardar(BuildContext context) async {
-  // Mostrar diálogo preguntando al usuario qué hacer con los cambios
   return await showDialog<bool>(
         context: context,
         barrierDismissible: false,
@@ -34,7 +33,6 @@ Future<bool> mostrarDialogoCambiosSinGuardar(BuildContext context) async {
               ),
             ),
             actions: [
-              // Botón Cancelar (quedarse en el control actual)
               TextButton(
                 onPressed: () {
                   Navigator.of(dialogContext).pop(false); // Retorna false = cancelar
@@ -46,7 +44,6 @@ Future<bool> mostrarDialogoCambiosSinGuardar(BuildContext context) async {
                   ),
                 ),
               ),
-              // Botón Descartar (perder los cambios)
               TextButton(
                 onPressed: () {
                   Navigator.of(dialogContext).pop(true); // Retorna true = descartar

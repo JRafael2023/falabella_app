@@ -45,7 +45,6 @@ class ModalUserDetailWidget extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
@@ -95,7 +94,6 @@ class ModalUserDetailWidget extends StatelessWidget {
               ),
             ),
 
-            // Avatar / Iniciales
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 8.0),
               child: Container(
@@ -122,7 +120,6 @@ class ModalUserDetailWidget extends StatelessWidget {
               ),
             ),
 
-            // Nombre destacado
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(20.0, 4.0, 20.0, 4.0),
               child: Text(
@@ -137,7 +134,6 @@ class ModalUserDetailWidget extends StatelessWidget {
               ),
             ),
 
-            // Badge de rol
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(0.0, 4.0, 0.0, 20.0),
               child: Container(
@@ -171,7 +167,6 @@ class ModalUserDetailWidget extends StatelessWidget {
               color: FlutterFlowTheme.of(context).alternate,
             ),
 
-            // Datos en lista
             Padding(
               padding: EdgeInsetsDirectional.fromSTEB(20.0, 16.0, 20.0, 24.0),
               child: Column(

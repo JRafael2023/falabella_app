@@ -17,7 +17,6 @@ Future<List<FFUploadedFile>> pickMultipleImagesFromGallery() async {
   try {
     final ImagePicker picker = ImagePicker();
 
-    // Seleccionar múltiples imágenes de la galería
     final List<XFile> images = await picker.pickMultiImage(
       imageQuality: 100,
     );
@@ -26,7 +25,6 @@ Future<List<FFUploadedFile>> pickMultipleImagesFromGallery() async {
       return [];
     }
 
-    // Convertir XFile a FFUploadedFile
     List<FFUploadedFile> uploadedFiles = [];
 
     for (var image in images) {

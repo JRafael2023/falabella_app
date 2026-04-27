@@ -32,7 +32,6 @@ Future<String> insertGerenciaToSupabase(GerenciaStruct gerencia) async {
       final insertedId = insertedRow['id'] as String;
       final managementId = insertedRow['management_id'] as String? ?? '';
 
-      // También insertar en SQLite con el management_id correcto
       if (managementId.isNotEmpty) {
         await DBGerencia.insertGerencia(
           GerenciaStruct(

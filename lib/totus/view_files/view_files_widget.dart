@@ -484,7 +484,6 @@ class _ViewFilesWidgetState extends State<ViewFilesWidget> {
                                                         .parameterActionVideo
                                                         ?.call(aarrayVideoIndex);
                                                     safeSetState(() {});
-                                                    // No cerrar el diálogo - mantener vista abierta
                                                   },
                                                 ),
                                               ),
@@ -612,7 +611,6 @@ class _ViewFilesWidgetState extends State<ViewFilesWidget> {
                                                     .parameterActionArchive
                                                     ?.call(arrayArchivesIndex);
                                                 safeSetState(() {});
-                                                // No cerrar el diálogo - mantener vista abierta
                                               },
                                             ),
                                           ),

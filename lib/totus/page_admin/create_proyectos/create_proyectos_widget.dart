@@ -47,9 +47,7 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
     super.initState();
     _model = createModel(context, () => CreateProyectosModel());
 
-    // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      // Inicializar timer pausable de internet
     initInternetCheck(context, onConnectionChanged: (isConnected) {
       _model.estaconectado = isConnected;
       if (mounted) {
@@ -694,7 +692,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                               ),
                                               showLoadingIndicator: true,
                                               onPressed: () async {
-                                                // Validar que el ID no esté vacío
                                                 final idBusqueda = _model.txtidTextController.text.trim();
                                                 if (idBusqueda.isEmpty) {
                                                   mostrarError('Ingresa el ID del proyecto de Highbond antes de buscar');
@@ -834,7 +831,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                   .map((e) => e.toString())
                                                   .toList(),
                                               onChanged: (val) {
-                                                // ✅ setModalState para que el modal muestre el valor seleccionado
                                                 setModalState(() {
                                                   _model.cbomatrixValue = val;
                                                   _model.cbomatrixValueController?.value = val;
@@ -968,7 +964,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                   })
                                                   .toList(),
                                               onChanged: (val) {
-                                                // ✅ setModalState para que el modal muestre el valor seleccionado
                                                 setModalState(() {
                                                   _model.cboUserAssignValue = val;
                                                   _model.cboUserAssignValueController?.value = val;
@@ -1286,7 +1281,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                     mostrarError('Selecciona un usuario a asignar');
                                                     return;
                                                   }
-                                                  // Verificar duplicado de ID en proyectos existentes (local SQLite/cache)
                                                   final idIngresado = _model.txtidTextController.text.trim();
                                                   final existeLocal = FFAppState().jsonProyectos.any((p) =>
                                                     getJsonField(p, r'''$.id_project''').toString().trim().toLowerCase() ==
@@ -1295,7 +1289,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                     mostrarError('El ID de proyecto "$idIngresado" ya existe');
                                                     return;
                                                   }
-                                                  // Si está conectado, verificar también contra Supabase
                                                   if (_model.estaconectado ?? false) {
                                                     final existenteSupabase = await ProjectsTable().queryRows(
                                                       queryFn: (q) => q.eqOrNull('id_project', idIngresado),
@@ -1471,12 +1464,10 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
                                                         ?.reset();
                                                     _model.cboUserAssignValue =
                                                         null;
-                                                    // Reset estado dropdown Highbond
                                                     _model.usarDropdownHighbond = false;
                                                     _model.selectedHighbondProjectId = null;
                                                     _model.selectedHighbondProjectName = null;
                                                   });
-                                                  // Cerrar el formulario primero
                                                   Navigator.pop(context);
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(
@@ -1610,7 +1601,6 @@ class _CreateProyectosWidgetState extends State<CreateProyectosWidget> with Widg
   }
 }
 
-// Widget dropdown custom para proyectos Highbond — evita ANR con 15k+ items
 class _HighbondDropdown extends StatefulWidget {
   final String? selectedId;
   final String? selectedName;

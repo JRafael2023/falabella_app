@@ -17,7 +17,6 @@ import 'package:tottus/custom_code/Proyecto.dart';
 
 Future<List<dynamic>> sqlLiteListProyectos() async {
   try {
-    // Obtener el usuario actual
     final userUid = FFAppState().currentUser?.uidUsuario ?? '';
     final userRole = FFAppState().currentUser?.rol ?? '';
 
@@ -25,21 +24,17 @@ Future<List<dynamic>> sqlLiteListProyectos() async {
       return [];
     }
 
-    // Obtener la lista de proyectos desde SQLite
     final List<Proyecto> todosProyectos = await DBProyectos.listarProyectos();
 
-    // Administrador ve TODOS los proyectos, usuario solo los suyos
     final bool esAdmin = userRole.toLowerCase() == 'administrador';
     final List<Proyecto> proyectosFiltrados = esAdmin
         ? todosProyectos
         : todosProyectos.where((p) => p.assignUser == userUid).toList();
 
 
-    // 🔥 CONVERTIR A MAPS para que getJsonField funcione
     final List<dynamic> proyectosMap =
         proyectosFiltrados.map((p) => p.toJson()).toList();
 
-    // Debug: mostrar los primeros proyectos
     if (proyectosMap.isNotEmpty) {
     }
 

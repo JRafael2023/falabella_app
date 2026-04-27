@@ -14,7 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:tottus/custom_code/titulo.dart';
 
 Future<List<dynamic>> excecuteTitulos() async {
-  // Add your function code here!
 
   var data = await Titulo.getAllTitulosProcesos();
   return data;

@@ -4,8 +4,6 @@ import 'Control.dart';
 import 'DBControlAttachments.dart';
 
 class DBControles {
-  //       final database = await db;
-  //
 
   static Future<String> insertControl(Control control) async {
     try {
@@ -14,20 +12,16 @@ class DBControles {
         return "Error: No se pudo acceder a la base de datos";
       }
 
-      // Extraer attachments antes de insertar
       final photos = control.getPhotosList();
       final videos = control.getVideosList();
       final archives = control.getArchivesList();
 
-      // Limpiar attachments del control antes de insertar en tabla Controles
       control.photos = '';
       control.video = '';
       control.archives = '';
 
-      // Convertimos el control a un mapa y lo insertamos
       final result = await database.insert('Controles', control.toMap());
       if (result > 0) {
-        // Guardar attachments en tabla separada
         if (photos.isNotEmpty) {
           await DBControlAttachments.guardarPhotos(control.idControl, photos);
         }
@@ -52,7 +46,6 @@ class DBControles {
     final database = await DBHelper.db;
     if (database == null) return [];
 
-    // Columnas base (siempre existen desde v8)
     const _colsBase = [
       'id', 'id_control', 'title', 'description', 'finding_status',
       'walkthrough_id', 'objective_id', 'completed', 'status',
@@ -60,7 +53,6 @@ class DBControles {
       'fecha', 'descripcion_hallazgo', 'recomendacion', 'proceso_propuesto',
     ];
 
-    // Columnas v19 (agregadas en migración v19)
     const _colsV19 = [
       'titulo_observacion', 'risk_level_id', 'publication_status_id',
       'estado_publicacion', 'impact_type_id', 'tipo_impacto',
@@ -100,11 +92,9 @@ class DBControles {
     }
 
     try {
-      // Intentar con columnas v19
       final maps = await _query([..._colsBase, ..._colsV19]);
       return _buildResult(maps);
     } catch (_) {
-      // Fallback: DB antigua sin columnas v19 (migración pendiente)
       try {
         final maps = await _query(_colsBase);
         return _buildResult(maps);
@@ -114,8 +104,6 @@ class DBControles {
     }
   }
 
-  /// Obtiene un control COMPLETO con todos sus campos (incluyendo archivos grandes)
-  /// Usar solo cuando se abre un control específico
   static Future<Map<String, dynamic>?> obtenerControlCompleto(String idControl) async {
     try {
       final database = await DBHelper.db;
@@ -123,8 +111,6 @@ class DBControles {
         return null;
       }
 
-      // Excluir photos/video/archives de la tabla Controles: vienen de DBControlAttachments.
-      // Esto evita el "Row too big for CursorWindow" en registros con datos base64 legacy.
       const _cols = [
         'id', 'id_control', 'title', 'description', 'finding_status',
         'walkthrough_id', 'objective_id', 'completed', 'status',
@@ -150,7 +136,6 @@ class DBControles {
       if (maps.isNotEmpty) {
         final control = maps.first;
 
-        // Obtener attachments por tipo — si uno falla por CursorWindow, los otros siguen
         String photos = '';
         String video = '';
         String archives = '';
@@ -185,7 +170,6 @@ class DBControles {
     }
   }
 
-  /// Obtiene solo el control_text de un control específico (campo muy grande)
   static Future<String?> obtenerControlText(String idControl) async {
     try {
       final database = await DBHelper.db;
@@ -218,11 +202,9 @@ class DBControles {
         return "vacio base datos";
       }
 
-      // Realizamos una consulta con un filtro WHERE basado en idControl
       final List<Map<String, dynamic>> maps = await database.query('Controles');
 
 
-      // Retornamos la lista de resultados filtrados
       return ("Éxito: ${maps.length} controles encontrados");
     } catch (e) {
       return ("Error al listar controles: $e");
@@ -238,13 +220,10 @@ class DBControles {
         return "Error: No se pudo acceder a la base de datos";
       }
 
-      // 🛡️ SAFETY: Never delete existing controls if the new list is empty.
-      // This prevents data loss when a Supabase fetch times out or returns nothing.
       if (controles.isEmpty) {
         return 'Sin cambios (lista vacía)';
       }
 
-      // Primero eliminar attachments de todos los controles del objetivo
       final controlesExistentes = await database.query(
         'Controles',
         columns: ['id_control'],
@@ -257,23 +236,18 @@ class DBControles {
         await DBControlAttachments.eliminarTodosAttachments(idControl);
       }
 
-      // Guardar attachments para procesar después de la transacción
       final attachmentsToSave = <Map<String, dynamic>>[];
 
       await database.transaction((txn) async {
-        // 1️⃣ BORRAR SOLO LOS CONTROLES DEL OBJETIVO ACTUAL
         await txn.delete('Controles',
             where: 'objective_id = ?', whereArgs: [objectiveId]);
 
-        // 2️⃣ INSERTAR CONTROLES NUEVOS
         for (var control in controles) {
           try {
-            // Extraer attachments
             final photos = control.getPhotosList();
             final videos = control.getVideosList();
             final archives = control.getArchivesList();
 
-            // Guardar para después
             if (photos.isNotEmpty || videos.isNotEmpty || archives.isNotEmpty) {
               attachmentsToSave.add({
                 'idControl': control.idControl,
@@ -283,7 +257,6 @@ class DBControles {
               });
             }
 
-            // Limpiar attachments antes de insertar
             control.photos = '';
             control.video = '';
             control.archives = '';
@@ -297,7 +270,6 @@ class DBControles {
         }
       });
 
-      // 3️⃣ GUARDAR ATTACHMENTS FUERA DE LA TRANSACCIÓN
       for (var attachment in attachmentsToSave) {
         final idControl = attachment['idControl'] as String;
         final photos = attachment['photos'] as List<String>;
@@ -320,7 +292,6 @@ class DBControles {
       return "Error en la sincronización de controles: $e";
     }
   }
-  // ⭐ AGREGAR ESTE MÉTODO DESPUÉS DE insertControl() y ANTES DE listarControlesJson()
 
   static Future<String> updateControl(Control control) async {
     try {
@@ -329,17 +300,14 @@ class DBControles {
         return "Error: No se pudo acceder a la base de datos";
       }
 
-      // Extraer attachments antes de actualizar
       final photos = control.getPhotosList();
       final videos = control.getVideosList();
       final archives = control.getArchivesList();
 
-      // Limpiar attachments del control antes de actualizar en tabla Controles
       control.photos = '';
       control.video = '';
       control.archives = '';
 
-      // Actualizamos el control en SQLite usando id_control como filtro
       final result = await database.update(
         'Controles',
         control.toMap(),
@@ -348,7 +316,6 @@ class DBControles {
       );
 
       if (result > 0) {
-        // Actualizar attachments en tabla separada
         if (photos.isNotEmpty) {
           await DBControlAttachments.guardarPhotos(control.idControl, photos);
         } else {
@@ -423,7 +390,6 @@ class DBControles {
         return "Error: No se pudo acceder a la base de datos";
       }
 
-      // Ejecutamos el comando para eliminar la tabla 'Controles'
       await database.execute('DROP TABLE IF EXISTS Controles');
       return "Tabla 'Controles' eliminada correctamente";
     } catch (e) {

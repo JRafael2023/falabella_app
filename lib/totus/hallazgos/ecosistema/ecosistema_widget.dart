@@ -272,14 +272,12 @@ class _EcosistemaWidgetState extends State<EcosistemaWidget> with WidgetsBinding
                                   padding: const EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 10.0),
                                   child: FFButtonWidget(
                                     onPressed: () async {
-                                      // Validar nombre vacío
                                       final nombreIngresado = _model.txtnombreTextController.text.trim();
                                       if (nombreIngresado.isEmpty) {
                                         mostrarError('Ingresa el nombre del ecosistema');
                                         return;
                                       }
 
-                                      // Validar duplicado local
                                       final duplicadoLocal = _model.listEcosistema.any(
                                         (e) => e.nombre.toLowerCase() == nombreIngresado.toLowerCase(),
                                       );
@@ -288,7 +286,6 @@ class _EcosistemaWidgetState extends State<EcosistemaWidget> with WidgetsBinding
                                         return;
                                       }
 
-                                      // Validar duplicado contra Supabase si hay conexión
                                       if (_model.estaconectado ?? false) {
                                         final existenteSupabase = await EcosystemsTable().queryRows(
                                           queryFn: (q) => q.ilike('name', nombreIngresado),
@@ -308,7 +305,6 @@ class _EcosistemaWidgetState extends State<EcosistemaWidget> with WidgetsBinding
                                           'updated_at': supaSerialize<DateTime>(getCurrentTimestamp),
                                           'status': true,
                                         });
-                                        // También insertar en SQLite para que sincronización no lo detecte como nuevo
                                         await DBEcosistema.insertEcosistema(
                                           EcosistemaStruct(
                                             idEcosistema: nuevoEcosystemId,
@@ -635,7 +631,6 @@ class _EcosistemaWidgetState extends State<EcosistemaWidget> with WidgetsBinding
                                           Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
-                                              // Botón editar online
                                               Align(
                                                 alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: Builder(
@@ -694,7 +689,6 @@ class _EcosistemaWidgetState extends State<EcosistemaWidget> with WidgetsBinding
                                                   ),
                                                 ),
                                               ),
-                                              // Botón eliminar online
                                               Align(
                                                 alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: InkWell(
@@ -882,7 +876,6 @@ class _EcosistemaWidgetState extends State<EcosistemaWidget> with WidgetsBinding
                                           Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
-                                              // Botón editar offline
                                               Align(
                                                 alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: Builder(
@@ -941,7 +934,6 @@ class _EcosistemaWidgetState extends State<EcosistemaWidget> with WidgetsBinding
                                                   ),
                                                 ),
                                               ),
-                                              // Botón eliminar offline
                                               Align(
                                                 alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: InkWell(

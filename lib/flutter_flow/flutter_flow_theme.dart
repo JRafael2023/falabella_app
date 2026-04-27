@@ -1,4 +1,3 @@
-// ignore_for_file: overridden_fields, annotate_overrides
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -379,7 +378,6 @@ extension TextStyleHelper on TextStyle {
             fontWeight: fontWeight ?? this.fontWeight,
             fontStyle: fontStyle ?? this.fontStyle);
       } catch (_) {
-        // Fuente no disponible (sin internet o no en assets), usar fuente del sistema
       }
     }
 

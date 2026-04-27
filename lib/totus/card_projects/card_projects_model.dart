@@ -15,11 +15,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class CardProjectsModel extends FlutterFlowModel<CardProjectsWidget> {
-  ///  State fields for stateful widgets in this component.
 
-  // Stores action output result for [Custom Action - checkInternetConecction] action in iconUpdate widget.
   bool? estadoConexion;
-  // Stores action output result for [Custom Action - sqlLiteListProyectos] action in iconUpdate widget.
   List<dynamic>? returnProjects;
 
   @override

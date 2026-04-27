@@ -55,23 +55,18 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
       }
     });
 
-    // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      // 🌐 Cargar proyectos Highbond en paralelo (solo si hay internet)
       _cargarProyectosHighbondEnParalelo();
 
-      // Cargar última sincronización desde SQLite
       try {
         final ultimoSync = await DBSyncLogs.getUltimoSync();
         if (ultimoSync != null && ultimoSync['sync_end'] != null) {
           String syncEndStr = ultimoSync['sync_end'].toString();
 
-          // Parsear como UTC y convertir a local
           DateTime? fecha;
           if (syncEndStr.endsWith('Z') || syncEndStr.contains('+')) {
             fecha = DateTime.tryParse(syncEndStr)?.toLocal();
           } else {
-            // Si no tiene zona horaria, asumimos que es hora LOCAL (guardada con DateTime.now())
             fecha = DateTime.tryParse(syncEndStr);
           }
 
@@ -111,8 +106,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
     super.dispose();
   }
 
-  /// Lee los proyectos desde la tabla cache de Supabase con paginación.
-  /// El sync con Highbond lo hace el cron job en background cada 2 horas.
   void _cargarProyectosHighbondEnParalelo() {
     _fetchAllHighbondProjects().then((projects) {
       if (!mounted) return;
@@ -147,7 +140,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
           }
         }
       }
-      // Si ningún resultado en este batch, terminamos
       if (!anyResults) break;
     }
     return all;
@@ -340,7 +332,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                   safeSetState(() {});
 
                                   if (context.mounted) {
-                                    // El mensaje ya viene con ✅ o sin prefijo desde sincronizarAdmin
                                     final bool sinCambios = syncResult.exito && !syncResult.huboCambiosPendientes && syncResult.usuariosSincronizados == 0;
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
@@ -942,7 +933,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                             onTap: () async {
                               void Function(String paso, int actual, int total)? actualizarProgreso;
 
-                              // Estado del diálogo de progreso
                               String progresoPaso = 'Iniciando importación...';
                               int progresoActual = 0;
                               int progresoTotal = 0;
@@ -1112,7 +1102,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                             const SizedBox(height: 20.0),
                                             Column(
                                               children: [
-                                                // Botón ACEPTAR (siempre visible)
                                                 SizedBox(
                                                   width: double.infinity,
                                                   child: ElevatedButton(
@@ -1130,7 +1119,6 @@ class _HomePageAdminWidgetState extends State<HomePageAdminWidget>
                                                     child: const Text('Aceptar'),
                                                   ),
                                                 ),
-                                                // Botón DESHACER (solo si hay datos insertados)
                                                 if (importResult.success && importResult.tieneRollback) ...[
                                                   const SizedBox(height: 10.0),
                                                   SizedBox(

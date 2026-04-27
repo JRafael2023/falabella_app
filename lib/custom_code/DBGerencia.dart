@@ -3,10 +3,6 @@ import 'sqlite_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBGerencia {
-  /// [fromSupabase] = true cuando el registro viene bajando de Supabase
-  /// (ya está en la nube → sincronizadoNube=1)
-  /// [fromSupabase] = false (default) cuando es creación offline local
-  /// (pendiente de subir → sincronizadoNube=0)
   static Future<String> insertGerencia(GerenciaStruct gerencia,
       {bool fromSupabase = false}) async {
     try {
@@ -41,7 +37,6 @@ class DBGerencia {
     }
   }
 
-  // Actualizar una Gerencia
   static Future<String> updateGerencia(GerenciaStruct gerencia) async {
     try {
       final database = await DBHelper.db;
@@ -75,7 +70,6 @@ class DBGerencia {
     }
   }
 
-  // Eliminar una Gerencia
   static Future<String> deleteGerencia(String idGerencia) async {
     try {
       final database = await DBHelper.db;
@@ -100,7 +94,6 @@ class DBGerencia {
     }
   }
 
-  // Obtener una Gerencia por ID
   static Future<GerenciaStruct?> getGerenciaById(String idGerencia) async {
     try {
       final database = await DBHelper.db;
@@ -125,8 +118,6 @@ class DBGerencia {
     }
   }
 
-  // Obtener todas las Gerencias
-// Obtener todas las Gerencias
   static Future<List<GerenciaStruct>> getAllGerencias() async {
     try {
       final database = await DBHelper.db;
@@ -140,7 +131,6 @@ class DBGerencia {
     }
   }
 
-// Convertir Map (SQLite) a GerenciaStruct ✅ CORRECTO FLUTTERFLOW
   static GerenciaStruct metodoconvertidorGerencia(Map<String, dynamic> data) {
     return GerenciaStruct.fromMap({
       'id': data['id']?.toString(),
@@ -156,7 +146,6 @@ class DBGerencia {
     });
   }
 
-  // ✅ NUEVO: Convertir datos de Supabase "Managements" a GerenciaStruct
   static List<GerenciaStruct> convertFromSupabase(List<dynamic> jsonList) {
     return jsonList.map((json) {
       return GerenciaStruct.fromMap({
@@ -174,7 +163,6 @@ class DBGerencia {
     }).toList();
   }
 
-  // ✅ NUEVO: Insertar lista completa desde Supabase a SQLite
   static Future<String> insertBatchFromSupabase(
       List<dynamic> supabaseData) async {
     try {
@@ -183,10 +171,8 @@ class DBGerencia {
         return "Error: No se pudo acceder a la base de datos";
       }
 
-      // Convertir datos de Supabase a GerenciaStruct
       List<GerenciaStruct> gerencias = convertFromSupabase(supabaseData);
 
-      // Insertar cada gerencia en SQLite
       int insertedCount = 0;
       for (var gerencia in gerencias) {
         final result = await insertGerencia(gerencia, fromSupabase: true);
@@ -201,7 +187,6 @@ class DBGerencia {
     }
   }
 
-  // ✅ NUEVO: Sincronizar de SQLite a Supabase
   static Map<String, dynamic> toSupabaseMap(GerenciaStruct gerencia) {
     return {
       'id': gerencia.id,

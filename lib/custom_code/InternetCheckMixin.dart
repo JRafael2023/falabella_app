@@ -6,58 +6,30 @@ import '/flutter_flow/instant_timer.dart';
 import '/components/no_internet_dialog_widget_widget.dart';
 import '/custom_code/actions/index.dart' as actions;
 
-/// ⚡ Mixin para detectar conexión a Internet con timer pausable
-///
-/// USO:
-/// 1. Agregar `with InternetCheckMixin` a tu State:
-///    class _MyPageState extends State<MyPage> with InternetCheckMixin {
-///
-/// 2. Inicializar en initState():
-///    @override
-///    void initState() {
-///      super.initState();
-///      initInternetCheck(context);
-///    }
-///
-/// 3. Limpiar en dispose():
-///    @override
-///    void dispose() {
-///      disposeInternetCheck();
-///      super.dispose();
-///    }
-///
 mixin InternetCheckMixin<T extends StatefulWidget> on State<T>, WidgetsBindingObserver {
   InstantTimer? _internetCheckTimer;
   StreamSubscription? _connectivitySubscription;
   bool? _isConnected;
   Function(bool?)? _onConnectionChanged;
 
-  /// Inicializa el timer de verificación de internet
-  /// [onConnectionChanged] - Callback opcional que se llama cuando cambia el estado de conexión
   void initInternetCheck(BuildContext context, {Function(bool?)? onConnectionChanged}) {
     _onConnectionChanged = onConnectionChanged;
 
-    // Agregar listener para detectar cuando la app se minimiza
     WidgetsBinding.instance.addObserver(this);
 
-    // ⚡ DETECCIÓN INSTANTÁNEA: listener al stream de conectividad
-    // Detecta al instante cuando se corta WiFi o datos móviles completamente
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen((result) {
       if (!mounted) return;
 
       final sinConexion = result == ConnectivityResult.none;
 
       if (sinConexion) {
-        // Invalidar caché para que el próximo chequeo sea fresco
         actions.invalidarCacheInternet();
 
-        // Actualizar estado y notificar
         _isConnected = false;
         if (_onConnectionChanged != null) {
           _onConnectionChanged!(false);
         }
 
-        // Mostrar diálogo de sin internet inmediatamente
         if (FFAppState().noInternetDialogShown != true && mounted) {
           FFAppState().noInternetDialogShown = true;
           setState(() {});
@@ -84,18 +56,15 @@ mixin InternetCheckMixin<T extends StatefulWidget> on State<T>, WidgetsBindingOb
       }
     });
 
-    // Iniciar timer periódico (para detectar casos donde WiFi sigue activo pero no hay internet)
     _startInternetCheckTimer(context);
   }
 
-  /// Detiene y limpia el timer y el listener
   void disposeInternetCheck() {
     WidgetsBinding.instance.removeObserver(this);
     _internetCheckTimer?.cancel();
     _connectivitySubscription?.cancel();
   }
 
-  /// Inicia el timer de verificación (privado)
   void _startInternetCheckTimer(BuildContext context) {
     if (!mounted) return;
 
@@ -112,7 +81,6 @@ mixin InternetCheckMixin<T extends StatefulWidget> on State<T>, WidgetsBindingOb
         try {
           _isConnected = await actions.checkInternetConecction();
 
-          // Notificar cambio de conexión si hay callback
           if (_onConnectionChanged != null) {
             _onConnectionChanged!(_isConnected);
           }
@@ -151,14 +119,12 @@ mixin InternetCheckMixin<T extends StatefulWidget> on State<T>, WidgetsBindingOb
             setState(() {});
           }
         } catch (e) {
-          // Error silencioso
         }
       },
       startImmediately: true,
     );
   }
 
-  /// Detectar cambios en el ciclo de vida de la app
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (!mounted) return;
@@ -166,10 +132,8 @@ mixin InternetCheckMixin<T extends StatefulWidget> on State<T>, WidgetsBindingOb
     super.didChangeAppLifecycleState(state);
 
     if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      // 📴 App en segundo plano o minimizada → Cancelar timer
       _internetCheckTimer?.cancel();
     } else if (state == AppLifecycleState.resumed) {
-      // ✅ App volvió al primer plano → Reiniciar timer
       if (mounted) {
         _startInternetCheckTimer(context);
       }

@@ -22,7 +22,6 @@ Future<String> updateMatrizSQLite(
   bool status,
 ) async {
   try {
-    // Crear objeto Matrices con los datos actualizados
     final matriz = Matrices(
       idMatriz: idMatriz,
       name: name,
@@ -31,7 +30,6 @@ Future<String> updateMatrizSQLite(
       status: status,
     );
 
-    // ✅ Usar la función de DBMatrices
     final resultado = await DBMatrices.updateMatriz(matriz);
 
     return resultado;

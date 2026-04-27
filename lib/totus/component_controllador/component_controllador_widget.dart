@@ -86,35 +86,28 @@ class _ComponentControlladorWidgetState
         text: widget.controlestext == 'null' ? '' : widget.controlestext);
     _model.txtdescripcionFocusNode ??= FocusNode();
 
-    // Inicializar el estado del control basándose en findingStatus
     if (widget.findingStatus != null) {
       _model.selectStateControl = widget.findingStatus;
     }
 
-    // Cargar datos completos del control (control_text, photos, videos, archives)
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // ⚠️ Verificar que idControl no sea null antes de continuar
       if (widget.idControl == null || widget.idControl!.isEmpty) {
         return;
       }
 
-      // ⚠️ Verificar que el widget aún está montado
       if (!mounted) {
         return;
       }
 
-      // Cargar control completo desde la base de datos
       final controlCompleto =
           await actions.obtenerControlCompleto(widget.idControl!);
 
       if (controlCompleto != null && mounted) {
-        // Cargar control_text si está vacío
         if (widget.controlestext == null ||
             widget.controlestext == 'null' ||
             widget.controlestext!.isEmpty) {
           final controlText = controlCompleto['control_text'];
           if (controlText != null && controlText.toString().isNotEmpty && mounted) {
-            // Verificar que el controller no fue disposed
             if (_model.txtdescripcionTextController != null &&
                 !(_model.txtdescripcionTextController?.hasListeners == false)) {
               _model.txtdescripcionTextController?.text = controlText.toString();
@@ -122,7 +115,6 @@ class _ComponentControlladorWidgetState
           }
         }
 
-        // Cargar fotos si la lista está vacía
         if (widget.listImages == null || widget.listImages!.isEmpty) {
           final photosJson = controlCompleto['photos'];
           if (photosJson != null) {
@@ -134,7 +126,6 @@ class _ComponentControlladorWidgetState
           _model.listImagesData = widget.listImages!.toList();
         }
 
-        // Cargar videos si la lista está vacía
         if (widget.listVideos == null || widget.listVideos!.isEmpty) {
           final videosJson = controlCompleto['video'];
           if (videosJson != null) {
@@ -146,7 +137,6 @@ class _ComponentControlladorWidgetState
           _model.listvideomp4Data = widget.listVideos!.toList();
         }
 
-        // Cargar archivos si la lista está vacía
         if (widget.listArchives == null || widget.listArchives!.isEmpty) {
           final archivesJson = controlCompleto['archives'];
           if (archivesJson != null) {
@@ -158,12 +148,9 @@ class _ComponentControlladorWidgetState
           _model.listarchiveData = widget.listArchives!.toList();
         }
 
-        // ⭐ CARGAR DATOS DE HALLAZGO - Prioridad a datos temporales
-        // 1️⃣ Intentar cargar desde FFAppState (datos temporales NO guardados)
         final datosTemporales = FFAppState().getHallazgoTemporal(widget.idControl!);
 
         if (datosTemporales != null) {
-          // Hay datos temporales - usar esos
           _model.observacion = datosTemporales['observacion'];
           _model.gerencia = datosTemporales['gerencia'];
           _model.ecosistema = datosTemporales['ecosistema'];
@@ -174,7 +161,6 @@ class _ComponentControlladorWidgetState
           _model.tituloHallazgo = datosTemporales['titulo'];
           _model.nivelRiesgo = datosTemporales['nivelRiesgo'];
           _model.titulo = datosTemporales['observacion']; // titulo observación
-          // ⭐ v19 campos adicionales
           _model.riskLevelId = datosTemporales['riskLevelId'];
           _model.publicationStatusId = datosTemporales['publicationStatusId'];
           _model.estadoPublicacion = datosTemporales['estadoPublicacion'];
@@ -195,7 +181,6 @@ class _ComponentControlladorWidgetState
           _model.riesgoActual = datosTemporales['riesgoActual'];
           _model.causaRaiz = datosTemporales['causaRaiz'];
         } else {
-          // No hay datos temporales - cargar desde SQLite (datos guardados)
           _model.observacion = controlCompleto['observacion'];
           _model.gerencia = controlCompleto['gerencia'];
           _model.ecosistema = controlCompleto['ecosistema'];
@@ -206,7 +191,6 @@ class _ComponentControlladorWidgetState
           _model.tituloHallazgo = controlCompleto['titulo'];
           _model.nivelRiesgo = controlCompleto['nivel_riesgo'];
           _model.titulo = controlCompleto['observacion']; // titulo observación
-          // ⭐ v19 campos adicionales
           _model.riskLevelId = controlCompleto['risk_level_id'];
           _model.publicationStatusId = controlCompleto['publication_status_id'];
           _model.estadoPublicacion = controlCompleto['estado_publicacion'];
@@ -228,35 +212,28 @@ class _ComponentControlladorWidgetState
           _model.causaRaiz = controlCompleto['causa_raiz'];
         }
 
-        // ⭐ CARGAR datos temporales COMPLETOS del control (imágenes, texto, estado, etc.)
-        // SOLO si hay datos temporales reales (no vacíos)
         final controlTemporal = FFAppState().getControlTemporal(widget.idControl!);
         if (controlTemporal != null && controlTemporal.isNotEmpty) {
-          // Cargar imágenes temporales (SOLO si hay imágenes)
           if (controlTemporal['imagenes'] != null &&
               (controlTemporal['imagenes'] as List).isNotEmpty) {
             _model.listImagesData = List<FFUploadedFile>.from(controlTemporal['imagenes']);
           }
 
-          // Cargar videos temporales (SOLO si hay videos)
           if (controlTemporal['videos'] != null &&
               (controlTemporal['videos'] as List).isNotEmpty) {
             _model.listvideomp4Data = List<FFUploadedFile>.from(controlTemporal['videos']);
           }
 
-          // Cargar archivos temporales (SOLO si hay archivos)
           if (controlTemporal['archivos'] != null &&
               (controlTemporal['archivos'] as List).isNotEmpty) {
             _model.listarchiveData = List<FFUploadedFile>.from(controlTemporal['archivos']);
           }
 
-          // Cargar texto temporal (SOLO si hay texto)
           if (controlTemporal['texto'] != null &&
               (controlTemporal['texto'] as String).isNotEmpty) {
             _model.txtdescripcionTextController?.text = controlTemporal['texto'];
           }
 
-          // Cargar estado temporal
           if (controlTemporal['estado'] != null) {
             _model.selectStateControl = controlTemporal['estado'];
           }
@@ -269,8 +246,6 @@ class _ComponentControlladorWidgetState
 
   @override
   void dispose() {
-    // 💾 Guardar datos temporalmente ANTES de destruir el componente
-    // Solo si hay cambios pendientes Y idControl no es null
     if (widget.idControl != null &&
         widget.idControl!.isNotEmpty &&
         (_model.listImagesData.isNotEmpty ||
@@ -471,7 +446,6 @@ class _ComponentControlladorWidgetState
                       onPressed: () async {
                         _model.selectStateControl = 1;
                         safeSetState(() {});
-                        // NO limpiar datos del hallazgo para mantenerlos temporalmente
                       },
                       text: 'Efectivo',
                       icon: FaIcon(
@@ -487,13 +461,11 @@ class _ComponentControlladorWidgetState
                             EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
                         color: valueOrDefault<Color>(
                           () {
-                            // Si el usuario ha seleccionado manualmente
                             if (_model.selectStateControl != null) {
                               if (_model.selectStateControl == 1) {
                                 return FlutterFlowTheme.of(context).efectivo;
                               }
                             }
-                            // Si no ha seleccionado, usar el valor guardado
                             else if (widget.findingStatus == 1) {
                               return FlutterFlowTheme.of(context).efectivo;
                             }
@@ -549,13 +521,11 @@ class _ComponentControlladorWidgetState
                             EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
                         color: valueOrDefault<Color>(
                           () {
-                            // Si el usuario ha seleccionado manualmente
                             if (_model.selectStateControl != null) {
                               if (_model.selectStateControl == 0) {
                                 return FlutterFlowTheme.of(context).inefectivo;
                               }
                             }
-                            // Si no ha seleccionado, usar el valor guardado
                             else if (widget.findingStatus == 0) {
                               return FlutterFlowTheme.of(context).inefectivo;
                             }
@@ -842,16 +812,13 @@ class _ComponentControlladorWidgetState
                                   }
                                 }
 
-                                // Agregar nuevos archivos sin duplicar (no reemplazar)
                                 if (_model.uploadedLocalFiles_archiveData.isNotEmpty) {
                                   for (var newArchive in _model.uploadedLocalFiles_archiveData) {
-                                    // Verificar si el archivo ya existe
                                     bool existe = _model.listarchiveData.any((archive) =>
                                       archive.name == newArchive.name &&
                                       archive.bytes?.length == newArchive.bytes?.length
                                     );
 
-                                    // Solo agregar si no existe
                                     if (!existe) {
                                       _model.addToListarchiveData(newArchive);
                                     }
@@ -1155,7 +1122,6 @@ class _ComponentControlladorWidgetState
                                         ) ??
                                         false;
                                 if (confirmDialogResponse) {
-                                  // Abrir cámara para grabar video
                                   final selectedMedia = await selectMedia(
                                     isVideo: true,
                                     mediaSource: MediaSource.camera,
@@ -1204,14 +1170,11 @@ class _ComponentControlladorWidgetState
                                     }
                                   }
                                 } else {
-                                  // Seleccionar múltiples videos desde galería
                                   _model.uploadListVideo = await actions
                                       .pickMultipleVideosFromGallery();
                                   if (_model.uploadListVideo != null &&
                                       (_model.uploadListVideo)!.isNotEmpty) {
-                                    // AGREGAR los nuevos videos a la lista existente (sin duplicar)
                                     for (var newVideo in _model.uploadListVideo!) {
-                                      // Solo agregar si no existe ya en la lista
                                       bool existe = _model.listvideomp4Data.any((video) =>
                                         video.name == newVideo.name &&
                                         video.bytes?.length == newVideo.bytes?.length
@@ -1439,9 +1402,6 @@ class _ComponentControlladorWidgetState
                           ),
                         ),
                       ),
-                      // ⭐ Mostrar botón Hallazgo si:
-                      // 1. Control nuevo marcado como inefectivo (_model.selectStateControl == 0)
-                      // 2. Control guardado que es inefectivo (widget.findingStatus == 0)
                       if (_model.selectStateControl == 0 || widget.findingStatus == 0)
                         Flexible(
                           child: Builder(
@@ -1457,7 +1417,6 @@ class _ComponentControlladorWidgetState
                                       alignment: AlignmentDirectional(0.0, 0.0)
                                           .resolve(Directionality.of(context)),
                                       child: CreateHallasgoWidget(
-                                        // ⭐ Pasar hallazgo existente si hay datos cargados
                                         hallazgo: (_model.procesoPropuesto != null ||
                                                    _model.titulo != null ||
                                                    _model.gerencia != null ||
@@ -1475,11 +1434,8 @@ class _ComponentControlladorWidgetState
                                                    _model.riskActualLevelId != null ||
                                                    _model.gerenteResponsable != null)
                                             ? () {
-                                                // 🔍 Convertir nombres (texto) a IDs para los dropdowns
                                                 String? procesoPropuestoId;
 
-                                                // procesoPropuesto se almacena como nombre del proceso
-                                                // (create_hallasgo lo busca por nombre o idProceso al restaurar)
                                                 if (_model.procesoPropuesto != null && _model.procesoPropuesto!.isNotEmpty) {
                                                   procesoPropuestoId = _model.procesoPropuesto;
                                                 }
@@ -1496,7 +1452,6 @@ class _ComponentControlladorWidgetState
                                                   tituloHallazgo: _model.tituloHallazgo,
                                                   nivelRiesgo: _model.nivelRiesgo,
                                                   riskLevelId: _model.riskLevelId ?? '',
-                                                  // ⭐ v19
                                                   publicationStatusId: _model.publicationStatusId ?? '',
                                                   impactTypeId: _model.impactTypeId ?? '',
                                                   ecosystemSupportId: _model.ecosystemSupportId ?? '',
@@ -1540,7 +1495,6 @@ class _ComponentControlladorWidgetState
                                             riesgoActual,
                                             causaRaiz) async {
 
-                                          // Guardar en _model (memoria local del componente)
                                           _model.titulo = tituloObservacion;
                                           _model.gerencia = gerencia;
                                           _model.ecosistema = ecosistema;
@@ -1552,7 +1506,6 @@ class _ComponentControlladorWidgetState
                                           _model.observacion = tituloObservacion;
                                           _model.tituloHallazgo = titulo;
                                           _model.nivelRiesgo = nivelRiesgo;
-                                          // ⭐ v19
                                           _model.riskLevelId = riskLevelId;
                                           _model.publicationStatusId = publicationStatusId;
                                           _model.estadoPublicacion = estadoPublicacion;
@@ -1573,7 +1526,6 @@ class _ComponentControlladorWidgetState
                                           _model.riesgoActual = riesgoActual;
                                           _model.causaRaiz = causaRaiz;
 
-                                          // ⭐ Guardar en FFAppState para que persista entre navegaciones
                                           FFAppState().setHallazgoTemporal(
                                             widget.idControl!,
                                             {
@@ -1586,7 +1538,6 @@ class _ComponentControlladorWidgetState
                                               'procesoPropuesto': procesoPropuesto,
                                               'titulo': titulo,
                                               'nivelRiesgo': nivelRiesgo,
-                                              // ⭐ v19
                                               'riskLevelId': riskLevelId,
                                               'publicationStatusId': publicationStatusId,
                                               'estadoPublicacion': estadoPublicacion,
@@ -1701,9 +1652,7 @@ class _ComponentControlladorWidgetState
                             .cast<FFUploadedFile>();
                         safeSetState(() {});
                       }
-                      // ⚠️ NO resetear selectStateControl aquí - ya fue actualizado al presionar el botón
 
-                      // 🔍 Resolver project_name con fallback robusto (igual que sync)
                       String resolvedProjectName = FFAppState().projectName.isNotEmpty
                           ? FFAppState().projectName
                           : widget.nameProyect;
@@ -1715,14 +1664,9 @@ class _ComponentControlladorWidgetState
                       }
 
                       if (_model.estaconectado!) {
-                        // ✅ ONLINE: guardar solo en SQLite.
-                        // El background sync (actualizarControlSqLite) envía a HighBond + Supabase
-                        // en paralelo sin bloquear la UI. Eliminamos las llamadas directas
-                        // a la API desde el widget para evitar el doble envío.
                         int? estadoControl = _model.selectStateControl ?? widget.findingStatus;
 
                         if (estadoControl != null) {
-                          // ✅ Guardar en SQLite → background sync envía a HighBond + Supabase
                           await actions.actualizarControlSqLite(
                             widget.idControl!,
                             widget.description!,
@@ -1788,11 +1732,8 @@ class _ComponentControlladorWidgetState
                           return;
                         }
                       } else {
-                        // 📴 MODO OFFLINE - Guardar SOLO en SQLite
-                        // ✅ Usar widget.findingStatus como fallback si selectStateControl es null (igual que modo online)
                         int? estadoControlOffline = _model.selectStateControl ?? widget.findingStatus;
                         if (estadoControlOffline != null) {
-                          // Guardar en SQLite según el estado (Efectivo=1 o Inefectivo=0)
                           await actions.actualizarControlSqLite(
                             widget.idControl!,
                             widget.description!,
@@ -1832,14 +1773,11 @@ class _ComponentControlladorWidgetState
                             _model.causaRaiz,
                           );
 
-                          // ⚡ Actualizar FFAppState con el control modificado
                           await actions.actualizarControlEnAppState(widget.idControl!);
 
-                          // Limpiar datos temporales
                           FFAppState().clearHallazgoTemporal(widget.idControl!);
                           FFAppState().clearControlTemporal(widget.idControl!);
 
-                          // Mostrar mensaje de éxito
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
@@ -1857,7 +1795,6 @@ class _ComponentControlladorWidgetState
 
                           _shouldSetState = true;
                         } else {
-                          // Error: No seleccionó Efectivo/Inefectivo
                           await showDialog(
                             context: context,
                             builder: (alertDialogContext) {
@@ -1906,10 +1843,6 @@ class _ComponentControlladorWidgetState
                           });
                         }),
                         Future(() async {
-                          // NO limpiar las listas para que los contadores sigan mostrando los archivos
-                          // _model.listImagesData = [];
-                          // _model.listvideomp4Data = [];
-                          // _model.listarchiveData = [];
                           _model.selectStateControl = null;
                           safeSetState(() {});
                         }),

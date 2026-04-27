@@ -274,14 +274,12 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
                                   padding: const EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 10.0),
                                   child: FFButtonWidget(
                                     onPressed: () async {
-                                      // Validar nombre vacío
                                       final nombreIngresado = _model.txtnombreTextController.text.trim();
                                       if (nombreIngresado.isEmpty) {
                                         mostrarError('Ingresa el nombre del proceso');
                                         return;
                                       }
 
-                                      // Validar duplicado local
                                       final duplicadoLocal = _model.listProcesosPageState.any(
                                         (p) => p.nombre.toLowerCase() == nombreIngresado.toLowerCase(),
                                       );
@@ -290,7 +288,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
                                         return;
                                       }
 
-                                      // Validar duplicado contra Supabase si hay conexión
                                       if (_model.estaconectado ?? false) {
                                         final existenteSupabase = await ProcessesTable().queryRows(
                                           queryFn: (q) => q.ilike('name', nombreIngresado),
@@ -617,7 +614,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
                                           Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
-                                              // Botón editar
                                               Align(
                                                 alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: Builder(
@@ -677,7 +673,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
                                                   ),
                                                 ),
                                               ),
-                                              // Botón eliminar online
                                               Align(
                                                 alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: InkWell(
@@ -861,7 +856,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
                                           Row(
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
-                                              // Botón editar offline
                                               Align(
                                                 alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: Builder(
@@ -921,7 +915,6 @@ class _ProcesosWidgetState extends State<ProcesosWidget> with WidgetsBindingObse
                                                   ),
                                                 ),
                                               ),
-                                              // Botón eliminar offline
                                               Align(
                                                 alignment: AlignmentDirectional(0.0, 0.0),
                                                 child: InkWell(

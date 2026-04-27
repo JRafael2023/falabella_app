@@ -3,7 +3,6 @@ import 'package:sqflite/sqflite.dart';
 import 'Matrices.dart';
 
 class DBMatrices {
-  // Insertar una nueva matriz
   static Future<String> insertMatriz(Matrices matriz) async {
     try {
       final database = await DBHelper.db;
@@ -25,7 +24,6 @@ class DBMatrices {
     }
   }
 
-  // Listar todas las matrices (JSON)
   static Future<List<Map<String, dynamic>>> listarMatricesJson() async {
     try {
       final database = await DBHelper.db;
@@ -42,7 +40,6 @@ class DBMatrices {
     }
   }
 
-  // Obtener todas las matrices como objetos
   static Future<List<Matrices>> getAllMatrices() async {
     try {
       final database = await DBHelper.db;
@@ -61,7 +58,6 @@ class DBMatrices {
     }
   }
 
-  // Obtener matriz por ID local
   static Future<Matrices?> getMatrizById(int id) async {
     try {
       final database = await DBHelper.db;
@@ -79,7 +75,6 @@ class DBMatrices {
     }
   }
 
-  // Obtener matriz por id_matriz (ID lógico / remoto)
   static Future<Matrices?> getMatrizByIdMatriz(String idMatriz) async {
     try {
       final database = await DBHelper.db;
@@ -97,7 +92,6 @@ class DBMatrices {
     }
   }
 
-  // Actualizar una matriz (por id_matriz)
   static Future<String> updateMatriz(Matrices matriz) async {
     try {
       final database = await DBHelper.db;
@@ -120,7 +114,6 @@ class DBMatrices {
     }
   }
 
-  // Soft delete (status = 0)
   static Future<String> deleteMatriz(String idMatriz) async {
     try {
       final database = await DBHelper.db;
@@ -143,7 +136,6 @@ class DBMatrices {
     }
   }
 
-  // Eliminar permanentemente
   static Future<String> deleteMatrizPermanently(int id) async {
     try {
       final database = await DBHelper.db;
@@ -162,7 +154,6 @@ class DBMatrices {
     }
   }
 
-  // Buscar matrices por nombre
   static Future<List<Matrices>> searchMatricesByName(String searchTerm) async {
     try {
       final database = await DBHelper.db;
@@ -181,7 +172,6 @@ class DBMatrices {
     }
   }
 
-  // Contar matrices activas
   static Future<int> countMatrices() async {
     try {
       final database = await DBHelper.db;
@@ -197,7 +187,6 @@ class DBMatrices {
     }
   }
 
-  // Eliminar la tabla Matrices
   static Future<String> dropMatricesTable() async {
     try {
       final database = await DBHelper.db;
@@ -212,9 +201,6 @@ class DBMatrices {
     }
   }
 
-  // ============================================
-// INSERTAR MATRICES MASIVAS (SYNC TOTAL)
-// ============================================
   static Future<String> insertMatricesMasivas(
     List<Matrices> matrices,
   ) async {
@@ -223,7 +209,6 @@ class DBMatrices {
       if (db == null) return "Error: DB no disponible";
 
       await db.transaction((txn) async {
-        // 🔥 sync full
         await txn.delete('Matrices');
 
         for (final matriz in matrices) {
@@ -241,9 +226,6 @@ class DBMatrices {
     }
   }
 
-// ============================================
-// INSERTAR MATRICES INCREMENTALES
-// ============================================
   static Future<String> insertMatricesIncrementales(
     List<Matrices> matrices,
   ) async {

@@ -68,7 +68,6 @@ class Titulo {
     );
 
     List<Titulo> titulos = [
-      // Seguridad Física
       Titulo(
           id: 1,
           name:
@@ -191,7 +190,6 @@ class Titulo {
           name: "Pruebas y/o inspecciones no se ejecutaron correctamente.",
           process: procesoSeguridad),
 
-      // Calidad
       Titulo(
           id: 27,
           name:
@@ -242,7 +240,6 @@ class Titulo {
           name: "Manipulación inadecuada de productos perecibles.",
           process: procesoCalidad),
 
-      // Cumplimiento Normativo
       Titulo(
           id: 38,
           name:
@@ -267,7 +264,6 @@ class Titulo {
               "Locatarios: Licencia de funcionamiento, Certificado ITSE, Uso indebido de espacios.",
           process: procesoCumplimiento),
 
-      // Operaciones
       Titulo(
           id: 43,
           name:
@@ -381,7 +377,6 @@ class Titulo {
     );
 
     List<Titulo> titulos = [
-      // Seguridad Física (1-26)
       Titulo(
           id: 1,
           name:
@@ -504,7 +499,6 @@ class Titulo {
           name: "Pruebas y/o inspecciones no se ejecutaron correctamente.",
           process: procesoSeguridad),
 
-      // Calidad (27-37)
       Titulo(
           id: 27,
           name:
@@ -555,7 +549,6 @@ class Titulo {
           name: "Manipulación inadecuada de productos perecibles.",
           process: procesoCalidad),
 
-      // Cumplimiento Normativo (38-42)
       Titulo(
           id: 38,
           name:
@@ -580,7 +573,6 @@ class Titulo {
               "Locatarios: Licencia de funcionamiento, Certificado ITSE, Uso indebido de espacios.",
           process: procesoCumplimiento),
 
-      // Operaciones (43-59)
       Titulo(
           id: 43,
           name:
@@ -691,7 +683,6 @@ class Titulo {
     );
 
     List<Titulo> titulos = [
-      // Seguridad Física (1-26)
       Titulo(
           id: 1,
           name:
@@ -814,7 +805,6 @@ class Titulo {
           name: "Pruebas y/o inspecciones no se ejecutaron correctamente.",
           process: procesoSeguridad),
 
-      // Calidad (27-37)
       Titulo(
           id: 27,
           name:
@@ -865,7 +855,6 @@ class Titulo {
           name: "Manipulación inadecuada de productos perecibles.",
           process: procesoCalidad),
 
-      // Cumplimiento Normativo (38-42)
       Titulo(
           id: 38,
           name:
@@ -890,7 +879,6 @@ class Titulo {
               "Locatarios: Licencia de funcionamiento, Certificado ITSE, Uso indebido de espacios.",
           process: procesoCumplimiento),
 
-      // Operaciones (43-59)
       Titulo(
           id: 43,
           name:

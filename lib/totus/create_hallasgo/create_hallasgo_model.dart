@@ -23,11 +23,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class CreateHallasgoModel extends FlutterFlowModel<CreateHallasgoWidget> {
-  ///  Local state fields for this component.
 
   DateTime? fecha;
 
-  // ⭐ Listas de maestros cargadas desde SQLite
   List<RiskLevel> riskLevels = [];
   List<PublicationStatus> publicationStatuses = [];
   List<ImpactType> impactTypes = [];
@@ -39,40 +37,30 @@ class CreateHallasgoModel extends FlutterFlowModel<CreateHallasgoWidget> {
   List<ResponsibleManager> responsibleManagers = [];
   List<ResponsibleAuditor> responsibleAuditors = [];
 
-  ///  State fields for stateful widgets in this component.
 
   final formKey = GlobalKey<FormState>();
-  // State field(s) for cmdproceso widget.
   String? cmdprocesoValue;
   FormFieldController<String>? cmdprocesoValueController;
-  // State field(s) for cmdobservacion widget.
   String? cmdobservacionValue;
   FormFieldController<String>? cmdobservacionValueController;
-  // State field(s) for cmdgerencia widget.
   String? cmdgerenciaValue;
   FormFieldController<String>? cmdgerenciaValueController;
-  // State field(s) for cmdecosistema widget.
   String? cmdecosistemaValue;
   FormFieldController<String>? cmdecosistemaValueController;
   DateTime? datePicked;
-  // State field(s) for DropDown widget (nivel riesgo legacy).
   String? dropDownValue;
   FormFieldController<String>? dropDownValueController;
-  // State field(s) for cmdriesgo widget (nivel riesgo - RiskLevels maestro).
   String? cmdriesgoValue;
   FormFieldController<String>? cmdriesgoValueController;
-  // State field(s) for txtdescripcion widget.
   FocusNode? txtdescripcionFocusNode;
   TextEditingController? txtdescripcionTextController;
   String? Function(BuildContext, String?)?
       txtdescripcionTextControllerValidator;
-  // State field(s) for txtrecomendacion widget.
   FocusNode? txtrecomendacionFocusNode;
   TextEditingController? txtrecomendacionTextController;
   String? Function(BuildContext, String?)?
       txtrecomendacionTextControllerValidator;
 
-  // ⭐ NUEVOS DROPDOWNS v19
   String? cmdPublicationStatusValue;
   FormFieldController<String>? cmdPublicationStatusController;
   String? cmdImpactTypeValue;
@@ -88,12 +76,10 @@ class CreateHallasgoModel extends FlutterFlowModel<CreateHallasgoWidget> {
   String? cmdRiskActualLevelValue;
   FormFieldController<String>? cmdRiskActualLevelController;
 
-  // ⭐ NUEVOS CAMPOS v19 - Gerente/Auditor como dropdowns
   String? cmdGerenteValue;
   FormFieldController<String>? cmdGerenteController;
   String? cmdAuditorValue;
   FormFieldController<String>? cmdAuditorController;
-  // Legacy text controllers (mantenidos para compatibilidad)
   FocusNode? txtGerenteResponsableFocusNode;
   TextEditingController? txtGerenteResponsableController;
   FocusNode? txtAuditorResponsableFocusNode;

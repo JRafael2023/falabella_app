@@ -21,36 +21,21 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class HomePageAdminModel extends FlutterFlowModel<HomePageAdminWidget> {
-  ///  State fields for stateful widgets in this page.
 
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in HomePageAdmin widget.
   bool? estaconectado;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // Stores action output result for [Custom Action - sincronizarDatos] action in IconButton widget.
   bool? returnSincronizacion;
-  // Stores action output result for [Custom Action - sqlLiteListProyectos] action in IconButton widget.
   List<dynamic>? masivodb;
-  // Stores action output result for [Custom Action - sqLiteListUsers] action in IconButton widget.
   List<dynamic>? usersMasivo;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel1;
-  // Stores action output result for [Custom Action - sqLiteListUsers] action in ContainerAdmin widget.
   List<dynamic>? usersMasivo1;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel2;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel3;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel4;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel5;
-  // Model for ContainerAdmin component.
   late ContainerAdminModel containerAdminModel6;
-  // Stores action output result for [Custom Action - importarHallazgos] action in ContainerAdmin widget.
   String? returnImport;
 
   @override
@@ -78,7 +63,6 @@ class HomePageAdminModel extends FlutterFlowModel<HomePageAdminWidget> {
     containerAdminModel6.dispose();
   }
 
-  /// Action blocks.
   Future cargarMatrices(BuildContext context) async {
     List<MatricesRow>? qMatricesRowsSupabase;
     String? formatjsonMatricesON;

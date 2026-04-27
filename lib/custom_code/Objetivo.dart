@@ -43,7 +43,6 @@ class Objetivo {
     this.status = true,
   });
 
-  // Convierte un Objetivo a un mapa (para insertarlo en SQLite)
   Map<String, dynamic> toMap() {
     return {
       'id_objetivo': idObjetivo,
@@ -67,7 +66,6 @@ class Objetivo {
     };
   }
 
-  // Crea un Objetivo desde un mapa (para leerlo desde SQLite)
   factory Objetivo.fromMap(Map<String, dynamic> map) {
     return Objetivo(
       id: map['id'],
@@ -92,7 +90,6 @@ class Objetivo {
     );
   }
 
-  // Convierte el objetivo a formato JSON (para Supabase)
   Map<String, dynamic> toJson() {
     return {
       'id_objetivo': idObjetivo,
@@ -114,7 +111,6 @@ class Objetivo {
     };
   }
 
-  // Factory para crear desde HighBond API
   factory Objetivo.fromHighBondJson(Map<String, dynamic> json) {
     return Objetivo(
       idObjetivo: json['id'] as String,
@@ -147,7 +143,6 @@ class Objetivo {
     );
   }
 
-  // Factory para crear desde Supabase
   factory Objetivo.fromSupabase(Map<String, dynamic> data) {
     return Objetivo(
       idObjetivo: data['id_objetivo'],
@@ -169,7 +164,6 @@ class Objetivo {
     );
   }
 
-  // Convertir lista de objetivos desde respuesta de HighBond
   static List<Objetivo> convercionListObjetivos(List<dynamic> data) {
     return data.map<Objetivo>((item) {
       return Objetivo.fromHighBondJson(item);

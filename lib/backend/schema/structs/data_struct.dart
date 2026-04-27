@@ -1,4 +1,3 @@
-// ignore_for_file: unnecessary_getters_setters
 
 import '/backend/schema/util/schema_util.dart';
 import '/backend/schema/enums/enums.dart';
@@ -13,14 +12,12 @@ class DataStruct extends BaseStruct {
   })  : _id = id,
         _type = type;
 
-  // "id" field.
   String? _id;
   String get id => _id ?? '';
   set id(String? val) => _id = val;
 
   bool hasId() => _id != null;
 
-  // "type" field.
   String? _type;
   String get type => _type ?? '';
   set type(String? val) => _type = val;

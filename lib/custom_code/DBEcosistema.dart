@@ -3,11 +3,6 @@ import 'sqlite_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBEcosistema {
-  // Insertar un nuevo Ecosistema
-  /// [fromSupabase] = true cuando el registro viene bajando de Supabase
-  /// (ya está en la nube → sincronizadoNube=1)
-  /// [fromSupabase] = false (default) cuando es creación offline local
-  /// (pendiente de subir → sincronizadoNube=0)
   static Future<String> insertEcosistema(EcosistemaStruct ecosistema,
       {bool fromSupabase = false}) async {
     try {
@@ -42,7 +37,6 @@ class DBEcosistema {
     }
   }
 
-  // Actualizar un Ecosistema
   static Future<String> updateEcosistema(EcosistemaStruct ecosistema) async {
     try {
       final database = await DBHelper.db;
@@ -76,7 +70,6 @@ class DBEcosistema {
     }
   }
 
-  // Eliminar un Ecosistema
   static Future<String> deleteEcosistema(String idEcosistema) async {
     try {
       final database = await DBHelper.db;
@@ -101,7 +94,6 @@ class DBEcosistema {
     }
   }
 
-  // Obtener un Ecosistema por ID
   static Future<EcosistemaStruct?> getEcosistemaById(
       String idEcosistema) async {
     try {
@@ -127,7 +119,6 @@ class DBEcosistema {
     }
   }
 
-  // Obtener todos los Ecosistemas
   static Future<List<EcosistemaStruct>> getAllEcosistemas() async {
     try {
       final database = await DBHelper.db;
@@ -141,8 +132,6 @@ class DBEcosistema {
     }
   }
 
-  // Método de conversión de Map a EcosistemaStruct
-  // Convertir Map (SQLite) a EcosistemaStruct ✅ CORRECTO FLUTTERFLOW
   static EcosistemaStruct metodoconvertidorEcosistema(
       Map<String, dynamic> data) {
     return EcosistemaStruct.fromMap({
@@ -159,8 +148,6 @@ class DBEcosistema {
     });
   }
 
-  // MÉTODO PARA SUPABASE: Convertir JSON de Supabase a EcosistemaStruct
-  // Convertir JSON de Supabase a EcosistemaStruct ✅ CORRECTO
   static List<EcosistemaStruct> convertFromSupabase(List<dynamic> jsonList) {
     return jsonList.map((json) {
       return EcosistemaStruct.fromMap({

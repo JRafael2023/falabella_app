@@ -26,7 +26,6 @@ Future<String> actualizarProyectoSQLite(
   try {
     final db = await DBHelper.db;
 
-    // Preparar los datos del proyecto a actualizar
     final Map<String, dynamic> projectData = {
       'name': name,
       'description': description,
@@ -38,7 +37,6 @@ Future<String> actualizarProyectoSQLite(
       'updated_at': DateTime.now().toIso8601String(),
     };
 
-    // Actualizar el proyecto en la tabla Proyectos
     final rows = await db.update(
       'Proyectos',
       projectData,

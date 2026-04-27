@@ -27,7 +27,6 @@ import 'package:tottus/custom_code/Proyecto.dart';
 Future<bool> verificarCambiosPendientesSync(String userUid) async {
   try {
 
-    // 1. Obtener PROYECTOS del usuario desde SUPABASE
     final proyectosSupabase = await ProjectsTable().queryRows(
       queryFn: (q) => q!.eq('assign_user', userUid),
     );
@@ -37,7 +36,6 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
     }
 
 
-    // 2. Extraer IDs de proyectos
     final idsProyectos = proyectosSupabase
         .map((p) => p.idProject ?? '')
         .where((id) => id.isNotEmpty)
@@ -47,8 +45,6 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
       return false;
     }
 
-    // 3. Obtener OBJETIVOS de esos proyectos desde SQLITE
-    // (porque Objectives NO existe en Supabase)
     List<Objetivo> objetivosSQLite = [];
     for (var idProyecto in idsProyectos) {
       final objetivos =
@@ -61,14 +57,11 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
     }
 
 
-    // 4. Extraer IDs de objetivos
     final idsObjetivos = objetivosSQLite
         .map((obj) => obj.idObjetivo)
         .where((id) => id.isNotEmpty)
         .toList();
 
-    // 5. Obtener CONTROLES de esos objetivos desde SUPABASE
-    // ⚡ Una query simple por objetivo en paralelo — evita el OR complejo que causa timeout/connection drop
     final _resultadosPorObjetivo = await Future.wait(
       idsObjetivos.map((id) => ControlsTable().queryRows(
         queryFn: (q) => q!.eq('id_objective', id),
@@ -81,7 +74,6 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
     }
 
 
-    // 6. Obtener TODOS los controles de SQLite (JSON maps para preservar photos_count/archives_count/has_video)
     List<Control> controlesSQLite = [];
     final Map<String, Map<String, dynamic>> controlesSQLiteJson = {}; // para attachment counts
 
@@ -96,7 +88,6 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
     }
 
 
-    // 7. Crear mapa para comparación rápida por ID
     final Map<String, dynamic> mapaSupabase = {};
     for (var control in controlesSupabase) {
       mapaSupabase[control.idControl ?? ''] = {
@@ -106,7 +97,6 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
         'photos': control.photos,
         'video': control.video,
         'archives': control.archives,
-        // ⭐ NUEVOS CAMPOS NULLABLE
         'observacion': control.observacion,
         'gerencia': control.gerencia,
         'ecosistema': control.ecosistema,
@@ -120,7 +110,6 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
       };
     }
 
-    // 8. Comparar cada control de SQLite con Supabase
     int diferenciasEncontradas = 0;
 
     for (var controlLocal in controlesSQLite) {
@@ -129,29 +118,21 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
       if (mapaSupabase.containsKey(idControl)) {
         final controlRemoto = mapaSupabase[idControl];
 
-        // Normalizar strings: null, "" y valores vacíos se consideran iguales
         String normalizarString(dynamic valor) {
           if (valor == null) return '';
           if (valor is String) return valor.trim();
           return valor.toString().trim();
         }
 
-        // ⚡ Solo es diferencia REAL si el AUDITOR completó offline pero Supabase NO lo sabe.
-        // Si Supabase tiene completed=true y local=false, es un caso de DESCARGA → no es upload pendiente.
         bool remoteCompleted = controlRemoto['completed'] ?? false;
         bool completedDiferenteReal = controlLocal.completed && !remoteCompleted;
 
-        // ⚡ finding_status: solo es pendiente de subir si el auditor completó OFFLINE
-        // (local=completed=true pero Supabase aún no lo tiene como completed)
-        // Si ambos están completed, el finding_status ya fue subido anteriormente.
         String findingLocal = normalizarString(controlLocal.findingStatus);
         String findingRemoto = normalizarString(controlRemoto['finding_status']);
         bool findingDiferenteReal = controlLocal.completed && !remoteCompleted
             ? findingLocal != findingRemoto
             : false;
 
-        // ⚡ Solo es diferencia si LOCAL tiene valor Y Supabase no lo tiene (pendiente de subir).
-        // Si Supabase tiene valor y local no → es DESCARGA, no upload pendiente.
         String localObservacion = normalizarString(controlLocal.observacion);
         bool observacionDiferenteReal = localObservacion.isNotEmpty &&
             localObservacion != normalizarString(controlRemoto['observacion']);
@@ -179,7 +160,6 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
         String localNivel = normalizarString(controlLocal.nivelRiesgo);
         bool nivelRiesgoDiferenteReal = localNivel.isNotEmpty &&
             localNivel != normalizarString(controlRemoto['nivel_riesgo']);
-        // description viene de la API (no es editable offline), ignorar diferencias
         bool descriptionDiferenteReal = false;
 
         final localJson = controlesSQLiteJson[idControl] ?? {};
@@ -187,7 +167,6 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
         final int localArchivesCount = (localJson['archives_count'] as int?) ?? 0;
         final bool localHasVideo = ((localJson['has_video'] as int?) ?? 0) == 1;
 
-        // Supabase: revisar si tiene datos (no null/vacío)
         final bool supabaseHasPhotos = controlRemoto['photos'] != null &&
             normalizarString(controlRemoto['photos']).isNotEmpty &&
             normalizarString(controlRemoto['photos']) != '[]';
@@ -198,8 +177,6 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
             normalizarString(controlRemoto['archives']).isNotEmpty &&
             normalizarString(controlRemoto['archives']) != '[]';
 
-        // ⚡ Solo es diferencia REAL si LOCAL tiene archivos que SUPABASE no tiene (pendiente de subir).
-        // Si Supabase tiene archivos pero local no → es DESCARGA, no upload pendiente.
         bool photosDiferenteReal = localPhotosCount > 0 && !supabaseHasPhotos;
         bool videoDiferenteReal = localHasVideo && !supabaseHasVideo;
         bool archivesDiferenteReal = localArchivesCount > 0 && !supabaseHasArchives;
@@ -242,12 +219,10 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
 
         }
       } else {
-        // Control existe en SQLite pero NO en Supabase
         diferenciasEncontradas++;
       }
     }
 
-    // 9. Verificar si hay controles en Supabase que no están en SQLite
     for (var control in controlesSupabase) {
       final idControl = control.idControl ?? '';
       bool existeEnSQLite = controlesSQLite
@@ -258,7 +233,6 @@ Future<bool> verificarCambiosPendientesSync(String userUid) async {
       }
     }
 
-    // 10. Resultado final
     if (diferenciasEncontradas > 0) {
       return true;
     } else {

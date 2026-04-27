@@ -3,10 +3,6 @@ import 'sqlite_helper.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBProceso {
-  /// [fromSupabase] = true cuando el registro viene bajando de Supabase
-  /// (ya está en la nube → sincronizadoNube=1)
-  /// [fromSupabase] = false (default) cuando es creación offline local
-  /// (pendiente de subir → sincronizadoNube=0)
   static Future<String> insertProceso(ProcesoStruct proceso,
       {bool fromSupabase = false}) async {
     try {
@@ -122,7 +118,6 @@ class DBProceso {
     }
   }
 
-// Convertir Map (SQLite) a ProcesoStruct ✅ CORRECTO FLUTTERFLOW
   static ProcesoStruct metodoconvertidor(Map<String, dynamic> data) {
     return ProcesoStruct.fromMap({
       'id': data['id']?.toString(),
@@ -138,7 +133,6 @@ class DBProceso {
     });
   }
 
-  // Obtener todos los procesos de SQLite
   static Future<List<ProcesoStruct>> getAllProcesos() async {
     try {
       final database = await DBHelper.db;
@@ -153,7 +147,6 @@ class DBProceso {
     }
   }
 
-  // ✅ NUEVO: Convertir datos de Supabase "Processes" a ProcesoStruct
   static List<ProcesoStruct> convertFromSupabase(List<dynamic> jsonList) {
     return jsonList.map((json) {
       return ProcesoStruct.fromMap({
@@ -171,7 +164,6 @@ class DBProceso {
     }).toList();
   }
 
-  // ✅ NUEVO: Insertar batch desde Supabase a SQLite
   static Future<String> insertBatchFromSupabase(
       List<dynamic> supabaseData) async {
     try {
@@ -196,7 +188,6 @@ class DBProceso {
     }
   }
 
-  // ✅ NUEVO: Convertir ProcesoStruct a Map para Supabase
   static Map<String, dynamic> toSupabaseMap(ProcesoStruct proceso) {
     return {
       'id': proceso.id,

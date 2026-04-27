@@ -25,7 +25,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class LogsModel extends FlutterFlowModel<LogsWidget> {
-  ///  Local state fields for this page.
 
   Proyecto? proyecto;
 
@@ -39,25 +38,17 @@ class LogsModel extends FlutterFlowModel<LogsWidget> {
   void updateListProyectosAtIndex(int index, Function(Proyecto) updateFn) =>
       listProyectos[index] = updateFn(listProyectos[index]);
 
-  ///  State fields for stateful widgets in this page.
 
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in logs widget.
   bool? estaconectado;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // State field(s) for cboAuditores widget.
   String? cboAuditoresValue;
   FormFieldController<String>? cboAuditoresValueController;
-  // State field(s) for cboPais widget.
   String? cboPaisValue;
   FormFieldController<String>? cboPaisValueController;
-  // Models for listAudits dynamic component.
   late FlutterFlowDynamicModels<ListAuditsModel> listAuditsModels;
   Completer<ApiCallResponse>? apiRequestCompleter;
-  // Models for tasks dynamic component.
   late FlutterFlowDynamicModels<TasksModel> tasksModels;
 
   @override
@@ -77,7 +68,6 @@ class LogsModel extends FlutterFlowModel<LogsWidget> {
     tasksModels.dispose();
   }
 
-  /// Additional helper methods.
   Future waitForApiRequestCompleted({
     double minWait = 0,
     double maxWait = double.infinity,

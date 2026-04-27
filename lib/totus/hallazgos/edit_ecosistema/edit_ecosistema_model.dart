@@ -13,7 +13,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class EditEcosistemaModel extends FlutterFlowModel<EditEcosistemaWidget> {
-  ///  Local state fields for this component.
 
   List<EcosistemaStruct> listEcosistema = [];
   void addToListEcosistema(EcosistemaStruct item) => listEcosistema.add(item);
@@ -27,10 +26,8 @@ class EditEcosistemaModel extends FlutterFlowModel<EditEcosistemaWidget> {
           int index, Function(EcosistemaStruct) updateFn) =>
       listEcosistema[index] = updateFn(listEcosistema[index]);
 
-  ///  State fields for stateful widgets in this component.
 
   final formKey = GlobalKey<FormState>();
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
@@ -42,13 +39,9 @@ class EditEcosistemaModel extends FlutterFlowModel<EditEcosistemaWidget> {
     return null;
   }
 
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Button widget.
   bool? estaconectado;
-  // Stores action output result for [Backend Call - Update Row(s)] action in Button widget.
   List<EcosystemsRow>? updateEcosistema;
-  // Stores action output result for [Custom Action - getEcosistemasFromSupabase] action in Button widget.
   List<EcosistemaStruct>? returnEcosistemas;
-  // Stores action output result for [Custom Class Method - DBEcosistema.getAllEcosistemas] action in Button widget.
   List<EcosistemaStruct>? ecosistemasoffline;
 
   @override

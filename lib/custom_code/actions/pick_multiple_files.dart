@@ -15,7 +15,6 @@ import 'package:file_picker/file_picker.dart';
 
 Future<List<FFUploadedFile>> pickMultipleFiles() async {
   try {
-    // Seleccionar múltiples archivos
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.any,
@@ -25,7 +24,6 @@ Future<List<FFUploadedFile>> pickMultipleFiles() async {
       return [];
     }
 
-    // Convertir a FFUploadedFile
     List<FFUploadedFile> uploadedFiles = [];
 
     for (var file in result.files) {

@@ -17,17 +17,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class LoginModel extends FlutterFlowModel<LoginWidget> {
-  ///  Local state fields for this page.
 
   bool stateError = false;
   String errorMessage = 'Correo electrónico o contraseña incorrecta. Por favor, vuelve a intentarlo nuevamente.';
 
-  ///  State fields for stateful widgets in this page.
 
   final formKey = GlobalKey<FormState>();
-  // Model for AdvertenciaLogin component.
   late AdvertenciaLoginModel advertenciaLoginModel;
-  // State field(s) for txtemail widget.
   FocusNode? txtemailFocusNode;
   TextEditingController? txtemailTextController;
   String? Function(BuildContext, String?)? txtemailTextControllerValidator;
@@ -42,7 +38,6 @@ class LoginModel extends FlutterFlowModel<LoginWidget> {
     return null;
   }
 
-  // State field(s) for txtcontra widget.
   FocusNode? txtcontraFocusNode;
   TextEditingController? txtcontraTextController;
   late bool txtcontraVisibility;
@@ -55,11 +50,8 @@ class LoginModel extends FlutterFlowModel<LoginWidget> {
     return null;
   }
 
-  // Stores action output result for [Custom Action - checkInternetConecction] action in btnlogin widget.
   bool? conectado;
-  // Stores action output result for [Custom Action - loginWithSupabaseAuth] action in btnlogin widget.
   String? returnlogin;
-  // Stores action output result for [Custom Action - getUsuarioByEmail] action in btnlogin widget.
   dynamic? correct;
 
   @override

@@ -3,9 +3,6 @@ import 'package:sqflite/sqflite.dart';
 import 'Objetivo.dart';
 
 class DBObjetivos {
-  // ============================================
-  // INSERTAR OBJETIVO
-  // ============================================
   static Future<String> insertObjetivo(Objetivo objetivo) async {
     try {
       final db = await DBHelper.db;
@@ -23,9 +20,6 @@ class DBObjetivos {
     }
   }
 
-  // ============================================
-  // INSERTAR OBJETIVOS MASIVOS (SYNC TOTAL)
-  // ============================================
   static Future<String> insertObjetivosMasivos(
     List<Objetivo> objetivos,
   ) async {
@@ -34,8 +28,6 @@ class DBObjetivos {
       if (db == null) return "Error: DB no disponible";
 
       await db.transaction((txn) async {
-        // Borrar solo los objetivos del proyecto específico (no toda la tabla)
-        // Evita race condition cuando múltiples proyectos se sincronizan en paralelo
         if (objetivos.isNotEmpty) {
           await txn.delete(
             'Objetivos',
@@ -59,9 +51,6 @@ class DBObjetivos {
     }
   }
 
-  // ============================================
-  // LISTAR OBJETIVOS POR PROYECTO
-  // ============================================
   static Future<List<Objetivo>> listarObjetivosPorProyecto(
     String projectId,
   ) async {
@@ -81,9 +70,6 @@ class DBObjetivos {
     }
   }
 
-  // ============================================
-  // LISTAR TODOS LOS OBJETIVOS
-  // ============================================
   static Future<List<Objetivo>> listarObjetivos() async {
     try {
       final db = await DBHelper.db;
@@ -96,9 +82,6 @@ class DBObjetivos {
     }
   }
 
-  // ============================================
-  // OBTENER OBJETIVO POR ID_OBJETIVO
-  // ============================================
   static Future<Objetivo?> getObjetivoByIdObjetivo(
     String idObjetivo,
   ) async {
@@ -122,9 +105,6 @@ class DBObjetivos {
     }
   }
 
-  // ============================================
-  // ELIMINAR OBJETIVO POR ID_OBJETIVO
-  // ============================================
   static Future<String> deleteObjetivoByIdObjetivo(
     String idObjetivo,
   ) async {
@@ -144,9 +124,6 @@ class DBObjetivos {
     }
   }
 
-  // ============================================
-  // EXISTE OBJETIVO
-  // ============================================
   static Future<bool> existeObjetivo(String idObjetivo) async {
     try {
       final db = await DBHelper.db;
@@ -165,9 +142,6 @@ class DBObjetivos {
     }
   }
 
-  // ============================================
-  // CONTAR OBJETIVOS
-  // ============================================
   static Future<int> contarObjetivos() async {
     try {
       final db = await DBHelper.db;
@@ -180,9 +154,6 @@ class DBObjetivos {
     }
   }
 
-  // ============================================
-  // ELIMINAR TODOS LOS OBJETIVOS
-  // ============================================
   static Future<String> deleteAllObjetivos() async {
     try {
       final db = await DBHelper.db;
@@ -195,9 +166,6 @@ class DBObjetivos {
     }
   }
 
-  // ============================================
-  // DROP TABLE (DEV ONLY)
-  // ============================================
   static Future<String> dropObjetivosTable() async {
     try {
       final db = await DBHelper.db;

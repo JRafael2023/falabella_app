@@ -237,14 +237,12 @@ class _EditGerenciaWidgetState extends State<EditGerenciaWidget> {
                               padding: const EdgeInsetsDirectional.fromSTEB(0.0, 10.0, 0.0, 10.0),
                               child: FFButtonWidget(
                                 onPressed: () async {
-                                  // Validar nombre vacío
                                   final nombreNuevo = _model.txtnombreTextController.text.trim();
                                   if (nombreNuevo.isEmpty) {
                                     _mostrarError('Ingresa el nombre de la gerencia');
                                     return;
                                   }
 
-                                  // 🔒 Validar nombre único (ignorando la gerencia actual)
                                   final nombreDuplicado = FFAppState().listagenerencia.any(
                                     (e) => e.nombre.toLowerCase() == nombreNuevo.toLowerCase() &&
                                         e.idGerencia != widget!.idGerencia,

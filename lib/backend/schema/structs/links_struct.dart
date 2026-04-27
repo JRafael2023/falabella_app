@@ -1,4 +1,3 @@
-// ignore_for_file: unnecessary_getters_setters
 
 import '/backend/schema/util/schema_util.dart';
 import '/backend/schema/enums/enums.dart';
@@ -11,7 +10,6 @@ class LinksStruct extends BaseStruct {
     String? ui,
   }) : _ui = ui;
 
-  // "ui" field.
   String? _ui;
   String get ui => _ui ?? '';
   set ui(String? val) => _ui = val;

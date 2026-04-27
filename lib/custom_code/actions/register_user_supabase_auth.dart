@@ -16,17 +16,11 @@ import '/flutter_flow/custom_functions.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Registra un nuevo usuario en Supabase Auth
-///
-/// @param email: Correo electrónico del usuario
-/// @param password: Contraseña del usuario
-/// @return String: "OK" si el registro es exitoso, o mensaje de error si falla
 Future<String> registerUserSupabaseAuth(
   String email,
   String password,
 ) async {
   try {
-    // Validar que los campos no estén vacíos
     if (email.trim().isEmpty) {
       return 'El correo electrónico es requerido';
     }
@@ -35,13 +29,11 @@ Future<String> registerUserSupabaseAuth(
       return 'La contraseña es requerida';
     }
 
-    // Validar longitud mínima de contraseña (Supabase requiere mínimo 6 caracteres)
     if (password.length < 6) {
       return 'La contraseña debe tener al menos 6 caracteres';
     }
 
 
-    // Registrar usuario en Supabase Auth
     final response = await SupaFlow.client.auth.signUp(
       email: email.trim(),
       password: password,

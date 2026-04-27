@@ -1,4 +1,3 @@
-// ignore_for_file: unnecessary_getters_setters
 
 import '/backend/schema/util/schema_util.dart';
 import '/backend/schema/enums/enums.dart';
@@ -20,7 +19,6 @@ class HallazgoStruct extends BaseStruct {
     String? tituloHallazgo,
     String? nivelRiesgo,
     String? riskLevelId, // UUID del nivel de riesgo (para dropdown)
-    // v19 fields
     String? publicationStatusId,
     String? impactTypeId,
     String? ecosystemSupportId,
@@ -56,161 +54,138 @@ class HallazgoStruct extends BaseStruct {
         _descripcionRiesgo = descripcionRiesgo,
         _causaRaiz = causaRaiz;
 
-  // "titulo" field.
   String? _titulo;
   String get titulo => _titulo ?? '';
   set titulo(String? val) => _titulo = val;
 
   bool hasTitulo() => _titulo != null;
 
-  // "gerencia" field.
   String? _gerencia;
   String get gerencia => _gerencia ?? '';
   set gerencia(String? val) => _gerencia = val;
 
   bool hasGerencia() => _gerencia != null;
 
-  // "ecosistema" field.
   String? _ecosistema;
   String get ecosistema => _ecosistema ?? '';
   set ecosistema(String? val) => _ecosistema = val;
 
   bool hasEcosistema() => _ecosistema != null;
 
-  // "fecha" field.
   String? _fecha;
   String get fecha => _fecha ?? '';
   set fecha(String? val) => _fecha = val;
 
   bool hasFecha() => _fecha != null;
 
-  // "nivelriesgo" field.
   String? _nivelriesgo;
   String get nivelriesgo => _nivelriesgo ?? '';
   set nivelriesgo(String? val) => _nivelriesgo = val;
 
   bool hasNivelriesgo() => _nivelriesgo != null;
 
-  // "descripcion" field.
   String? _descripcion;
   String get descripcion => _descripcion ?? '';
   set descripcion(String? val) => _descripcion = val;
 
   bool hasDescripcion() => _descripcion != null;
 
-  // "recomendacion" field.
   String? _recomendacion;
   String get recomendacion => _recomendacion ?? '';
   set recomendacion(String? val) => _recomendacion = val;
 
   bool hasRecomendacion() => _recomendacion != null;
 
-  // "procesoPropuesto" field.
   String? _procesoPropuesto;
   String get procesoPropuesto => _procesoPropuesto ?? '';
   set procesoPropuesto(String? val) => _procesoPropuesto = val;
 
   bool hasProcesoPropuesto() => _procesoPropuesto != null;
 
-  // "observacion" field.
   String? _observacion;
   String get observacion => _observacion ?? '';
   set observacion(String? val) => _observacion = val;
 
   bool hasObservacion() => _observacion != null;
 
-  // "tituloHallazgo" field.
   String? _tituloHallazgo;
   String get tituloHallazgo => _tituloHallazgo ?? '';
   set tituloHallazgo(String? val) => _tituloHallazgo = val;
 
   bool hasTituloHallazgo() => _tituloHallazgo != null;
 
-  // "nivelRiesgo" field.
   String? _nivelRiesgo;
   String get nivelRiesgo => _nivelRiesgo ?? '';
   set nivelRiesgo(String? val) => _nivelRiesgo = val;
 
   bool hasNivelRiesgo() => _nivelRiesgo != null;
 
-  // "riskLevelId" field (UUID del nivel de riesgo seleccionado en el dropdown).
   String? _riskLevelId;
   String get riskLevelId => _riskLevelId ?? '';
   set riskLevelId(String? val) => _riskLevelId = val;
 
   bool hasRiskLevelId() => _riskLevelId != null;
 
-  // "publicationStatusId" field.
   String? _publicationStatusId;
   String get publicationStatusId => _publicationStatusId ?? '';
   set publicationStatusId(String? val) => _publicationStatusId = val;
 
   bool hasPublicationStatusId() => _publicationStatusId != null;
 
-  // "impactTypeId" field.
   String? _impactTypeId;
   String get impactTypeId => _impactTypeId ?? '';
   set impactTypeId(String? val) => _impactTypeId = val;
 
   bool hasImpactTypeId() => _impactTypeId != null;
 
-  // "ecosystemSupportId" field.
   String? _ecosystemSupportId;
   String get ecosystemSupportId => _ecosystemSupportId ?? '';
   set ecosystemSupportId(String? val) => _ecosystemSupportId = val;
 
   bool hasEcosystemSupportId() => _ecosystemSupportId != null;
 
-  // "riskTypeId" field.
   String? _riskTypeId;
   String get riskTypeId => _riskTypeId ?? '';
   set riskTypeId(String? val) => _riskTypeId = val;
 
   bool hasRiskTypeId() => _riskTypeId != null;
 
-  // "riskTypologyId" field.
   String? _riskTypologyId;
   String get riskTypologyId => _riskTypologyId ?? '';
   set riskTypologyId(String? val) => _riskTypologyId = val;
 
   bool hasRiskTypologyId() => _riskTypologyId != null;
 
-  // "observationScopeId" field.
   String? _observationScopeId;
   String get observationScopeId => _observationScopeId ?? '';
   set observationScopeId(String? val) => _observationScopeId = val;
 
   bool hasObservationScopeId() => _observationScopeId != null;
 
-  // "riskActualLevelId" field.
   String? _riskActualLevelId;
   String get riskActualLevelId => _riskActualLevelId ?? '';
   set riskActualLevelId(String? val) => _riskActualLevelId = val;
 
   bool hasRiskActualLevelId() => _riskActualLevelId != null;
 
-  // "gerenteResponsable" field.
   String? _gerenteResponsable;
   String get gerenteResponsable => _gerenteResponsable ?? '';
   set gerenteResponsable(String? val) => _gerenteResponsable = val;
 
   bool hasGerenteResponsable() => _gerenteResponsable != null;
 
-  // "auditorResponsable" field.
   String? _auditorResponsable;
   String get auditorResponsable => _auditorResponsable ?? '';
   set auditorResponsable(String? val) => _auditorResponsable = val;
 
   bool hasAuditorResponsable() => _auditorResponsable != null;
 
-  // "descripcionRiesgo" field.
   String? _descripcionRiesgo;
   String get descripcionRiesgo => _descripcionRiesgo ?? '';
   set descripcionRiesgo(String? val) => _descripcionRiesgo = val;
 
   bool hasDescripcionRiesgo() => _descripcionRiesgo != null;
 
-  // "causaRaiz" field.
   String? _causaRaiz;
   String get causaRaiz => _causaRaiz ?? '';
   set causaRaiz(String? val) => _causaRaiz = val;

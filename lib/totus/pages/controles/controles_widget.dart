@@ -54,7 +54,6 @@ class _ControlesWidgetState extends State<ControlesWidget> with WidgetsBindingOb
     super.initState();
     _model = createModel(context, () => ControlesModel());
 
-    // Inicializar timer pausable de internet
     initInternetCheck(context, onConnectionChanged: (isConnected) {
       _model.estaconectado = isConnected;
       if (mounted) {
@@ -62,9 +61,7 @@ class _ControlesWidgetState extends State<ControlesWidget> with WidgetsBindingOb
       }
     });
 
-    // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      // Establecer ID del primer control (ya deberían estar cargados desde HOME)
       if (FFAppState().jsonControles.isNotEmpty) {
         _model.idControl = getJsonField(
           FFAppState().jsonControles.firstOrNull,
@@ -112,7 +109,6 @@ class _ControlesWidgetState extends State<ControlesWidget> with WidgetsBindingOb
               hoverColor: Colors.transparent,
               highlightColor: Colors.transparent,
               onTap: () async {
-                // 🔍 Verificar si hay cambios sin guardar
                 if (_model.hayCambiosSinGuardar) {
                   final debeDescartar = await actions.mostrarDialogoCambiosSinGuardar(context);
                   if (debeDescartar == null || !debeDescartar) {
@@ -563,7 +559,6 @@ class _ControlesWidgetState extends State<ControlesWidget> with WidgetsBindingOb
                           decoration: BoxDecoration(),
                           child: Builder(
                             builder: (context) {
-                              // Primero filtrar por objetivo, luego por búsqueda
                               final controlesPorObjetivo = FFAppState()
                                   .jsonControles
                                   .where((control) =>
@@ -671,9 +666,6 @@ class _ControlesWidgetState extends State<ControlesWidget> with WidgetsBindingOb
                                                   'video'),
                                           onUpdateDinamic: (state) async {
                                             if (state!) {
-                                              // ⚡ OPTIMIZACIÓN: Actualizar SOLO el control modificado (mucho más rápido)
-                                              // En lugar de recargar todos los 20+ controles desde SQLite,
-                                              // solo actualizamos el control que cambió
                                               final controlId = getJsonField(
                                                 arrayControlsItem,
                                                 r'''$.id_control''',
@@ -683,7 +675,6 @@ class _ControlesWidgetState extends State<ControlesWidget> with WidgetsBindingOb
                                                 controlId,
                                               );
 
-                                              // Solo actualizar este widget específico con safeSetState
                                               safeSetState(() {});
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(

@@ -1,4 +1,3 @@
-// ignore_for_file: unnecessary_getters_setters
 
 import '/backend/schema/util/schema_util.dart';
 import '/backend/schema/enums/enums.dart';
@@ -21,42 +20,36 @@ class GerenciaStruct extends BaseStruct {
         _updateAt = updateAt,
         _estado = estado;
 
-  // "id" field.
   String? _id;
   String get id => _id ?? '';
   set id(String? val) => _id = val;
 
   bool hasId() => _id != null;
 
-  // "idGerencia" field.
   String? _idGerencia;
   String get idGerencia => _idGerencia ?? '';
   set idGerencia(String? val) => _idGerencia = val;
 
   bool hasIdGerencia() => _idGerencia != null;
 
-  // "nombre" field.
   String? _nombre;
   String get nombre => _nombre ?? '';
   set nombre(String? val) => _nombre = val;
 
   bool hasNombre() => _nombre != null;
 
-  // "created_at" field.
   DateTime? _createdAt;
   DateTime? get createdAt => _createdAt;
   set createdAt(DateTime? val) => _createdAt = val;
 
   bool hasCreatedAt() => _createdAt != null;
 
-  // "update_at" field.
   DateTime? _updateAt;
   DateTime? get updateAt => _updateAt;
   set updateAt(DateTime? val) => _updateAt = val;
 
   bool hasUpdateAt() => _updateAt != null;
 
-  // "estado" field.
   bool? _estado;
   bool get estado => _estado ?? false;
   set estado(bool? val) => _estado = val;

@@ -17,8 +17,6 @@ import 'dart:typed_data'; // Para el tipo Uint8List
 import 'package:file_picker/file_picker.dart'; // Para FilePicker
 
 Future<FFUploadedFile?> openVideoMp4() async {
-  // Limite máximo de tamaño de archivo (en bytes) 100MB
-  //
   const maxSize = 100 * 1024 * 1024; // 100 MB en bytes
 
   final result = await FilePicker.platform.pickFiles(
@@ -33,19 +31,16 @@ Future<FFUploadedFile?> openVideoMp4() async {
 
   final file = result.files.first;
   final String? extension = file.extension?.toLowerCase();
-  // ✅ Validar que sea video .mp4
   if (extension == null || extension != 'mp4') {
     return null;
   }
 
-  // Verificar el tamaño del archivo
   final int fileSize = file.bytes!.lengthInBytes; // Tamaño del archivo en bytes
   if (fileSize > maxSize) {
     return null; // Retorna null si el archivo excede el límite de tamaño
   }
 
 
-  // Convertir a bytes si lo vas a subir
   final Uint8List bytes = file.bytes!;
 
   final ffFile = FFUploadedFile(
@@ -58,5 +53,4 @@ Future<FFUploadedFile?> openVideoMp4() async {
   );
 
   return ffFile; // Aquí puedes agregar tu lógica para subir el video a donde lo necesites
-  // await subirVideoASupabase(bytes, file.name!); // Ejemplo de cómo podrías subirlo
 }

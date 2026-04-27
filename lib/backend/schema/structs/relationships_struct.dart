@@ -1,4 +1,3 @@
-// ignore_for_file: unnecessary_getters_setters
 
 import '/backend/schema/util/schema_util.dart';
 import '/backend/schema/enums/enums.dart';
@@ -11,7 +10,6 @@ class RelationshipsStruct extends BaseStruct {
     WalkthroughStruct? walkthrough,
   }) : _walkthrough = walkthrough;
 
-  // "walkthrough" field.
   WalkthroughStruct? _walkthrough;
   WalkthroughStruct get walkthrough => _walkthrough ?? WalkthroughStruct();
   set walkthrough(WalkthroughStruct? val) => _walkthrough = val;

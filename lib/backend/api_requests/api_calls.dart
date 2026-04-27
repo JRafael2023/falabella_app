@@ -11,7 +11,6 @@ export 'api_manager.dart' show ApiCallResponse;
 
 const _kPrivateApiFunctionName = 'ffPrivateApiCall';
 
-/// Start Supabase Group Code
 
 class SupabaseGroup {
   static String getBaseUrl({
@@ -134,9 +133,7 @@ class GetUsersCall {
   }
 }
 
-/// End Supabase Group Code
 
-/// Start Supabase Functions Group Code
 
 class SupabaseFunctionsGroup {
   static String getBaseUrl() =>
@@ -332,7 +329,6 @@ class UpdateControlHighbondInefectivoCall {
     List<String>? archivosList,
     String? projectName = '',
     String? controlText = '',
-    // ⭐ v19
     String? publicationStatusId = '',
     String? estadoPublicacion = '',
     String? impactTypeId = '',
@@ -449,7 +445,6 @@ class CreateIssueHighbondCall {
     String? cause = '',
     String? executiveOwner = '',
     String? projectOwner = '',
-    // custom attributes
     String? tipoImpacto = '',
     String? soporteEcosistema = '',
     String? tipoRiesgo = '',
@@ -509,7 +504,6 @@ class CreateIssueHighbondCall {
   }
 }
 
-/// End Supabase Functions Group Code
 
 class ApiPagingParams {
   int nextPageNumber = 0;

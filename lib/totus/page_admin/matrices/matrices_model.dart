@@ -21,17 +21,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class MatricesModel extends FlutterFlowModel<MatricesWidget> {
-  ///  State fields for stateful widgets in this page.
 
   final formKey = GlobalKey<FormState>();
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Matrices widget.
   bool? estaconectado;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
@@ -43,19 +38,12 @@ class MatricesModel extends FlutterFlowModel<MatricesWidget> {
     return null;
   }
 
-  // Stores action output result for [Custom Action - sqlLiteListMatrices] action in Button widget.
   List<dynamic>? listONMatriz;
-  // Stores action output result for [Custom Action - sqlLiteListMatrices] action in Button widget.
   List<dynamic>? listOFFMatriz;
-  // Models for cardMatriz dynamic component.
   late FlutterFlowDynamicModels<CardMatrizModel> cardMatrizModels1;
-  // Stores action output result for [Custom Action - sqlLiteEliminarMatriz] action in cardMatriz widget.
   String? eliminate;
-  // Stores action output result for [Custom Action - sqlLiteListMatrices] action in cardMatriz widget.
   List<dynamic>? returnMatrices;
-  // Models for cardMatriz dynamic component.
   late FlutterFlowDynamicModels<CardMatrizModel> cardMatrizModels2;
-  // Stores action output result for [Custom Action - sqlLiteListMatrices] action in cardMatriz widget.
   List<dynamic>? returnListSqLite;
 
   @override

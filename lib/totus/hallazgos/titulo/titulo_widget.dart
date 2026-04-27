@@ -286,14 +286,12 @@ class _TituloWidgetState extends State<TituloWidget> with WidgetsBindingObserver
                                         mostrarError('Ingresa el nombre del título');
                                         return;
                                       }
-                                      // Validar nombre duplicado local
                                       final existeNombreDuplicado = _model.listTitulos.any((t) =>
                                           t.nombre.trim().toLowerCase() == nombreIngresado.toLowerCase());
                                       if (existeNombreDuplicado) {
                                         mostrarError('El título "$nombreIngresado" ya existe');
                                         return;
                                       }
-                                      // Si está conectado, verificar también contra Supabase
                                       if (_model.estaconectado ?? false) {
                                         final existenteSupabase = await TitlesTable().queryRows(
                                           queryFn: (q) => q.ilike('name', nombreIngresado),

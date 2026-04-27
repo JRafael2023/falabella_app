@@ -17,46 +17,33 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class ModalUpdateUserModel extends FlutterFlowModel<ModalUpdateUserWidget> {
-  ///  Local state fields for this component.
 
   Usuario? usuario;
 
-  ///  State fields for stateful widgets in this component.
 
   final formKey = GlobalKey<FormState>();
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in modalUpdateUser widget.
   bool? estaconectado;
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
-  // State field(s) for txtcorreo widget.
   FocusNode? txtcorreoFocusNode;
   TextEditingController? txtcorreoTextController;
   String? Function(BuildContext, String?)? txtcorreoTextControllerValidator;
-  // State field(s) for txtid widget.
   FocusNode? txtidFocusNode;
   TextEditingController? txtidTextController;
   String? Function(BuildContext, String?)? txtidTextControllerValidator;
-  // State field(s) for txtcontra widget.
   FocusNode? txtcontraFocusNode;
   TextEditingController? txtcontraTextController;
   late bool txtcontraVisibility;
   String? Function(BuildContext, String?)? txtcontraTextControllerValidator;
-  // State field(s) for cbopais widget.
   String? cbopaisValue;
   FormFieldController<String>? cbopaisValueController;
-  // State field(s) for cborol widget.
   String? cborolValue;
   FormFieldController<String>? cborolValueController;
-  // Stores action output result for [Backend Call - Query Rows] action in Button widget.
   List<UsersRow>? qONSUpabseRows;
-  // Stores action output result for [Custom Action - convertRowsUsers] action in Button widget.
   List<dynamic>? qUsersON;
-  // Stores action output result for [Custom Action - sqLiteListUsers] action in Button widget.
   List<dynamic>? listSqUsers;
-  // Stores action output result for [Custom Action - sqLiteListUsers] action in Button widget.
   List<dynamic>? qOFFUsers;
 
   @override

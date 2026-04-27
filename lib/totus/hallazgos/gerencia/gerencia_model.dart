@@ -21,7 +21,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class GerenciaModel extends FlutterFlowModel<GerenciaWidget> {
-  ///  Local state fields for this page.
 
   List<GerenciaStruct> listGerenciaPageState = [];
   void addToListGerenciaPageState(GerenciaStruct item) =>
@@ -36,23 +35,15 @@ class GerenciaModel extends FlutterFlowModel<GerenciaWidget> {
           int index, Function(GerenciaStruct) updateFn) =>
       listGerenciaPageState[index] = updateFn(listGerenciaPageState[index]);
 
-  ///  State fields for stateful widgets in this page.
 
   final formKey = GlobalKey<FormState>();
   InstantTimer? instantTimer;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Gerencia widget.
   bool? estaconectado;
-  // Stores action output result for [Custom Action - getGerenciasFromSupabase] action in Gerencia widget.
   List<GerenciaStruct>? qSupabaseGerencia;
-  // Stores action output result for [Custom Action - checkInternetConecction] action in Gerencia widget.
   bool? conexion;
-  // Stores action output result for [Custom Action - getGerenciasFromSQLite] action in Gerencia widget.
   List<GerenciaStruct>? getGerencias;
-  // Model for wifiComponent component.
   late WifiComponentModel wifiComponentModel;
-  // Model for exitComponent component.
   late ExitComponentModel exitComponentModel;
-  // State field(s) for txtnombre widget.
   FocusNode? txtnombreFocusNode;
   TextEditingController? txtnombreTextController;
   String? Function(BuildContext, String?)? txtnombreTextControllerValidator;
@@ -64,13 +55,9 @@ class GerenciaModel extends FlutterFlowModel<GerenciaWidget> {
     return null;
   }
 
-  // Stores action output result for [Custom Action - getGerenciasFromSupabase] action in Button widget.
   List<GerenciaStruct>? returnGerencias;
-  // Stores action output result for [Custom Class Method - DBGerencia.getAllGerencias] action in Button widget.
   List<GerenciaStruct>? gerenciaoffline;
-  // Stores action output result for [Custom Action - getGerenciasFromSupabase] action in IconDeleteOn widget.
   List<GerenciaStruct>? qSupabaseGerenciaOn;
-  // Stores action output result for [Custom Action - getGerenciasFromSQLite] action in IconDeleteOff widget.
   List<GerenciaStruct>? getEcosistemaoff;
 
   @override

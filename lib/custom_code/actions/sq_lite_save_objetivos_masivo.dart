@@ -22,7 +22,6 @@ Future<String> sqLiteSaveObjetivosMasivo(dynamic jsonObjetivos) async {
       return 'Error: No se recibieron datos';
     }
 
-    // Extraer array de objetivos
     List<dynamic> objetivosData;
 
     if (jsonObjetivos is Map<String, dynamic>) {
@@ -42,7 +41,6 @@ Future<String> sqLiteSaveObjetivosMasivo(dynamic jsonObjetivos) async {
       return 'Error: Tipo de datos no soportado';
     }
 
-    // Convertir a objetos Objetivo
     List<Objetivo> objetivos = objetivosData.map((item) {
       return Objetivo.fromHighBondJson(item);
     }).toList();
@@ -53,7 +51,6 @@ Future<String> sqLiteSaveObjetivosMasivo(dynamic jsonObjetivos) async {
     int actualizados = 0;
 
     for (var objetivo in objetivos) {
-      // ✅ VALIDAR SI EXISTE (evita duplicados)
       final existente = await db.query(
         'objetivos',
         where: 'id_objetivo = ?',
@@ -61,7 +58,6 @@ Future<String> sqLiteSaveObjetivosMasivo(dynamic jsonObjetivos) async {
       );
 
       if (existente.isEmpty) {
-        // ✅ INSERTAR NUEVO (con sincronizadoNube = 1)
         await db.insert('objetivos', {
           ...objetivo.toMap(),
           'sincronizadoNube': 1, // Viene de la nube
@@ -69,11 +65,9 @@ Future<String> sqLiteSaveObjetivosMasivo(dynamic jsonObjetivos) async {
         });
         insertados++;
       } else {
-        // ✅ ACTUALIZAR SOLO SI NO TIENE CAMBIOS LOCALES
         final sincronizadoLocal = existente[0]['sincronizadoLocal'] as int;
 
         if (sincronizadoLocal == 0) {
-          // No tiene cambios locales pendientes, actualizar
           await db.update(
             'objetivos',
             {
@@ -86,7 +80,6 @@ Future<String> sqLiteSaveObjetivosMasivo(dynamic jsonObjetivos) async {
           );
           actualizados++;
         } else {
-          // Tiene cambios locales, NO sobrescribir
         }
       }
     }

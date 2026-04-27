@@ -1,4 +1,3 @@
-// ignore_for_file: unnecessary_getters_setters
 
 import '/backend/schema/util/schema_util.dart';
 import '/backend/schema/enums/enums.dart';
@@ -17,28 +16,24 @@ class MatricesStruct extends BaseStruct {
         _name = name,
         _status = status;
 
-  // "id" field.
   String? _id;
   String get id => _id ?? '';
   set id(String? val) => _id = val;
 
   bool hasId() => _id != null;
 
-  // "matrix_id" field.
   String? _matrixId;
   String get matrixId => _matrixId ?? '';
   set matrixId(String? val) => _matrixId = val;
 
   bool hasMatrixId() => _matrixId != null;
 
-  // "name" field.
   String? _name;
   String get name => _name ?? '';
   set name(String? val) => _name = val;
 
   bool hasName() => _name != null;
 
-  // "status" field.
   bool? _status;
   bool get status => _status ?? false;
   set status(bool? val) => _status = val;

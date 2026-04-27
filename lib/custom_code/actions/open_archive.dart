@@ -24,7 +24,6 @@ Future openArchive(FFUploadedFile? archive) async {
   }
 
   try {
-    // 🌐 WEB: Abrir directamente con data URL
     if (kIsWeb) {
       final mimeType = _getMimeType(archive.name ?? '');
       final base64Data = base64Encode(archive.bytes!);
@@ -33,17 +32,14 @@ Future openArchive(FFUploadedFile? archive) async {
       return;
     }
 
-    // 📱 MOBILE: Guardar el archivo temporalmente y abrirlo
     final dir = await getTemporaryDirectory();
     final fileName =
         archive.name ?? 'archivo_${DateTime.now().millisecondsSinceEpoch}';
     final filePath = '${dir.path}/$fileName';
 
-    // Guardar bytes en archivo temporal
     final file = File(filePath);
     await file.writeAsBytes(archive.bytes!);
 
-    // Abrir el archivo con la app predeterminada
     final result = await OpenFile.open(filePath);
 
     if (result.type == ResultType.done) {

@@ -83,7 +83,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
     super.initState();
     _model = createModel(context, () => CreateHallasgoModel());
 
-    // Helper: si el valor es null o el string literal "null", devuelve ''
     String safeText(String? val) => (val == null || val == 'null') ? '' : val;
 
     _model.txtdescripcionTextController ??= TextEditingController(
@@ -96,7 +95,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
     );
     _model.txtrecomendacionFocusNode ??= FocusNode();
 
-    // New text controllers
     _model.txtGerenteResponsableController ??= TextEditingController(text: '');
     _model.txtGerenteResponsableFocusNode ??= FocusNode();
     _model.txtAuditorResponsableController ??= TextEditingController(text: '');
@@ -106,9 +104,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
     _model.txtCausaRaizController ??= TextEditingController(text: '');
     _model.txtCausaRaizFocusNode ??= FocusNode();
 
-    // Precargar datos del hallazgo si existen
     if (widget.hallazgo != null) {
-      // 1. Observación - buscar por nombre en todos los títulos
       final observacionValue = widget.hallazgo?.observacion;
       if (observacionValue != null && observacionValue.isNotEmpty) {
         final tituloExists = FFAppState().listatitulos.any((e) => e.nombre == observacionValue);
@@ -118,7 +114,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         }
       }
 
-      // 3. Gerencia - directo por nombre
       final gerenciaValue = widget.hallazgo?.gerencia;
       if (gerenciaValue != null && gerenciaValue.isNotEmpty) {
         final gerenciaExists = FFAppState().listagenerencia.any((e) => e.nombre == gerenciaValue);
@@ -128,7 +123,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         }
       }
 
-      // 4. Ecosistema - directo por nombre
       final ecosistemaValue = widget.hallazgo?.ecosistema;
       if (ecosistemaValue != null && ecosistemaValue.isNotEmpty) {
         final ecosistemaExists = FFAppState().listaecosistema.any((e) => e.nombre == ecosistemaValue);
@@ -138,7 +132,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         }
       }
 
-      // 5. Nivel Riesgo — usar riskLevelId (UUID) para que coincida con las opciones del dropdown
       final riskLevelIdToRestore = widget.hallazgo!.riskLevelId.isNotEmpty
           ? widget.hallazgo!.riskLevelId
           : null;
@@ -147,7 +140,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         _model.cmdriesgoValueController = FormFieldController<String>(riskLevelIdToRestore);
       }
 
-      // 6. Fecha - parsear string a DateTime
       if (widget.hallazgo?.fecha != null && widget.hallazgo!.fecha.isNotEmpty) {
         final parsedDate = DateTime.tryParse(widget.hallazgo!.fecha);
         if (parsedDate != null) {
@@ -156,7 +148,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         }
       }
 
-      // 7. v19 fields pre-population
       if (widget.hallazgo!.publicationStatusId.isNotEmpty) {
         _model.cmdPublicationStatusValue = widget.hallazgo!.publicationStatusId;
       }
@@ -194,7 +185,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
       }
     }
 
-    // Initialize all dropdown controllers so they are stable across rebuilds
     _model.cmdriesgoValueController ??=
         FormFieldController<String>(_model.cmdriesgoValue);
     _model.cmdPublicationStatusController ??=
@@ -223,7 +213,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
   }
 
   Future<void> _loadMaestros() async {
-    // Cargar desde SQLite primero
     _model.riskLevels = await DBRiskLevel.getAllRiskLevels();
     _model.publicationStatuses = await DBPublicationStatus.getAllPublicationStatuses();
     _model.impactTypes = await DBImpactType.getAllImpactTypes();
@@ -235,7 +224,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
     _model.responsibleManagers = await DBResponsibleManager.getAllResponsibleManagers();
     _model.responsibleAuditors = await DBResponsibleAuditor.getAllResponsibleAuditors();
 
-    // Si SQLite está vacío, sincronizar desde Supabase y recargar
     final necesitaSync = _model.riskLevels.isEmpty ||
         _model.publicationStatuses.isEmpty ||
         _model.impactTypes.isEmpty ||
@@ -267,7 +255,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
           _syncMaestroFromSupabase('ResponsibleAuditors', 'responsible_auditor_id',
               (data) => DBResponsibleAuditor.insertBatchFromSupabase(data)),
         ]);
-        // Recargar desde SQLite tras sync
         _model.riskLevels = await DBRiskLevel.getAllRiskLevels();
         _model.publicationStatuses = await DBPublicationStatus.getAllPublicationStatuses();
         _model.impactTypes = await DBImpactType.getAllImpactTypes();
@@ -282,10 +269,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
       }
     }
 
-    // ⭐ Después de cargar los maestros, refrescar los valores de los dropdowns
-    // que se pre-popularon en initState. Actualizar el valor en el controller
-    // existente (sin reemplazarlo) para que el listener de FlutterFlowDropDown
-    // siga funcionando.
     if (widget.hallazgo != null) {
       void _refreshControllerValue(
         String? value,
@@ -296,7 +279,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
         }
       }
 
-      // Si cmdriesgoValue está vacío pero hay nivelRiesgo por nombre, buscar el ID
       if ((_model.cmdriesgoValue == null || _model.cmdriesgoValue!.isEmpty) &&
           widget.hallazgo!.nivelRiesgo.isNotEmpty) {
         final match = _model.riskLevels.where(
@@ -345,7 +327,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
     super.dispose();
   }
 
-  // Helper: label text style
   Widget _buildLabel(BuildContext context, String text) {
     return Text(
       text,
@@ -362,7 +343,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
     );
   }
 
-  // Helper: build a standard searchable dropdown column
   Widget _buildDropdownField({
     required BuildContext context,
     required String label,
@@ -442,7 +422,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
     );
   }
 
-  // Helper: build a standard text field column
   Widget _buildTextField({
     required BuildContext context,
     required String label,
@@ -552,7 +531,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // Close button row
                 Row(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -576,7 +554,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                     ),
                   ],
                 ),
-                // Title
                 Align(
                   alignment: AlignmentDirectional(0.0, 0.0),
                   child: Text(
@@ -594,7 +571,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                         ),
                   ),
                 ),
-                // Subtitle
                 Align(
                   alignment: AlignmentDirectional(0.0, 0.0),
                   child: Padding(
@@ -615,7 +591,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                     ),
                   ),
                 ),
-                // Form
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(0.0, 17.0, 0.0, 0.0),
                   child: Form(
@@ -624,7 +599,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        // 1. Título Observación
                         Row(
                           mainAxisSize: MainAxisSize.max,
                           children: [
@@ -713,7 +687,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                             ),
                           ].divide(SizedBox(width: 15.0)),
                         ),
-                        // 2. Descripción/Hallazgo (with microphone)
                         Column(
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -844,7 +817,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                             ),
                           ].divide(SizedBox(height: 5.0)),
                         ),
-                        // 3. Gerencia Responsable (ancho completo)
                         Column(
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -904,7 +876,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                             ),
                           ].divide(SizedBox(height: 5.0)),
                         ),
-                        // 4. Ecosistema Físico Digital (ancho completo)
                         Column(
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -964,7 +935,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                             ),
                           ].divide(SizedBox(height: 5.0)),
                         ),
-                        // 5. Fecha Identificación hallazgo (ancho completo)
                         Column(
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1085,7 +1055,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                             ),
                           ].divide(SizedBox(height: 5.0)),
                         ),
-                        // 6. Nivel de Riesgo (ancho completo)
                         _buildDropdownField(
                           context: context,
                           label: 'Nivel de Riesgo',
@@ -1095,7 +1064,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdriesgoValueController,
                           onChanged: (val) => safeSetState(() => _model.cmdriesgoValue = val),
                         ),
-                        // 7. Estado de Publicación (Publicado/a) (ancho completo)
                         _buildDropdownField(
                           context: context,
                           label: 'Publicado/a',
@@ -1105,7 +1073,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdPublicationStatusController,
                           onChanged: (val) => safeSetState(() => _model.cmdPublicationStatusValue = val),
                         ),
-                        // 8. Recomendaciones (ancho completo)
                         Column(
                           mainAxisSize: MainAxisSize.max,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1206,7 +1173,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                             ),
                           ].divide(SizedBox(height: 5.0)),
                         ),
-                        // 9. Tipo de Impacto (ancho completo)
                         _buildDropdownField(
                           context: context,
                           label: 'Tipo de Impacto',
@@ -1216,7 +1182,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdImpactTypeController,
                           onChanged: (val) => safeSetState(() => _model.cmdImpactTypeValue = val),
                         ),
-                        // 10. Soporte al Ecosistema (ancho completo)
                         _buildDropdownField(
                           context: context,
                           label: 'Soporte al Ecosistema',
@@ -1226,7 +1191,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdEcosystemSupportController,
                           onChanged: (val) => safeSetState(() => _model.cmdEcosystemSupportValue = val),
                         ),
-                        // 11. Tipo de Riesgo (ancho completo)
                         _buildDropdownField(
                           context: context,
                           label: 'Tipo de Riesgo',
@@ -1240,14 +1204,12 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                               final filtered = _model.riskTypologies
                                   .where((t) => t.riskTypeId == val)
                                   .toList();
-                              // Si no hay tipologías con ese riskTypeId, mostrar todas
                               _model.filteredRiskTypologies = filtered.isNotEmpty ? filtered : _model.riskTypologies;
                               _model.cmdRiskTypologyValue = null;
                               _model.cmdRiskTypologyController?.value = null;
                             });
                           },
                         ),
-                        // 12. Tipología de Riesgo (ancho completo)
                         _buildDropdownField(
                           context: context,
                           label: 'Tipología de Riesgo',
@@ -1257,7 +1219,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdRiskTypologyController,
                           onChanged: (val) => safeSetState(() => _model.cmdRiskTypologyValue = val),
                         ),
-                        // 13. Gerente Responsable
                         _buildDropdownField(
                           context: context,
                           label: 'Gerente Responsable',
@@ -1266,7 +1227,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdGerenteController,
                           onChanged: (val) => safeSetState(() => _model.cmdGerenteValue = val),
                         ),
-                        // 14. Auditor Responsable
                         _buildDropdownField(
                           context: context,
                           label: 'Auditor Responsable',
@@ -1275,7 +1235,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdAuditorController,
                           onChanged: (val) => safeSetState(() => _model.cmdAuditorValue = val),
                         ),
-                        // 15. Descripción del Riesgo (ancho completo)
                         _buildTextField(
                           context: context,
                           label: 'Descripción del Riesgo',
@@ -1285,7 +1244,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           maxLines: 3,
                           minLines: 3,
                         ),
-                        // 16. Alcance de Observación (ancho completo)
                         _buildDropdownField(
                           context: context,
                           label: 'Alcance de Observación',
@@ -1295,7 +1253,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdObservationScopeController,
                           onChanged: (val) => safeSetState(() => _model.cmdObservationScopeValue = val),
                         ),
-                        // 17. Riesgo Actual (ancho completo)
                         _buildDropdownField(
                           context: context,
                           label: 'Riesgo Actual',
@@ -1305,7 +1262,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           controller: _model.cmdRiskActualLevelController,
                           onChanged: (val) => safeSetState(() => _model.cmdRiskActualLevelValue = val),
                         ),
-                        // 18. Causa Raíz (ancho completo)
                         _buildTextField(
                           context: context,
                           label: 'Causa Raíz',
@@ -1319,7 +1275,6 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                     ),
                   ),
                 ),
-                // Guardar Hallazgo button
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(0.0, 16.0, 0.0, 0.0),
                   child: Row(

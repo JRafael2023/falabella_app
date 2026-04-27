@@ -1,4 +1,3 @@
-// ignore_for_file: unnecessary_getters_setters
 
 import '/backend/schema/util/schema_util.dart';
 import '/backend/schema/enums/enums.dart';
@@ -13,14 +12,12 @@ class AttributesStruct extends BaseStruct {
   })  : _title = title,
         _description = description;
 
-  // "title" field.
   String? _title;
   String get title => _title ?? '';
   set title(String? val) => _title = val;
 
   bool hasTitle() => _title != null;
 
-  // "description" field.
   String? _description;
   String get description => _description ?? '';
   set description(String? val) => _description = val;
