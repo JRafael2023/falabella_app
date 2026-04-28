@@ -3118,14 +3118,7 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                                           ),
                                                                     ),
                                                                     Text(
-                                                                      valueOrDefault<
-                                                                          String>(
-                                                                        getJsonField(
-                                                                          arrayEnProgresoItem,
-                                                                          r'''$.progress''',
-                                                                        )?.toString(),
-                                                                        '0',
-                                                                      ),
+                                                                      '${((getJsonField(arrayEnProgresoItem, r'''$.progress''') as num?)?.toDouble() ?? 0.0).round()}%',
                                                                       style: FlutterFlowTheme.of(
                                                                               context)
                                                                           .bodyMedium
@@ -3539,14 +3532,7 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                                     ),
                                                               ),
                                                               Text(
-                                                                valueOrDefault<
-                                                                    String>(
-                                                                  getJsonField(
-                                                                    arrayEnProgresoOffItem,
-                                                                    r'''$.progress''',
-                                                                  )?.toString(),
-                                                                  '0',
-                                                                ),
+                                                                '${((getJsonField(arrayEnProgresoOffItem, r'''$.progress''') as num?)?.toDouble() ?? 0.0).round()}%',
                                                                 style: FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyMedium
@@ -4385,14 +4371,7 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                                           ),
                                                                     ),
                                                                     Text(
-                                                                      valueOrDefault<
-                                                                          String>(
-                                                                        getJsonField(
-                                                                          arregloCompletasItem,
-                                                                          r'''$.progress''',
-                                                                        )?.toString(),
-                                                                        '0',
-                                                                      ),
+                                                                      '${((getJsonField(arregloCompletasItem, r'''$.progress''') as num?)?.toDouble() ?? 0.0).round()}%',
                                                                       style: FlutterFlowTheme.of(
                                                                               context)
                                                                           .bodyMedium
@@ -4879,14 +4858,7 @@ class _HomeProyectsWidgetState extends State<HomeProyectsWidget>
                                                                     ),
                                                               ),
                                                               Text(
-                                                                valueOrDefault<
-                                                                    String>(
-                                                                  getJsonField(
-                                                                    arregloCompletasOffItem,
-                                                                    r'''$.progress''',
-                                                                  )?.toString(),
-                                                                  '0',
-                                                                ),
+                                                                '${((getJsonField(arregloCompletasOffItem, r'''$.progress''') as num?)?.toDouble() ?? 0.0).round()}%',
                                                                 style: FlutterFlowTheme.of(
                                                                         context)
                                                                     .bodyMedium

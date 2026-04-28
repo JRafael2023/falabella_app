@@ -1201,12 +1201,7 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                           onChanged: (val) {
                             safeSetState(() {
                               _model.cmdRiskTypeValue = val;
-                              final filtered = _model.riskTypologies
-                                  .where((t) => t.riskTypeId == val)
-                                  .toList();
-                              _model.filteredRiskTypologies = filtered.isNotEmpty ? filtered : _model.riskTypologies;
-                              _model.cmdRiskTypologyValue = null;
-                              _model.cmdRiskTypologyController?.value = null;
+                              _model.filteredRiskTypologies = _model.riskTypologies;
                             });
                           },
                         ),
@@ -1283,6 +1278,28 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                       Expanded(
                         child: FFButtonWidget(
                           onPressed: () async {
+                            // Advertencia campos requeridos para publicar en HighBond
+                            final camposFaltantes = <String>[];
+                            if ((_model.txtdescripcionTextController?.text ?? '').trim().isEmpty)
+                              camposFaltantes.add('Descripción del hallazgo');
+                            if ((_model.cmdGerenteValue ?? '').trim().isEmpty)
+                              camposFaltantes.add('Gerente responsable');
+                            if ((_model.cmdecosistemaValue ?? '').trim().isEmpty)
+                              camposFaltantes.add('Ecosistema (tipo de deficiencia)');
+
+                            if (camposFaltantes.isNotEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Para publicar en HighBond se requiere: ${camposFaltantes.join(', ')}',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  backgroundColor: Colors.orange,
+                                  duration: const Duration(seconds: 4),
+                                ),
+                              );
+                            }
+
                             await widget.createHallazgo?.call(
                               _model.cmdobservacionValue ?? '',
                               _model.cmdgerenciaValue ?? '',

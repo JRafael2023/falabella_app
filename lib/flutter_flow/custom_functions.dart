@@ -1330,6 +1330,10 @@ List<FFUploadedFile>? convertBase64StringToUploadFiles(
           if (base64Index != -1) {
             int base64Start = base64Index + 7; // Saltar "base64:"
             base64Data = item.substring(base64Start).trim();
+            if (base64Data.startsWith('"')) {
+              int endQuote = base64Data.lastIndexOf('"');
+              if (endQuote > 0) base64Data = base64Data.substring(1, endQuote);
+            }
           }
 
           if (base64Data != null && base64Data.isNotEmpty) {
@@ -1496,7 +1500,23 @@ String? convertirJSONaFormatoSQLite(dynamic jsonData) {
   if (jsonData == null) return null;
 
   try {
-    if (jsonData is String) return jsonData;
+    if (jsonData is String) {
+      final s = (jsonData as String).trim();
+      if (s.startsWith('[')) {
+        try {
+          final parsed = jsonDecode(s);
+          if (parsed is List) {
+            jsonData = parsed;
+          } else {
+            return jsonData as String;
+          }
+        } catch (_) {
+          return jsonData as String;
+        }
+      } else {
+        return jsonData as String;
+      }
+    }
 
     if (jsonData is List) {
       if (jsonData.isEmpty) return null;

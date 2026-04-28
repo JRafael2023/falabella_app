@@ -141,6 +141,14 @@ Future<String> combineAndSyncControls(
         final localData = await DBControles.obtenerControlCompleto(controlId);
 
         final existingCompleted = existing['completed'] == true || existing['completed'] == 1;
+        final localCompleted = localData?['completed'] == 1;
+        final resolvedCompleted = localCompleted || existingCompleted;
+        int? resolvedFindingStatus;
+        if (localCompleted) {
+          resolvedFindingStatus = localData?['finding_status'] as int?;
+        } else if (resolvedCompleted) {
+          resolvedFindingStatus = existing['finding_status'] as int?;
+        }
 
         final control = Control(
           idControl: controlId,
@@ -148,7 +156,7 @@ Future<String> combineAndSyncControls(
           description: controlData['attributes']?['description']?.toString() ?? existing['description']?.toString() ?? '',
           objectiveId: objectiveId,
           walkthroughId: walkthroughMap[controlId] ?? existing['walkthrough_id']?.toString(),
-          findingStatus: existingCompleted ? existing['finding_status'] : null,
+          findingStatus: resolvedFindingStatus,
           photos: await _resolveAttachment(() => DBControlAttachments.obtenerPhotos(controlId),
               functions.convertirJSONaFormatoSQLite(existing['photos'])),
           video: await _resolveAttachment(() => DBControlAttachments.obtenerVideos(controlId),
@@ -156,7 +164,7 @@ Future<String> combineAndSyncControls(
           archives: await _resolveAttachment(() => DBControlAttachments.obtenerArchives(controlId),
               functions.convertirJSONaFormatoSQLite(existing['archives'])),
           status: existing['status'] ?? true,
-          completed: existingCompleted,
+          completed: resolvedCompleted,
           createdAt: existing['created_at']?.toString() ?? DateTime.now().toIso8601String(),
           updatedAt: existing['updated_at']?.toString() ?? DateTime.now().toIso8601String(),
           observacion: _localFirst(localData?['observacion']?.toString(), existing['observacion']),
@@ -269,6 +277,38 @@ Future<String> combineAndSyncControls(
     final results = await Future.wait([supabaseFuture, sqliteFuture]);
     final supabaseResult = results[0] as Map<String, int>;
     final sqliteResult = results[1] as String;
+
+    // Refresh in-memory state so objectives page shows updated progress
+    try {
+      final freshControles = await DBControles.listarControlesJson(objectiveId);
+      if (freshControles.isNotEmpty) {
+        final others = FFAppState().jsonControles
+            .where((c) =>
+                c['objective_id']?.toString() != objectiveId &&
+                c['id_objective']?.toString() != objectiveId)
+            .toList();
+        FFAppState().jsonControles = [...others, ...freshControles];
+
+        final total = freshControles.length;
+        final completados = freshControles
+            .where((c) => c['completed'] == 1 || c['completed'] == true)
+            .length;
+        final progressReal = total > 0 ? completados / total : 0.0;
+
+        final objIndex = FFAppState().jsonObjetivos.indexWhere(
+          (o) => o['id_objective']?.toString() == objectiveId,
+        );
+        if (objIndex != -1) {
+          FFAppState().updateJsonObjetivosAtIndex(
+            objIndex,
+            (obj) => {
+              ...(obj as Map<String, dynamic>),
+              'progress': progressReal,
+            },
+          );
+        }
+      }
+    } catch (_) {}
 
     final duration = DateTime.now().difference(startTime).inMilliseconds;
 

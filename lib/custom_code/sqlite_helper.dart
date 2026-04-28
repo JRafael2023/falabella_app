@@ -28,7 +28,7 @@ class DBHelper {
 
     return await openDatabase(
       path,
-      version: 22,
+      version: 23,
       onCreate: (db, version) async {
         await db.execute('PRAGMA foreign_keys = OFF;');
 
@@ -920,6 +920,15 @@ class DBHelper {
               )
             ''');
           } catch (e) { print('⚠️ ResponsibleManagers: $e'); }
+        }
+
+        if (oldVersion < 23) {
+          // Los blobs de imágenes guardados en SQLite superan el límite de
+          // CursorWindow (2MB) y son ilegibles. Se limpian para que el app
+          // los re-sincronice desde Supabase y los guarde como archivos en disco.
+          try {
+            await db.execute('DELETE FROM ControlAttachments');
+          } catch (e) {}
         }
 
         if (oldVersion < 15) {
