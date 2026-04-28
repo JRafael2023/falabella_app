@@ -249,7 +249,10 @@ Future<String> combineAndSyncControls(
       }
     }
 
-    final supabaseFuture = Future(() async {
+    // SQLite primero (crítico) — Supabase en background (best-effort)
+    await DBControles.insertControlesMasivos(combinedControls, objectiveId);
+
+    Future(() async {
       int updated = 0;
       int inserted = 0;
 
@@ -269,14 +272,9 @@ Future<String> combineAndSyncControls(
       }
 
       return {'updated': updated, 'inserted': inserted};
-    });
+    }).catchError((_) {});
 
-    final sqliteFuture =
-        DBControles.insertControlesMasivos(combinedControls, objectiveId);
-
-    final results = await Future.wait([supabaseFuture, sqliteFuture]);
-    final supabaseResult = results[0] as Map<String, int>;
-    final sqliteResult = results[1] as String;
+    final supabaseResult = {'updated': 0, 'inserted': 0};
 
     // Refresh in-memory state so objectives page shows updated progress
     try {

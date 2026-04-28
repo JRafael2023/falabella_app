@@ -17,6 +17,7 @@ import '/custom_code/DBControles.dart';
 import '/custom_code/DBControlAttachments.dart';
 import '../sqlite_helper.dart';
 import '/custom_code/Objetivo.dart';
+import '/custom_code/Control.dart';
 import '/backend/api_requests/api_calls.dart' as api_calls;
 
 /// Corrige el campo `completed` de los controles comparando SQLite vs Supabase.
@@ -376,8 +377,37 @@ Future cargarTodosLosDatosUsuario(String userId) async {
                 final controlesNuevos =
                     await DBControles.listarControlesJson(idObjetivo);
 
-                return controlesNuevos;
+                if (controlesNuevos.isNotEmpty) return controlesNuevos;
               }
+
+              // Fallback: cargar directamente de Supabase si HighBond falla o retorna vacío
+              try {
+                final supabase = SupaFlow.client;
+                final rows = await supabase
+                    .from('Controls')
+                    .select(
+                      'id_control, title, description, finding_status, id_objective, '
+                      'completed, walkthrough_id, status, observacion, gerencia, '
+                      'ecosistema, fecha, descripcion_hallazgo, recomendacion, '
+                      'proceso_propuesto, titulo, nivel_riesgo, control_text, '
+                      'titulo_observacion, publication_status_id, estado_publicacion, '
+                      'impact_type_id, tipo_impacto, ecosystem_support_id, soporte_ecosistema, '
+                      'risk_type_id, tipo_riesgo, risk_typology_id, tipologia_riesgo, '
+                      'risk_level_id, gerente_responsable, auditor_responsable, '
+                      'descripcion_riesgo, observation_scope_id, alcance_observacion, '
+                      'risk_actual_level_id, riesgo_actual, causa_raiz, '
+                      'created_at, updated_at',
+                    )
+                    .eq('id_objective', idObjetivo);
+
+                if (rows.isNotEmpty) {
+                  final controles = rows
+                      .map<Control>((row) => Control.fromSupabase(row))
+                      .toList();
+                  await DBControles.insertControlesMasivos(controles, idObjetivo);
+                  return await DBControles.listarControlesJson(idObjetivo);
+                }
+              } catch (_) {}
             }
           } catch (e) {
             final esRetriable = e.toString().contains('57014') ||

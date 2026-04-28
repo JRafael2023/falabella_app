@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/USER/Downloads/falabella/lib -type f -name \"*.dart\" -exec grep -l \"homeProyect\\\\|home_proyect\" {} \\\\;)",
+      "Bash(flutter analyze *)"
+    ]
+  }
+}
