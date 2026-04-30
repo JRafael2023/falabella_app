@@ -18,9 +18,9 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 
-Future openArchive(FFUploadedFile? archive) async {
+Future<String?> openArchive(FFUploadedFile? archive) async {
   if (archive == null || archive.bytes == null) {
-    return;
+    return 'Archivo vacío o no disponible';
   }
 
   try {
@@ -29,7 +29,7 @@ Future openArchive(FFUploadedFile? archive) async {
       final base64Data = base64Encode(archive.bytes!);
       final dataUrl = 'data:$mimeType;base64,$base64Data';
       await launchURL(dataUrl);
-      return;
+      return null;
     }
 
     final dir = await getTemporaryDirectory();
@@ -43,9 +43,12 @@ Future openArchive(FFUploadedFile? archive) async {
     final result = await OpenFile.open(filePath);
 
     if (result.type == ResultType.done) {
+      return null;
     } else {
+      return 'No se encontró una app para abrir este tipo de archivo';
     }
   } catch (e) {
+    return 'Error al abrir el archivo: $e';
   }
 }
 

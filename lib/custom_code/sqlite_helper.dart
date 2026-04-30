@@ -28,7 +28,7 @@ class DBHelper {
 
     return await openDatabase(
       path,
-      version: 23,
+      version: 24,
       onCreate: (db, version) async {
         await db.execute('PRAGMA foreign_keys = OFF;');
 
@@ -126,7 +126,8 @@ class DBHelper {
     alcance_observacion TEXT,
     risk_actual_level_id TEXT,
     riesgo_actual TEXT,
-    causa_raiz TEXT
+    causa_raiz TEXT,
+    project_id TEXT
   )
 ''');
 
@@ -928,6 +929,12 @@ class DBHelper {
           // los re-sincronice desde Supabase y los guarde como archivos en disco.
           try {
             await db.execute('DELETE FROM ControlAttachments');
+          } catch (e) {}
+        }
+
+        if (oldVersion < 24) {
+          try {
+            await db.execute('ALTER TABLE Controles ADD COLUMN project_id TEXT');
           } catch (e) {}
         }
 

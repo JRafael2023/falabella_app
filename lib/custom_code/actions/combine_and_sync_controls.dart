@@ -23,8 +23,9 @@ import '/flutter_flow/custom_functions.dart' as functions;
 Future<String> combineAndSyncControls(
   List<dynamic> apiResponseDescription,
   List<dynamic> apiResponseWalkthrough,
-  String? objectiveId,
-) async {
+  String? objectiveId, {
+  String? projectId,
+}) async {
   try {
     final supabase = SupaFlow.client;
     final startTime = DateTime.now();
@@ -155,6 +156,7 @@ Future<String> combineAndSyncControls(
           title: controlData['attributes']?['title']?.toString() ?? existing['title']?.toString() ?? '',
           description: controlData['attributes']?['description']?.toString() ?? existing['description']?.toString() ?? '',
           objectiveId: objectiveId,
+          projectId: projectId,
           walkthroughId: walkthroughMap[controlId] ?? existing['walkthrough_id']?.toString(),
           findingStatus: resolvedFindingStatus,
           photos: await _resolveAttachment(() => DBControlAttachments.obtenerPhotos(controlId),
@@ -207,6 +209,8 @@ Future<String> combineAndSyncControls(
             'title': control.title,
             'description': control.description,
             'walkthrough_id': control.walkthroughId,
+            if (control.projectId != null && control.projectId!.isNotEmpty)
+              'project_id': control.projectId,
           },
         });
       } else {
@@ -216,6 +220,7 @@ Future<String> combineAndSyncControls(
           description:
               controlData['attributes']?['description']?.toString() ?? '',
           objectiveId: objectiveId,
+          projectId: projectId,
           walkthroughId: walkthroughMap[controlId],
           findingStatus: null,
           photos: null,
@@ -237,6 +242,7 @@ Future<String> combineAndSyncControls(
           'description': control.description,
           'id_objective': control.objectiveId,
           'walkthrough_id': control.walkthroughId,
+          'project_id': control.projectId,
           'finding_status': null,
           'photos': null,
           'video': null,

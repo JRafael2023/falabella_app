@@ -13,11 +13,14 @@ import 'package:flutter/material.dart';
 
 import 'package:file_picker/file_picker.dart';
 
+const _allowedExtensions = ['pdf', 'doc', 'docx', 'txt', 'xls', 'xlsx'];
+
 Future<List<FFUploadedFile>> pickMultipleFiles() async {
   try {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
-      type: FileType.any,
+      type: FileType.custom,
+      allowedExtensions: _allowedExtensions,
     );
 
     if (result == null || result.files.isEmpty) {
@@ -27,12 +30,15 @@ Future<List<FFUploadedFile>> pickMultipleFiles() async {
     List<FFUploadedFile> uploadedFiles = [];
 
     for (var file in result.files) {
-      if (file.bytes != null) {
-        uploadedFiles.add(FFUploadedFile(
-          name: file.name,
-          bytes: file.bytes!,
-        ));
-      }
+      if (file.bytes == null) continue;
+
+      final ext = (file.extension ?? '').toLowerCase();
+      if (!_allowedExtensions.contains(ext)) continue;
+
+      uploadedFiles.add(FFUploadedFile(
+        name: file.name,
+        bytes: file.bytes!,
+      ));
     }
 
     return uploadedFiles;

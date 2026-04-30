@@ -51,6 +51,7 @@ class DBControles {
       'walkthrough_id', 'objective_id', 'completed', 'status',
       'titulo', 'nivel_riesgo', 'observacion', 'gerencia', 'ecosistema',
       'fecha', 'descripcion_hallazgo', 'recomendacion', 'proceso_propuesto',
+      'project_id',
     ];
 
     const _colsV19 = [

@@ -48,695 +48,348 @@ class _ViewFilesWidgetState extends State<ViewFilesWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => ViewFilesModel());
-
     WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
   }
 
   @override
   void dispose() {
     _model.maybeDispose();
-
     super.dispose();
+  }
+
+  Widget _sectionHeader(BuildContext context, IconData icon, String title, int count) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 16, 0, 10),
+      child: Row(
+        children: [
+          Icon(icon, color: FlutterFlowTheme.of(context).primary, size: 20),
+          const SizedBox(width: 8),
+          Text(
+            count > 0 ? '$title ($count)' : title,
+            style: FlutterFlowTheme.of(context).bodyMedium.override(
+                  font: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                  ),
+                  fontSize: 16,
+                  letterSpacing: 0,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _emptyState(BuildContext context, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Icon(Icons.block, color: FlutterFlowTheme.of(context).secondaryText, size: 16),
+          const SizedBox(width: 6),
+          Text(
+            'Sin $label',
+            style: FlutterFlowTheme.of(context).bodySmall.override(
+                  font: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontStyle: FlutterFlowTheme.of(context).bodySmall.fontStyle,
+                  ),
+                  color: FlutterFlowTheme.of(context).secondaryText,
+                  letterSpacing: 0,
+                ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final photos = widget.listImages ?? [];
+    final videos = widget.videomp4 ?? [];
+    final archives = widget.archive ?? [];
+
     return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(8.0, 20.0, 8.0, 20.0),
+      padding: const EdgeInsets.fromLTRB(8, 20, 8, 20),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
           color: FlutterFlowTheme.of(context).secondaryBackground,
-          borderRadius: BorderRadius.circular(20.0),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Padding(
-          padding: EdgeInsetsDirectional.fromSTEB(8.0, 8.0, 8.0, 8.0),
+          padding: const EdgeInsets.all(16),
           child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // ── Header ──────────────────────────────────────────────────
                 Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 8.0, 0.0),
-                      child: InkWell(
-                        splashColor: Colors.transparent,
-                        focusColor: Colors.transparent,
-                        hoverColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        onTap: () async {
-                          Navigator.pop(context);
-                        },
-                        child: Icon(
-                          Icons.close_rounded,
-                          color: FlutterFlowTheme.of(context).primaryText,
-                          size: 24.0,
+                    Row(
+                      children: [
+                        FaIcon(FontAwesomeIcons.eye,
+                            color: FlutterFlowTheme.of(context).primaryText,
+                            size: 20),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Evidencias',
+                          style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                font: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                ),
+                                fontSize: 20,
+                                letterSpacing: 0,
+                                fontWeight: FontWeight.w700,
+                              ),
                         ),
+                      ],
+                    ),
+                    InkWell(
+                      onTap: () => Navigator.pop(context),
+                      borderRadius: BorderRadius.circular(20),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: Icon(Icons.close_rounded,
+                            color: FlutterFlowTheme.of(context).secondaryText,
+                            size: 22),
                       ),
                     ),
                   ],
                 ),
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(8.0, 0.0, 8.0, 0.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      FaIcon(
-                        FontAwesomeIcons.eye,
-                        color: FlutterFlowTheme.of(context).primaryText,
-                        size: 24.0,
-                      ),
-                      Align(
-                        alignment: AlignmentDirectional(-1.0, 0.0),
-                        child: Text(
-                          'Evidencias',
-                          textAlign: TextAlign.center,
-                          style:
-                              FlutterFlowTheme.of(context).bodyMedium.override(
-                                    font: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    fontSize: 21.0,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
-                        ),
-                      ),
-                    ].divide(SizedBox(width: 15.0)),
-                  ),
-                ),
-                Align(
-                  alignment: AlignmentDirectional(0.0, 0.0),
-                  child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(0.0, 5.0, 0.0, 5.0),
-                    child: Text(
-                      ' ',
-                      textAlign: TextAlign.center,
-                      style: FlutterFlowTheme.of(context).bodyMedium.override(
-                            font: TextStyle(
-                              fontWeight: FontWeight.w200,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                            color: FlutterFlowTheme.of(context).secondaryText,
-                            letterSpacing: 0.0,
-                            fontWeight: FontWeight.w200,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .fontStyle,
-                          ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(8.0, 25.0, 8.0, 0.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(8.0, 0.0, 8.0, 0.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            FaIcon(
-                              FontAwesomeIcons.image,
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              size: 24.0,
-                            ),
-                            Align(
-                              alignment: AlignmentDirectional(-1.0, 0.0),
-                              child: Text(
-                                'Fotos  (${valueOrDefault<String>(
-                                  widget!.listImages?.length?.toString(),
-                                  '0',
-                                )})',
-                                textAlign: TextAlign.center,
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
-                                      fontSize: 21.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                              ),
-                            ),
-                          ].divide(SizedBox(width: 15.0)),
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),
-                        child: Builder(
-                          builder: (context) {
-                            if ((widget!.listImages != null &&
-                                    (widget!.listImages)!.isNotEmpty) !=
-                                null) {
-                              return Builder(
-                                builder: (context) {
-                                  final arreglo =
-                                      widget!.listImages?.toList() ?? [];
 
-                                  return Wrap(
-                                    spacing: 15.0,
-                                    runSpacing: 15.0,
-                                    alignment: WrapAlignment.start,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.start,
-                                    direction: Axis.horizontal,
-                                    runAlignment: WrapAlignment.start,
-                                    verticalDirection: VerticalDirection.down,
-                                    clipBehavior: Clip.none,
-                                    children: List.generate(arreglo.length,
-                                        (arregloIndex) {
-                                      final arregloItem = arreglo[arregloIndex];
-                                      return Container(
-                                        width: 175.0,
-                                        height: 200.0,
-                                        child: Stack(
-                                          alignment:
-                                              AlignmentDirectional(1.0, -1.0),
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                              child: Image.memory(
-                                                arregloItem.bytes ??
-                                                    Uint8List.fromList([]),
-                                                width: double.infinity,
-                                                height: double.infinity,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            Align(
-                                              alignment: AlignmentDirectional(
-                                                  1.0, -1.0),
-                                              child: Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(
-                                                        0.0, 8.0, 8.0, 0.0),
-                                                child: FlutterFlowIconButton(
-                                                  borderRadius: 20.0,
-                                                  buttonSize: 30.0,
-                                                  fillColor:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .inefectivo,
-                                                  icon: FaIcon(
-                                                    FontAwesomeIcons.trashAlt,
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .primaryBackground,
-                                                    size: 15.0,
-                                                  ),
-                                                  onPressed: () async {
-                                                    await widget
-                                                        .parameterAcctionImagen
-                                                        ?.call(
-                                                      widget!.listImages!,
-                                                      arregloIndex,
-                                                    );
-                                                    safeSetState(() {});
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                            Align(
-                                              alignment: AlignmentDirectional(
-                                                  0.0, 1.0),
-                                              child: Container(
-                                                width: double.infinity,
-                                                height: 35.8,
-                                                decoration: BoxDecoration(
-                                                  color: Color(0x7F000000),
-                                                ),
-                                                child: Padding(
-                                                  padding: EdgeInsets.all(5.0),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.max,
-                                                    children: [
-                                                      FaIcon(
-                                                        FontAwesomeIcons.clock,
-                                                        color: FlutterFlowTheme
-                                                                .of(context)
-                                                            .containerColorPrimary,
-                                                        size: 18.0,
-                                                      ),
-                                                      Text(
-                                                        valueOrDefault<String>(
-                                                          dateTimeFormat(
-                                                            "yMd",
-                                                            getCurrentTimestamp,
-                                                            locale: FFLocalizations
-                                                                    .of(context)
-                                                                .languageCode,
-                                                          ),
-                                                          '05/12/2025, 03.40 p. m.',
-                                                        ),
-                                                        style:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .bodyMedium
-                                                                .override(
-                                                                  font:
-                                                                      GoogleFonts
-                                                                          .inter(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w200,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                  ),
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primaryBackground,
-                                                                  fontSize:
-                                                                      12.0,
-                                                                  letterSpacing:
-                                                                      0.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w200,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                      ),
-                                                    ].divide(
-                                                        SizedBox(width: 5.0)),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                                  );
-                                },
-                              );
-                            } else {
-                              return Text(
-                                'No Foto',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: TextStyle(
-                                        fontWeight: FontWeight.w100,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryText,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w100,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(8.0, 25.0, 8.0, 0.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
+                Divider(color: FlutterFlowTheme.of(context).alternate, height: 24),
+
+                // ── Fotos ────────────────────────────────────────────────────
+                _sectionHeader(context, Icons.photo_library_outlined, 'Fotos', photos.length),
+                if (photos.isEmpty)
+                  _emptyState(context, 'fotos')
+                else
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: List.generate(photos.length, (i) {
+                      final img = photos[i];
+                      return Stack(
+                        alignment: AlignmentDirectional(1.0, -1.0),
                         children: [
-                          Icon(
-                            Icons.videocam_outlined,
-                            color: FlutterFlowTheme.of(context).primaryText,
-                            size: 24.0,
-                          ),
-                          Align(
-                            alignment: AlignmentDirectional(-1.0, 0.0),
-                            child: Text(
-                              'Video',
-                              textAlign: TextAlign.center,
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .override(
-                                    font: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                                    fontSize: 21.0,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .fontStyle,
-                                  ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.memory(
+                              img.bytes ?? Uint8List.fromList([]),
+                              width: (MediaQuery.of(context).size.width - 60) / 2,
+                              height: 160,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        ].divide(SizedBox(width: 15.0)),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),
-                        child: Builder(
-                          builder: (context) {
-                            if (widget!.videomp4 != null &&
-                                (widget!.videomp4)!.isNotEmpty) {
-                              return Builder(
-                                builder: (context) {
-                                  final aarrayVideo =
-                                      widget!.videomp4?.toList() ?? [];
-
-                                  return Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: List.generate(aarrayVideo.length,
-                                        (aarrayVideoIndex) {
-                                      final aarrayVideoItem =
-                                          aarrayVideo[aarrayVideoIndex];
-                                      return Padding(
-                                        padding: EdgeInsetsDirectional.fromSTEB(
-                                            0.0, 8.0, 0.0, 8.0),
-                                        child: Stack(
-                                          children: [
-                                            Container(
-                                              width: MediaQuery.of(context).size.width - 32.0,
-                                              height: 450.0,
-                                              child: custom_widgets
-                                                  .LazyVideoWidget(
-                                                width: MediaQuery.of(context).size.width - 32.0,
-                                                height: 450.0,
-                                                ffupload: aarrayVideoItem,
-                                                videoIndex: aarrayVideoIndex,
-                                              ),
-                                            ),
-                                            Align(
-                                              alignment:
-                                                  AlignmentDirectional(1.0, -1.0),
-                                              child: Padding(
-                                                padding: EdgeInsetsDirectional
-                                                    .fromSTEB(0.0, 8.0, 8.0, 0.0),
-                                                child: FlutterFlowIconButton(
-                                                  borderRadius: 20.0,
-                                                  buttonSize: 30.0,
-                                                  fillColor:
-                                                      FlutterFlowTheme.of(context)
-                                                          .inefectivo,
-                                                  icon: FaIcon(
-                                                    FontAwesomeIcons.trashAlt,
-                                                    color: FlutterFlowTheme.of(
-                                                            context)
-                                                        .primaryBackground,
-                                                    size: 15.0,
-                                                  ),
-                                                  onPressed: () async {
-                                                    await widget
-                                                        .parameterActionVideo
-                                                        ?.call(aarrayVideoIndex);
-                                                    safeSetState(() {});
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                                  );
-                                },
-                              );
-                            } else {
-                              return Text(
-                                'No Video',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: TextStyle(
-                                        fontWeight: FontWeight.w100,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryText,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w100,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Icon(
-                              Icons.file_copy,
-                              color: FlutterFlowTheme.of(context).primaryText,
-                              size: 24.0,
-                            ),
-                            Align(
-                              alignment: AlignmentDirectional(-1.0, 0.0),
-                              child: Text(
-                                'Archivo',
-                                textAlign: TextAlign.center,
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
-                                      fontSize: 21.0,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
+                          Positioned(
+                            top: 6,
+                            right: 6,
+                            child: GestureDetector(
+                              onTap: () async {
+                                await widget.parameterAcctionImagen?.call(widget.listImages!, i);
+                                safeSetState(() {});
+                              },
+                              child: Container(
+                                width: 28,
+                                height: 28,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context).inefectivo,
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Icon(Icons.delete_outline,
+                                    color: Colors.white, size: 16),
                               ),
                             ),
-                          ].divide(SizedBox(width: 15.0)),
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            EdgeInsetsDirectional.fromSTEB(0.0, 24.0, 0.0, 0.0),
-                        child: Builder(
-                          builder: (context) {
-                            if (widget!.archive != null &&
-                                (widget!.archive)!.isNotEmpty) {
-                              return Builder(
-                                builder: (context) {
-                                  final arrayArchives =
-                                      widget!.archive?.toList() ?? [];
-
-                                  return Wrap(
-                                    spacing: 0.0,
-                                    runSpacing: 0.0,
-                                    alignment: WrapAlignment.start,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.start,
-                                    direction: Axis.horizontal,
-                                    runAlignment: WrapAlignment.start,
-                                    verticalDirection: VerticalDirection.down,
-                                    clipBehavior: Clip.none,
-                                    children:
-                                        List.generate(arrayArchives.length,
-                                            (arrayArchivesIndex) {
-                                      final arrayArchivesItem =
-                                          arrayArchives[arrayArchivesIndex];
-                                      return Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    8.0, 8.0, 8.0, 0.0),
-                                            child: FlutterFlowIconButton(
-                                              borderRadius: 20.0,
-                                              buttonSize: 30.0,
-                                              fillColor:
-                                                  FlutterFlowTheme.of(context)
-                                                      .inefectivo,
-                                              icon: FaIcon(
-                                                FontAwesomeIcons.trashAlt,
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .primaryBackground,
-                                                size: 15.0,
-                                              ),
-                                              onPressed: () async {
-                                                await widget
-                                                    .parameterActionArchive
-                                                    ?.call(arrayArchivesIndex);
-                                                safeSetState(() {});
-                                              },
-                                            ),
-                                          ),
-                                          Material(
-                                            color: Colors.transparent,
-                                            elevation: 5.0,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8.0),
-                                            ),
-                                            child: Container(
-                                              width: 450.0,
-                                              height: 250.0,
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    FlutterFlowTheme.of(context)
-                                                        .secondaryBackground,
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0),
-                                              ),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.max,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Align(
-                                                    alignment:
-                                                        AlignmentDirectional(
-                                                            0.0, 0.0),
-                                                    child: Text(
-                                                      'Documento',
-                                                      style:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .override(
-                                                                font:
-                                                                    GoogleFonts
-                                                                        .inter(
-                                                                  fontWeight: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontWeight,
-                                                                  fontStyle: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .fontStyle,
-                                                                ),
-                                                                letterSpacing:
-                                                                    0.0,
-                                                                fontWeight: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                                fontStyle: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                              ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsetsDirectional
-                                                            .fromSTEB(0.0, 8.0,
-                                                                0.0, 0.0),
-                                                    child:
-                                                        FlutterFlowIconButton(
-                                                      borderRadius: 8.0,
-                                                      buttonSize: 40.0,
-                                                      icon: Icon(
-                                                        Icons.launch_outlined,
-                                                        color: FlutterFlowTheme
-                                                                .of(context)
-                                                            .colorImagefecha,
-                                                        size: 24.0,
-                                                      ),
-                                                      showLoadingIndicator:
-                                                          true,
-                                                      onPressed: () async {
-                                                        await actions
-                                                            .openArchive(
-                                                          arrayArchivesItem,
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ].divide(SizedBox(height: 8.0)),
-                                      );
-                                    }),
-                                  );
-                                },
-                              );
-                            } else {
-                              return Text(
-                                'No  Archivo',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .override(
-                                      font: TextStyle(
-                                        fontWeight: FontWeight.w100,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryText,
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w100,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .fontStyle,
-                                    ),
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                    ],
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(10),
+                                  bottomRight: Radius.circular(10),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.access_time,
+                                      color: Colors.white70, size: 12),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    dateTimeFormat("yMd", getCurrentTimestamp,
+                                        locale: FFLocalizations.of(context).languageCode),
+                                    style: const TextStyle(
+                                        color: Colors.white70, fontSize: 11),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
                   ),
-                ),
-              ].divide(SizedBox(height: 2.0)),
+
+                // ── Video ────────────────────────────────────────────────────
+                _sectionHeader(context, Icons.videocam_outlined, 'Video', videos.length),
+                if (videos.isEmpty)
+                  _emptyState(context, 'video')
+                else
+                  Column(
+                    children: List.generate(videos.length, (i) {
+                      final v = videos[i];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Stack(
+                          children: [
+                            RepaintBoundary(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  height: 320,
+                                  child: custom_widgets.LazyVideoWidget(
+                                    width: MediaQuery.of(context).size.width - 32,
+                                    height: 320,
+                                    ffupload: v,
+                                    videoIndex: i,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: GestureDetector(
+                                onTap: () async {
+                                  await widget.parameterActionVideo?.call(i);
+                                  safeSetState(() {});
+                                },
+                                child: Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: BoxDecoration(
+                                    color: FlutterFlowTheme.of(context).inefectivo,
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Icon(Icons.delete_outline,
+                                      color: Colors.white, size: 16),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ),
+
+                // ── Archivos ─────────────────────────────────────────────────
+                _sectionHeader(context, Icons.attach_file, 'Archivos', archives.length),
+                if (archives.isEmpty)
+                  _emptyState(context, 'archivos')
+                else
+                  Column(
+                    children: List.generate(archives.length, (i) {
+                      final file = archives[i];
+                      final fileName = (file.name != null && file.name!.isNotEmpty)
+                          ? file.name!
+                          : 'Documento ${i + 1}';
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: FlutterFlowTheme.of(context).primaryBackground,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 1),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.insert_drive_file_outlined,
+                                color: FlutterFlowTheme.of(context).primary,
+                                size: 26),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                fileName,
+                                style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                      font: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontStyle: FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                                      ),
+                                      letterSpacing: 0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () async {
+                                final error = await actions.openArchive(file);
+                                if (error != null && context.mounted) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12)),
+                                      title: Row(children: [
+                                        Icon(Icons.warning_amber_rounded,
+                                            color: Colors.orange, size: 22),
+                                        const SizedBox(width: 8),
+                                        const Text('No se pudo abrir'),
+                                      ]),
+                                      content: Text(error),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(_),
+                                          child: const Text('OK'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: Padding(
+                                padding: const EdgeInsets.all(6),
+                                child: Icon(Icons.open_in_new,
+                                    color: FlutterFlowTheme.of(context).primary,
+                                    size: 20),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            InkWell(
+                              onTap: () async {
+                                await widget.parameterActionArchive?.call(i);
+                                safeSetState(() {});
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: Padding(
+                                padding: const EdgeInsets.all(6),
+                                child: Icon(Icons.delete_outline,
+                                    color: FlutterFlowTheme.of(context).inefectivo,
+                                    size: 20),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ),
+
+                const SizedBox(height: 8),
+              ],
             ),
           ),
         ),

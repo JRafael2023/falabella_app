@@ -296,14 +296,18 @@ Future<String> syncControlesToSupabase(
                 (videosList != null && videosList.isNotEmpty) ||
                 (archivosList != null && archivosList.isNotEmpty);
 
-            if (controlLocal.findingStatus == 0) {
+            final _issueTitle = controlLocal.observacion?.isNotEmpty == true
+                ? controlLocal.observacion
+                : controlLocal.tituloObservacion;
+            if (controlLocal.findingStatus == 0 &&
+                _issueTitle != null &&
+                _issueTitle.isNotEmpty &&
+                FFAppState().idproyect.isNotEmpty) {
               final createIssueResponse = await SupabaseFunctionsGroup
                   .createIssueHighbondCall
                   .call(
                 projectId: FFAppState().idproyect,
-                title: controlLocal.observacion?.isNotEmpty == true
-                    ? controlLocal.observacion
-                    : controlLocal.tituloObservacion,
+                title: _issueTitle,
                 description: controlLocal.descripcionHallazgo,
                 owner: controlLocal.gerencia,
                 recommendation: controlLocal.recomendacion,

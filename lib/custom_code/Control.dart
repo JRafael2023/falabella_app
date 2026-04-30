@@ -48,6 +48,7 @@ class Control {
   String? riskActualLevelId;
   String? riesgoActual;
   String? causaRaiz;
+  String? projectId;
 
   static const String separator = '|||';
 
@@ -99,6 +100,7 @@ class Control {
     this.riskActualLevelId,
     this.riesgoActual,
     this.causaRaiz,
+    this.projectId,
   });
 
 
@@ -200,6 +202,7 @@ class Control {
       'risk_actual_level_id': (riskActualLevelId?.isNotEmpty ?? false) ? riskActualLevelId : null,
       'riesgo_actual': (riesgoActual?.isNotEmpty ?? false) ? riesgoActual : null,
       'causa_raiz': (causaRaiz?.isNotEmpty ?? false) ? causaRaiz : null,
+      'project_id': (projectId?.isNotEmpty ?? false) ? projectId : null,
     };
   }
 
@@ -259,6 +262,7 @@ class Control {
       riskActualLevelId: _limpiarNull(map['risk_actual_level_id']),
       riesgoActual: _limpiarNull(map['riesgo_actual']),
       causaRaiz: _limpiarNull(map['causa_raiz']),
+      projectId: _limpiarNull(map['project_id']),
     );
   }
 
@@ -311,6 +315,7 @@ class Control {
       'risk_actual_level_id': (riskActualLevelId?.isNotEmpty ?? false) ? riskActualLevelId : null,
       'riesgo_actual': (riesgoActual?.isNotEmpty ?? false) ? riesgoActual : null,
       'causa_raiz': (causaRaiz?.isNotEmpty ?? false) ? causaRaiz : null,
+      'project_id': (projectId?.isNotEmpty ?? false) ? projectId : null,
     };
   }
 
@@ -404,6 +409,7 @@ class Control {
       riskActualLevelId: data['risk_actual_level_id'],
       riesgoActual: data['riesgo_actual'],
       causaRaiz: data['causa_raiz'],
+      projectId: data['project_id'],
     );
   }
 

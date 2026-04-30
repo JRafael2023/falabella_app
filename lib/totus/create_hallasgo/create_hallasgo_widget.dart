@@ -592,6 +592,34 @@ class _CreateHallasgoWidgetState extends State<CreateHallasgoWidget> {
                   ),
                 ),
                 Padding(
+                  padding: EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color(0xFFFFF3CD),
+                      borderRadius: BorderRadius.circular(8.0),
+                      border: Border.all(color: Color(0xFFFFCA2C), width: 1.0),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.info_outline, color: Color(0xFF856404), size: 18.0),
+                        SizedBox(width: 8.0),
+                        Expanded(
+                          child: Text(
+                            'Para registrar la observación en HighBond, debes completar al menos el campo "Título Observación". Sin este campo, la observación no será enviada.',
+                            style: TextStyle(
+                              color: Color(0xFF856404),
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(0.0, 17.0, 0.0, 0.0),
                   child: Form(
                     key: _model.formKey,

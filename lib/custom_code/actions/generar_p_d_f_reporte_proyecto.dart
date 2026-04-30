@@ -15,6 +15,7 @@ import 'index.dart'; // Imports other custom actions
 import '/custom_code/DBProyectos.dart';
 import '/custom_code/DBObjetivos.dart';
 import '/custom_code/DBControles.dart';
+import '/custom_code/DBControlAttachments.dart';
 import '/custom_code/sqlite_helper.dart';
 import '/custom_code/Proyecto.dart';
 import '/custom_code/Objetivo.dart';
@@ -314,52 +315,7 @@ pw.Widget _buildCampo(String etiqueta, String? valor, pw.Font fontBold) {
 
 Future<List<String>> _obtenerFotosSeguro(String idControl) async {
   try {
-    final db = await DBHelper.db;
-
-    final countResult = await db.rawQuery(
-      'SELECT COUNT(*) as cnt FROM ControlAttachments '
-      'WHERE id_control = ? AND attachment_type = ?',
-      [idControl, 'photo'],
-    );
-    final count = (countResult.first['cnt'] as int?) ?? 0;
-    if (count == 0) return [];
-
-    const chunkSize = 400000; // 400KB < 2MB límite Android
-    final List<String> fotos = [];
-
-    for (int i = 0; i < count; i++) {
-      try {
-        final lenResult = await db.rawQuery(
-          'SELECT length(attachment_data) as len FROM ControlAttachments '
-          'WHERE id_control = ? AND attachment_type = ? AND attachment_index = ?',
-          [idControl, 'photo', i],
-        );
-        if (lenResult.isEmpty) continue;
-        final totalLen = (lenResult.first['len'] as int?) ?? 0;
-        if (totalLen == 0) continue;
-
-        final buffer = StringBuffer();
-        int offset = 1;
-        while (offset <= totalLen) {
-          final chunkResult = await db.rawQuery(
-            'SELECT substr(attachment_data, ?, ?) as chunk '
-            'FROM ControlAttachments '
-            'WHERE id_control = ? AND attachment_type = ? AND attachment_index = ?',
-            [offset, chunkSize, idControl, 'photo', i],
-          );
-          if (chunkResult.isEmpty) break;
-          final chunk = chunkResult.first['chunk'] as String?;
-          if (chunk == null || chunk.isEmpty) break;
-          buffer.write(chunk);
-          offset += chunkSize;
-        }
-
-        final dato = buffer.toString();
-        if (dato.isNotEmpty) fotos.add(dato);
-      } catch (e) {
-      }
-    }
-    return fotos;
+    return await DBControlAttachments.obtenerPhotos(idControl);
   } catch (e) {
     return [];
   }

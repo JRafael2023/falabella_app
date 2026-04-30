@@ -327,6 +327,13 @@ Future cargarTodosLosDatosUsuario(String userId) async {
     List<dynamic> todosControlesJSON = [];
     int totalControles = 0;
 
+    final Map<String, String> objetivoAProyecto = {
+      for (final obj in todosObjetivosJSON)
+        if ((obj['id_objective']?.toString() ?? '').isNotEmpty &&
+            (obj['id_project']?.toString() ?? '').isNotEmpty)
+          obj['id_objective'].toString(): obj['id_project'].toString(),
+    };
+
     final idsObjetivos = todosObjetivosJSON
         .map((obj) => obj['id_objective']?.toString() ?? '')
         .where((id) => id.isNotEmpty)
@@ -372,6 +379,7 @@ Future cargarTodosLosDatosUsuario(String userId) async {
                   getJsonField(
                       apiControlWalk?.jsonBody ?? '', r'''$.data.data''', true)!,
                   idObjetivo,
+                  projectId: objetivoAProyecto[idObjetivo],
                 );
 
                 final controlesNuevos =
@@ -401,9 +409,11 @@ Future cargarTodosLosDatosUsuario(String userId) async {
                     .eq('id_objective', idObjetivo);
 
                 if (rows.isNotEmpty) {
-                  final controles = rows
-                      .map<Control>((row) => Control.fromSupabase(row))
-                      .toList();
+                  final controles = rows.map<Control>((row) {
+                    final c = Control.fromSupabase(row);
+                    c.projectId = objetivoAProyecto[idObjetivo];
+                    return c;
+                  }).toList();
                   await DBControles.insertControlesMasivos(controles, idObjetivo);
                   return await DBControles.listarControlesJson(idObjetivo);
                 }
